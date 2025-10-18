@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- resultType 는 반드시 정확하게 입력해야함 클래스급으로 오류남 -->
+<mapper namespace="ReservoVO">
+
+<select id="checkselectreserve" resultType="reserveVO">
+		select id ,reserve_day from reserve where id=#{id} and reserve_day=#{reserve_day} 		
+	</select>
+
+	<insert id="insertreserve">
+		INSERT INTO reserve
+		(id,onedayclass_name,onedayclass_price,reserve_day,reserve_info)
+		VALUES
+		(#{id},#{onedayclass_name},#{onedayclass_price},#{reserve_day},#{reserve_info})
+	</insert>
+
+	
+
+
+
+</mapper>

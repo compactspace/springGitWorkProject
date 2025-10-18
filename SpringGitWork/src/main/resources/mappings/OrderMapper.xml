@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="OrderDAO">
+
+    <!-- 1. 주문 기본 정보 저장 -->
+ <insert id="insertOrderInfo" useGeneratedKeys="true" keyProperty="orderInfoId">
+    INSERT INTO order_info (user_id, order_date)
+    VALUES (#{userCode}, NOW())
+</insert>
+
+    <!-- 2. 주문 상품 리스트 저장 -->
+    <insert id="insertOrderItems">
+        INSERT INTO order_item (order_info_id, product_id, product_name, quantity, price_per_unit)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{orderInfoId}, #{item.productId}, #{item.productName}, #{item.quantity}, #{item.pricePerUnit})
+        </foreach>
+    </insert>
+
+    <!-- 3. 주문자 정보 저장 -->
+    <insert id="insertOrderPerson">
+        INSERT INTO order_person (order_info_id, name, email, phone)
+        VALUES (#{orderInfoId}, #{name}, #{email}, #{phone})
+    </insert>
+
+
+
+	<select id="selectOrdersByDateWithPaging" parameterType="map" resultMap="orderPaymentResultMap">
+SELECT
+  oi.order_info_id,
+  oi.user_id,
+  op.name AS person_name,
+  op.email AS person_email,
+  op.phone AS person_phone,
+  oi2.product_id AS item_product_id,
+  oi2.product_name AS item_product_name,
+  oi2.quantity AS item_quantity,
+  oi2.price_per_unit AS item_price_per_unit,
+  p.payment_id,
+  p.order_info_id AS payment_order_info_id,
+  p.payment_number,
+  p.amount AS payment_amount,
+  p.payment_method,
+  p.created_at AS payment_created_at
+FROM
+  order_info oi
+JOIN order_item oi2 ON oi.order_info_id = oi2.order_info_id
+JOIN order_person op ON oi.order_info_id = op.order_info_id
+JOIN payment p ON oi.order_info_id = p.order_info_id
+WHERE
+  p.created_at BETWEEN #{startDate} AND #{endDate}
+ORDER BY
+  p.created_at DESC,
+  oi.order_info_id DESC
+LIMIT ${limit} OFFSET ${offset}
+
+
+</select>
+
+<!-- OrderItemDTO 매핑 분리 -->
+<resultMap id="orderItemResultMap" type="OrderItemDTO">
+  <id property="productId" column="item_product_id"/>
+  <result property="productName" column="item_product_name"/>
+  <result property="quantity" column="item_quantity"/>
+  <result property="pricePerUnit" column="item_price_per_unit"/>
+</resultMap>
+
+<!-- 최상위 resultMap -->
+<resultMap id="orderPaymentResultMap" type="OrderPaymentRequestDTO">
+
+  <association property="order" javaType="OrderRequestDTO">
+    <id property="orderInfoId" column="order_info_id"/>
+    <result property="userId" column="user_id"/>
+  
+
+    <association property="person" javaType="OrderPersonDTO">
+      <result property="name" column="person_name"/>
+      <result property="email" column="person_email"/>
+      <result property="phone" column="person_phone"/>
+    </association>
+
+    <!-- collection에서 별도의 resultMap 참조 -->
+    <collection property="items" ofType="OrderItemDTO" resultMap="orderItemResultMap"/>
+  </association>
+
+  <association property="payment" javaType="PaymentDTO">
+    <id property="paymentId" column="payment_id"/>
+    <result property="orderInfoId" column="payment_order_info_id"/>
+    <result property="paymentNumber" column="payment_number"/>
+    <result property="amount" column="payment_amount"/>
+    <result property="paymentMethod" column="payment_method"/>
+    <result property="createdAt" column="payment_created_at"/>
+  </association>
+
+</resultMap>
+
+
+
+
+
+
+</mapper>
+

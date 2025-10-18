@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+
+resultType 는 반드시 정확하게 입력해야함 클래스급으로 오류남
+ -->
+<mapper namespace="authVO">
+
+	<insert id="insertAuthnum" >
+		insert into AUTH values(#{authnumber},#{auth_check})  
+	</insert>
+	
+	
+	<delete id="deleteAuthnum">
+		delete from AUTH where AUTHNUMBER=#{authnumber}
+	</delete>
+
+
+
+
+
+
+</mapper>

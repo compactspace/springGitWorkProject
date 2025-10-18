@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- resultType 는 반드시 정확하게 입력해야함 클래스급으로 오류남 -->
+<mapper namespace="ReserveInfoVO">
+
+	<select id="checkreserinfo" resultType="Integer">
+		select count(*) from
+		reserveinfo where user_code=#{user_code} and openday=#{openday} and
+		onedayclass_num=#{onedayclass_num}
+	</select>
+	
+	<insert id="insertreserveinfo">
+		INSERT INTO reserveinfo
+		(onedayclass_num,merchant_uid,openday,user_code) VALUES
+		(#{onedayclass_num},#{merchant_uid},#{openday},#{user_code})
+	</insert>
+
+	<select id="myreserveinfo" parameterType="java.util.HashMap"
+		resultType="Map">
+		SELECT reservestatus,
+		reserveinfo_num,reserveinfo.onedayclass_num,openday,reserve_img ,
+		openday, merchant_uid,user.user_name ,user.user_tell
+		,onedayclass.onedayclass_price
+		,onedayclass.onedayclass_name,application_day from reserveinfo
+		INNER JOIN user on reserveinfo.user_code=user.user_code
+		INNER JOIN onedayclass ON
+		reserveinfo.onedayclass_num=onedayclass.onedayclass_num WHERE
+		user.user_code=#{user_code}
+
+	</select>
+
+	<update id="paystatusupdate" parameterType="java.util.HashMap">
+
+		UPDATE reserveinfo SET reservestatus='paycancel' WHERE
+		reserveinfo_num=#{reserveinfo_num}
+
+	</update>
+
+
+
+
+</mapper>

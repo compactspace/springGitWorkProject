@@ -1,0 +1,69 @@
+<!-- <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+<context:component-scan
+		base-package="com.spring.finall.aop" />
+		<context:property-placeholder
+		location="classpath:mappings/database.properties" />
+ <aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
+ 트랜젝션 관리 객체
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	@Transactional 어노테이션 처리
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	
+		<bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+	
+	Spring JDBC설정
+	<bean id="jdbcTemplate"
+		class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	classpath:sql-map-config.xml 객체화하기
+	<bean id="sqlsession"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="configLocation"
+			value="classpath:sql-map-config.xml"></property>
+	</bean>
+
+	생성된 bean=객체 sqlsession 을 가지고 SqlSessionTemplate 형 객체를 생성한다.
+	<bean class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlsession"></constructor-arg>
+	</bean>
+	
+	<aop:config>
+        <aop:advisor advice-ref="transactionManager" pointcut="execution(* com.spring.finall.aop.*.*(..))"/>
+    </aop:config>
+	
+	
+	
+	
+	
+	
+	<bean id="aspecttarget" class="com.spring.finall.aop.Ex01AspectTarget"/>
+   <bean id="aspect" class="com.spring.finall.aop.Ex01Aspect"/>
+ <bean id="transaction" class="com.spring.finall.aop.Transaction"/>
+	
+</beans>
+  -->

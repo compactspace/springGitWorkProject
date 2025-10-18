@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="OneDayClassVO">
+
+
+	<resultMap type="com.spring.finall.user.ReviewVO" id="review">
+		<result column="REVIEW_NUM" property="review_num" />
+		<result column="REVIEW_IMG" property="review_img" />
+		<result column="REVIEW_COMMENT" property="review_comment" />
+		<result column="REVIEW_CREATE_AT" property="review_create_at" />
+		<result column="REVIEW_NAME" property="review_name" />
+	</resultMap>	
+	
+	
+	
+
+	<resultMap type="com.spring.finall.user.OneDayClassVO"
+		id="onedayclass">
+		<result column="ONEDAYCLASS_NAME" property="onedayclass_name" />
+		<result column="ONEDAYCLASS_PRICE" property="onedayclass_price" />
+		<result column="ONEDAYCLASS_INFO" property="onedayclass_info" />
+		<result column="RESERVE_IMG" property="reserve_img" />
+		<result column="ONEDAYCLASS_NUM" property="onedayclass_num" />
+		<collection property="reivewvo" resultMap="review"></collection>
+
+	</resultMap>
+
+
+
+<select id="getReviewCount" parameterType="OneDayClassVO" resultType="int">
+    SELECT COUNT(*)
+    FROM onedayclass AS o
+    INNER JOIN review AS r ON o.onedayclass_num = r.onedayclass_num
+    WHERE o.onedayclass_name = #{onedayclass_name}
+</select>
+
+
+
+	<!-- review 테이블과 조인해보자. -->
+	<select id="getReview" parameterType="OneDayClassVO" resultMap="onedayclass">
+		SELECT * FROM onedayclass as o INNER JOIN review AS r ON
+		o.onedayclass_num=r.onedayclass_num  WHERE o.onedayclass_name=#{onedayclass_name} order  BY  review_create_at DESC LIMIT #{nextpage},4;
+	</select>
+
+<!-- 후.. jsp돌리고 프론트에서 처리하는게 거의 불가능해서 보조 마지막페이지 연산을 한다. 쿼리문은 같아도 목적이 다르다. -->
+	<select id="isEndpage" parameterType="OneDayClassVO" resultMap="onedayclass">
+		SELECT * FROM onedayclass as o INNER JOIN review AS r ON
+		o.onedayclass_num=r.onedayclass_num WHERE o.onedayclass_name=#{onedayclass_name} order BY  review_create_at DESC LIMIT #{nextpage},4;
+	</select>
+
+
+	<select id="selectOneDayClass" resultType="oneDayClassVO">
+		select * from
+		onedayclass where onedayclass_name=#{onedayclass_name}
+	</select>
+	
+	<select id="getOneOneDayClass" resultType="oneDayClassVO">
+		select * from
+		onedayclass where onedayclass_num=#{onedayclass_num}
+	</select>
+	
+
+	<select id="selectDayClassList" resultType="oneDayClassVO">
+		select * from onedayclass 
+	</select>
+
+
+
+</mapper>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ReceiptVO">
+
+<insert id="insertReceipt" >
+insert into receipt values(#{receipt_buyer_id},#{receipt_buyer_tel},#{receipt_buyer_addr},#{receipt_paid_amount},#{receipt_imp_uid},#{receipt_merchant_uid});
+</insert>
+		
+<delete id="deleteReceipt">
+
+delete from receipt where receipt_merchant_uid=#{receipt_merchant_uid}  and receipt_buyer_id=#{receipt_buyer_id}
+</delete>
+
+<!-- SELECT SUM(receipt_paid_amount) FROM receipt WHERE product_cod=#{product_cod} -->
+<select id="completequantity"  resultType="int">
+SELECT count(*) FROM receipt WHERE product_cod=#{amount}
+</select>
+
+ <select id="canclequantity" resultType="receiptVO">
+SELECT * FROM receipt where receipt_merchant_uid=#{receipt_merchant_uid}  and receipt_buyer_id=#{receipt_buyer_id}
+</select> 
+
+
+
+
+
+
+
+
+</mapper>

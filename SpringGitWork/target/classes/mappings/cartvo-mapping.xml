@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="CartVO">
+  
+     <!--일반상품 전용  --> 
+<select id="generalcartcheck" resultType="CartVO" >
+SELECT cart_id ,afterpay FROM cart WHERE product_cod=#{product_cod} AND user_code=#{user_code} and AFTERpay!='yes';
+</select>    
+  
+  <!--일반상품 전용  --> 
+  <insert id="generaladdcart" >
+insert into cart(id,product_cod,product_name,product_price,product_img,user_code) values(#{id},#{product_cod},#{product_name},#{product_price},#{product_img},#{user_code})
+</insert>
+   <!--일반상품 전용  --> 
+<update id="generalcartupdate" parameterType="CartVO">
+update cart  SET 
+
+cart_quantity=(select cart_quantity from cart where id=#{id} and product_cod=#{product_cod} and cart_id=#{cart_id} and afterpay='no')+1 WHERE cart_id=#{cart_id};
+</update>  
+  
+  
+   <!--일반상품 전용  --> 
+<update id="afgerpaycartupdate"  parameterType="java.util.HashMap">
+
+update cart  set afterpay='yes' WHERE cart_id=#{cart_id}
+</update>  
+  
+  <!-- 일반 상품 카트 버리기  -->
+  <delete id="dropgeneralcart" parameterType="CartVO">
+  delete from cart WHERE cart_id=#{cart_id}
+  </delete>
+	
+  
+  
+  <!-- 일반 상품 정보를 끌고오기  afterpay 컬럼 기준으로 장바구니에 노출여부를 가릴것임 -->
+  <select id="generalcartlist" resultType="cartVO">
+select * from cart where id=#{id} AND afterpay= 'no'
+</select>
+  
+  
+  <!-- 반 상품 전용 카트에서 + - 버튼 클릭시 수량 1 -1 씩 증감  -->
+  <update id="plusminus"  parameterType="CartVO">
+update cart  SET
+ cart_quantity
+ =(select cart_quantity from cart where user_code=#{user_code} and product_cod=#{product_cod} AND cart_id=#{cart_id})+#{plusminus} where cart_id=#{cart_id}; 
+</update> 
+
+ <!-- 반 상품 전용 카트에서 -1 로 인해 수량이 0 이되는데 그러면 테이블에 여전히 있다. delete를 위해 수량을 체크한다.  -->
+<select id="minusZeorcheck" resultType="CartVO" >
+select cart_quantity from cart where cart_id=#{cart_id}; 
+</select>
+
+<!-- 위 select id="minusZeorcheck" 에 의해 0이 확인되면 delete시작  -->
+<delete id="deleteZeorcart" parameterType="CartVO" >
+delete from cart where cart_id=#{cart_id}; 
+</delete>
+
+  
+  
+  
+  
+<!--레디스 특가 전용  -->  
+<insert id="addcart" >
+insert into cart(id,product_cod,product_name,product_price,product_img) values(#{id},#{product_cod},#{product_name},#{product_price},#{product_img})
+</insert>
+
+<!--레디스 특가 전용  --> 
+<update id="cartupdate" >
+
+update cart  set cart_quantity=(select cart_quantity from cart where id=#{id} and product_cod=#{product_cod} )+#{plusone} where id=#{id} and product_cod=#{product_cod} 
+</update>
+
+
+
+<select id="selectcart_id" resultType="cartVO">
+
+select cart_id from cart where id=#{id} and product_cod=#{product_cod}
+
+</select>
+
+
+
+<insert id="testaddcart" parameterType="String">
+insert into testcart(id) values(#{id})
+</insert>
+
+
+
+
+									
+<select id="cartlist" resultType="CartVO" parameterType="string">
+    select * from cart where id = #{userId}
+</select>
+
+
+<select id="check" resultType="cartVO">
+select cart_quantity  from cart where id=#{id} and product_cod=#{product_cod}
+</select>
+
+<select id="getupdateOne" resultType="cartVO" >
+ SELECT CART_QUANTITY FROM CART WHERE id=#{id} and product_cod=#{product_cod};
+</select>
+
+
+
+<update id="cartZeroupdate" >
+
+update cart  set cart_quantity=#{plusone} where id=#{id} and product_cod=#{product_cod} 
+</update>
+
+
+
+
+
+
+
+<select id="isZeorcheck" resultType="int" >
+select cart_quantity from cart where id=#{id} and product_cod=#{product_cod}
+</select>
+
+<update id="yesnoneZerodelete" >
+
+update cart  set cart_quantity=(select cart_quantity from cart where id=#{id} and product_cod=#{product_cod} )-#{plusone} where id=#{id} and product_cod=#{product_cod} 
+</update>
+
+<!-- <delete id="dropcart" parameterType="java.util.HashMap">
+delete from cart where id=#{id} and product_cod=#{code}
+</delete> -->
+
+<delete id="dropcart" parameterType="CartVO">
+delete from cart where id=#{id} and product_cod=#{product_cod}
+</delete>
+
+
+
+
+<delete id="afterpaydeletecart" parameterType="java.util.HashMap">
+delete from cart where cart_id=#{cart_id}
+</delete>
+
+
+
+</mapper>

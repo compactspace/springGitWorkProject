@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.finall.redis.controller.TestMyMapper">
+
+<select id="testproductlist3"  resultType="java.util.HashMap" >
+SELECT * FROM product 
+</select>
+
+
+<select id="testproductlist4" parameterType="int" resultType="java.util.HashMap" >
+SELECT product_quantity FROM product  WHERE product_cod=#{one} 
+</select>
+
+<!-- <update id="testproductlist5" parameterType="java.util.HashMap" timeout="6">
+update product set  product_quantity=#{product_quantity}-#{minus}  where product_cod=#{one}
+</update> -->
+
+<update id="testproductlist5" parameterType="java.util.HashMap" >
+update product set  product_quantity=#{product_quantity}-#{minus}  where product_cod=#{one} 
+</update>
+
+<select id="test1"  resultType="java.util.HashMap" timeout="6">
+SELECT * FROM test for update
+</select>
+
+<select id="test11"  resultType="java.util.HashMap" timeout="6">
+SELECT * FROM test2 for share
+</select>
+
+<select id="test2"  resultType="java.util.HashMap" timeout="6">
+SELECT * FROM test2 for update
+</select>
+
+<select id="test22"  resultType="java.util.HashMap" timeout="6">
+SELECT * FROM test for share
+</select>
+
+<delete id="del1" timeout="6">
+delete from product_history 
+</delete>
+
+<delete id="del2" parameterType="int" timeout="6">
+delete from product_history where product_no =#{one} 
+</delete>
+
+
+
+
+</mapper>

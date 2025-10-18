@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- resultType 는 반드시 정확하게 입력해야함 클래스급으로 오류남 -->
+<mapper namespace="OrderInfoVO">
+
+
+<!-- resultMap 는 조인 관계등을 설정 하는 태그이다.  -->
+
+
+
+
+<resultMap type="com.spring.finall.user.CartVO" id="CartVO">
+
+
+<result column="USER_CODE" property="user_code"></result>
+<result column="CART_ID" property="cart_id"></result>
+<result column="PRODUCT_COD" property="product_cod"></result>
+<result column="CART_QUANTITY" property="cart_quantity"></result>
+<result column="PRODUCT_NAME" property="product_name"></result>
+<result column="PRODUCT_PRICE" property="product_price"></result>
+<result column="PRODUCT_IMG" property="product_img"></result>
+</resultMap>
+
+<resultMap type="com.spring.finall.user.OrderInfoVO" id="OrderInfoVO">
+<result column="ORDERINFO_ID" property="orderinfo_id"></result>
+<result column="USER_CODE" property="user_code"></result>
+<result column="ORDERINFO_PAY" property="orderinfo_pay"></result>
+<collection property="cartvo" resultMap="CartVO" />
+</resultMap>
+
+
+
+
+
+	<!--일반 상품 결제현황 출력 -->
+	<select id="mypayinfo" parameterType="OrderInfoVO" resultMap="OrderInfoVO">
+	SELECT * FROM orderinfo AS o 
+inner JOIN  cart AS c ON o.cart_id=c.cart_id WHERE o.user_code=#{user_code};
+	</select>
+
+
+
+
+
+	<!-- 일반상품 -->
+	<select id="generalorderinfo" resultType="OrderInfoVO">
+		SELECT
+		cart_id
+		FROM
+		orderinfo
+		WHERE cart_id=(SELECT cart_id FROM cart WHERE
+		product_cod=#{product_cod} AND user_code=#{user_code})
+	</select>
+
+
+	<insert id="insertgeneralorderinfo"
+		parameterType="java.util.HashMap">
+		INSERT INTO orderinfo (cart_id, user_code)
+		VALUES (#{cart_id}, (SELECT DISTINCT(user_code) FROM cart WHERE
+		user_code=#{user_code}));
+	</insert>
+
+	<!--일반상품 -->
+	<update id="payupdategeneralorderinfo" parameterType="Integer">
+
+		update
+		orderinfo set orderinfo_pay='yes' where cart_id=#{cart_id}
+
+	</update>
+
+<!--일반 상품을 고객이 취소한뒤 페이 여부를 업데이트  -->
+<update id="paycanclegeneral" parameterType="Integer">
+
+		UPDATE  orderinfo set orderinfo_pay='no' , orderinfo_cancel_create= DATE_FORMAT(NOW(),'%Y-%m-%d %T') where cart_id=#{cart_id}
+
+	</update>
+
+
+
+
+	<!--레디스 특가 전용 -->
+	<insert id="insertorderinfo">
+		INSERT INTO orderinfo (cart_id, user_code) VALUES
+		(#{cart_id}, #{user_code})
+	</insert>
+
+
+	<!--레디스 특가 전용 -->
+	<update id="payupdate" parameterType="Integer">
+
+		update orderinfo set
+		orderinfo_pay='yes' where cart_id=#{cart_id}
+
+	</update>
+
+
+
+
+</mapper>

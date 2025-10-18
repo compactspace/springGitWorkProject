@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- resultType 는 반드시 정확하게 입력ㅓㅁ해야함 클래스급으로 오류남 으휴 적어주면 뭐하냐 시발 좀 주석단것좀봐라 -->
+<mapper namespace="ReserveMapper">
+
+
+	<select id="selectAvailableDaysInMonth"
+		parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+		r.id,
+		r.openday,
+		r.rest
+		FROM
+		reserverest AS r
+		WHERE
+		r.onedayclass_num = #{onedayclass_num}
+		AND DATE_FORMAT(r.openday, '%Y-%m') = #{searchMonth}
+	</select>
+
+
+	<select id="checkRestCnt" parameterType="java.util.Map"
+		resultType="int">
+		SELECT r.rest
+		FROM reserverest AS r
+		WHERE r.id = #{reserverest_id}
+	</select>
+
+<insert id="insertPayment" parameterType="java.util.HashMap" useGeneratedKeys="true" keyProperty="reserve_payment_id">
+    INSERT INTO reserve_payment (
+        merchant_uid,
+        price,
+        payment_method
+    ) VALUES (
+        #{merchant_uid},
+        #{price},
+        #{payment_method}
+    )
+</insert>
+
+
+
+
+<update id="decreaseRestIfAvailable" parameterType="java.util.HashMap">
+    UPDATE reserverest
+    SET rest = rest - 1
+    WHERE id = #{reserverest_id}
+      AND rest > 0
+</update>
+
+<update id="increaseRestOnCancel" parameterType="java.util.HashMap">
+    UPDATE reserverest
+    SET rest = rest + 1
+    WHERE id = #{reserverest_id}
+</update>
+
+
+
+	<insert id="insertreserveinfo" parameterType="java.util.HashMap" useGeneratedKeys="true" keyProperty="reserveinfo_num">
+    INSERT INTO reserveinfo
+        (merchant_uid, reserverest_id, reserve_payment_id, user_code, selectedDate,onedayclass_num)
+    VALUES
+        (#{merchant_uid}, #{reserverest_id}, #{reserve_payment_id}, #{user_code}, #{selectedDate},#{onedayclass_num})
+</insert>
+
+
+	<select id="checkreserinfo" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT
+	r.selectedDate
+FROM
+		reserveinfo AS r
+WHERE
+	user_code = #{user_code}
+	AND DATE_FORMAT(selectedDate, '%Y-%m') =#{searchMonth} 
+	</select>
+
+<insert id="insertApplicantInfo" parameterType="java.util.HashMap">
+    INSERT INTO onedayclass_applicantinfo (
+        user_code,
+        name,
+        phone,
+        email,
+        reserveinfo_num
+    ) VALUES (
+        #{user_code},
+        #{name},
+        #{phone},
+        #{email},
+        #{reserveinfo_num}
+        
+    )
+</insert>
+
+
+
+<select id="selectRecentReserveInfo" parameterType="java.util.HashMap" resultType="Map">
+  SELECT
+    *
+  FROM (
+    SELECT
+      *
+    FROM
+      reserve_payment AS rp
+    WHERE
+      DATE(rp.created_at) = CURRENT_DATE
+      OR rp.created_at >= CURRENT_DATE - INTERVAL 6 MONTH
+  ) AS recently_reserve_payment
+  INNER JOIN (
+    SELECT
+      *
+    FROM
+      reserveinfo AS r
+    WHERE
+      r.user_code = #{user_code}
+  ) AS recently_reserveinfo
+    ON recently_reserve_payment.merchant_uid = recently_reserveinfo.merchant_uid
+  INNER JOIN onedayclass_applicantinfo AS oa
+    ON recently_reserveinfo.reserveinfo_num = oa.reserveinfo_num
+  INNER JOIN onedayclass AS oc
+    ON oc.onedayclass_num = recently_reserveinfo.onedayclass_num
+  ORDER BY
+    recently_reserve_payment.created_at DESC
+  LIMIT #{limit} OFFSET #{offset}
+</select>
+
+
+
+
+
+	
+
+	<select id="myreserveinfo" parameterType="java.util.HashMap"
+		resultType="Map">
+		SELECT reservestatus,
+		reserveinfo_num,reserveinfo.onedayclass_num,openday,reserve_img ,
+		openday, merchant_uid,user.user_name ,user.user_tell
+		,onedayclass.onedayclass_price
+		,onedayclass.onedayclass_name,application_day from reserveinfo
+		INNER
+		JOIN user on reserveinfo.user_code=user.user_code
+		INNER JOIN
+		onedayclass ON
+		reserveinfo.onedayclass_num=onedayclass.onedayclass_num
+		WHERE
+		user.user_code=#{user_code}
+
+	</select>
+
+	<update id="paystatusupdate" parameterType="java.util.HashMap">
+
+		UPDATE reserveinfo
+		SET reservestatus='paycancel' WHERE
+		reserveinfo_num=#{reserveinfo_num}
+
+	</update>
+
+
+
+
+</mapper>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	<context:component-scan base-package="com.spring.finall">
+    <context:exclude-filter type="regex" expression="com\.spring\.finall\.admin(\..*)?" />
+</context:component-scan>
+
+	<mvc:annotation-driven />
+
+
+	<mvc:resources mapping="/resources/**" location="/resources/" />
+<mvc:default-servlet-handler />
+
+	<task:annotation-driven />
+
+
+    <!-- 인터셉터 등록 -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**" />
+            <bean class="com.spring.interceptor.SecurityLogInterceptor" />
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+
+ <!-- ViewResolver 추가 (중요) -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/views/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+
+
+
+	<!-- @Transactional 어노테이션 처리 -->
+	<tx:annotation-driven
+		transaction-manager="transactionManager" />
+
+	<!-- 트랜젝션 관리 객체 -->
+	<!-- dataSource 는 application.xml 에 있는 등록된 bean 이고 이름이 dataSource 인 sql 컨넥션풀객체임 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+</beans>

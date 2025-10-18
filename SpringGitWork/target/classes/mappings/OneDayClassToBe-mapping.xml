@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="OneDayClassToBe">
+
+	<select id="oneDayClassList" parameterType="java.util.Map"
+		resultType="oneDayClassVO">
+		select * from onedayclass
+		<where>
+			<if test=" onedayclass_num!=null and onedayclass_num!='' ">
+				and	onedayclass_num=#{onedayclass_num}
+			</if>
+
+		</where>
+		<if test=" onedayclass_num==null or onedayclass_num=='' ">
+			onedayclass limit 0,5
+		</if>
+
+	</select>
+	
+	<!--해당 클래스번호 리뷰에 대한 풀 사이즈 -->
+	<select id="getReviewSize" parameterType="java.util.Map" resultType="java.lang.Integer">
+		SELECT count(*) FROM review  WHERE onedayclass_num=#{onedayclass_num};
+	</select>	
+	
+	
+	<!-- <select id="getReview">
+		SELECT * FROM review  WHERE onedayclass_num=#{onedayclass_num} order  BY  review_create_at DESC LIMIT #{nextpage},4;
+	</select> -->
+	
+	
+	
+
+</mapper>

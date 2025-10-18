@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ProductVO">
+<!-- 이친구는 어따 쓰는지 모르것다. -->
+<select id="productlist" resultType="productVO">
+select * from product 
+</select>
+
+
+<!--일반상품 최초 링크 타고 들어오거나 부분로딩시 리턴값-->
+<select id="producGroupLlist" resultType="map">
+SELECT
+	p.product_img,
+	p.product_Registration_status,
+	p.product_info,
+	p.product_status,
+	p.product_id,
+	p.product_cod,
+	p.product_name,
+	p.product_group,
+	h.old_price,
+	h.new_price,
+	h.changed_at
+FROM
+	product p
+INNER JOIN product_price_history h ON
+	p.product_id = h.product_id
+INNER JOIN (
+	SELECT
+		product_id,
+		MAX(changed_at) AS max_changed_at
+	FROM
+		product_price_history
+	GROUP BY
+		product_id
+) latest ON
+	h.product_id = latest.product_id
+	AND h.changed_at = latest.max_changed_at
+WHERE
+	p.product_group = #{product_group}
+	AND h.old_price != h.new_price
+ORDER BY
+	p.product_id;
+
+
+</select>
+
+<!--  일반 상품 결제 이후 해당 제품 테이블의 주문 수량을 먼저 확인 -->
+<select id="checkOrderQuantity" parameterType="Integer" resultType="productVO">
+SELECT  product_quantity, product_order_quantity,product_delivery_quantity FROM product WHERE product_cod=#{product_cod}
+</select>
+
+<!-- 주문 수량을 먼저 확인했으니 이제 기존에 존재하던 주문수량에 요청받은 주문 수량을 더하자 -->
+<update id="updateQuantity" parameterType="java.util.HashMap">
+UPDATE product SET product_order_quantity=(SELECT product_order_quantity FROM product WHERE product_cod=#{product_cod})+#{product_order_quantity} WHERE product_cod=#{product_cod}
+</update> 
+
+<!-- 위   update id="updateQuantity" 가 실행된후 창고재고에서 주문받은 수량을 뺀 가재고 를 업데이트 해준다. -->
+<update id="updateDeliveryQuantity" parameterType="java.util.HashMap">
+UPDATE product SET product_delivery_quantity=(SELECT product_quantity FROM product WHERE product_cod=#{product_cod})-#{product_order_quantity}  WHERE product_cod=#{product_cod}
+</update>
+
+
+<!-- 결제취소니 상품테이블의 주문 컬럼을 빼준다. -->
+<update id="updateMinusQuantity" parameterType="java.util.HashMap">
+UPDATE product SET product_order_quantity=(SELECT product_order_quantity FROM product WHERE product_cod=#{product_cod})-#{product_order_quantity} WHERE product_cod=#{product_cod}
+</update> 
+
+<!-- 위   update id="updateMinusQuantity" 가 실행된후 창고재고에서 결제 취소니 취소 받은 수량만큼 더한다.-->
+<update id="updateMinusDeliveryQuantity" parameterType="java.util.HashMap">
+UPDATE product SET product_delivery_quantity=(SELECT product_delivery_quantity FROM product WHERE product_cod=#{product_cod})+#{product_order_quantity}  WHERE product_cod=#{product_cod}
+</update>
+
+<!--  update id="updateMinusQuantity" 는 수량만큼 더하기에  창고재고와 일치하게 되면 0으로 만들어주자.-->
+<select id="showDeliveryQuantity"  parameterType="java.util.HashMap" resultType="ProductVO">
+select product_delivery_quantity ,product_quantity from product WHERE product_cod=#{product_cod}
+</select>
+
+<!--  백단에서 product_quantity = product_delivery_quantity 일치하면 호출됨  창고재고와 일치하게 되면 0으로 만들어주자.-->
+<update id="zeroDeliveryQuantity" parameterType="java.util.HashMap">
+update product set product_delivery_quantity=0  WHERE product_cod=#{product_cod}
+</update>
+
+
+
+
+ <update id="completequantity" parameterType="java.util.HashMap" >
+
+update product set product_quantity=#{quantity} where product_cod=#{code} 
+</update>
+
+
+
+<!--  <update id="completequantity" parameterType="java.util.HashMap" >
+
+update product set product_quantity=#{quantity} where product_cod=#{code} 
+</update> -->
+
+
+<select id="testproductlist" parameterType="int" resultType="java.util.HashMap">
+SELECT product_quantity FROM product  WHERE product_cod=#{one} for update
+</select>
+
+
+
+<!-- <select id="testproductlist" parameterType="int" resultType="java.util.HashMap">
+SELECT product_quantity FROM product  WHERE product_cod=#{one} 
+</select>
+ -->
+
+
+<update id="testproductlist2" parameterType="java.util.HashMap">
+update product set  product_quantity=#{product_quantity}-#{minus}  where product_cod=#{one}
+</update>
+
+
+</mapper>
