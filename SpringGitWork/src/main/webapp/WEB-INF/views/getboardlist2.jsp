@@ -311,17 +311,7 @@ var backpage;
 var startbtn;
 var endbtn;
 	
-	window.onload=()=>{			
-		
-		$("td[class=title]").on("click",(e)=>{				
-			let seq=$(e.target)[0].getAttribute("value");
-			window.location.href="reading.jsp?seq="+seq;	
-		//제이쿼리 의 클릭이벤트속에서
-		//리턴 펠스는 상위 전파를 막아주는 기능이란다..
-		 return false ;		
-			
-		})		
-		
+	window.onload=()=>{		
 		
 		//개별 버튼 페이지 게시글
 		// select * from board limit  버튼태그 벨류, 10
