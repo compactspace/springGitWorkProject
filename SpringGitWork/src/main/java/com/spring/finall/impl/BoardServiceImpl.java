@@ -17,12 +17,7 @@ public class BoardServiceImpl implements BoardService {
 	private BoardDAObatis boardDAO;
 	
 	
-	
-	@Override
-	public List<BoardVO> getBoard(BoardVO vo, Integer startpage) {
-		return boardDAO.getBoard(vo,startpage);
-		
-	}
+
 	
 	@Override
 	public List<BoardVO> geteachbtnBoard(BoardVO vo) {

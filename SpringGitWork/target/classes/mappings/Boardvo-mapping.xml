@@ -80,34 +80,7 @@ delete from board where seq=#{seq}
 
 </delete>
 
-	<!-- AsIs Code -->
-	<select id="getBoard" parameterType="Integer"
-		resultType="boardVO">
-		SELECT * FROM BOARD
-		<choose>
-			<when test='isserch.equals("isserch")'>
-				<if test='keyword.equals("title")'>
-					where title like concat('%', #{serchvalue}, '%')
-				</if>
-				<if test='keyword.equals("content")'>
-					where content like concat('%', #{serchvalue}, '%')
-				</if>
-				<if test='keyword.equals("titleAndcontent")'>
-					where title like concat('%', #{serchvalue}, '%') or content like
-					concat('%', #{serchvalue}, '%')
-				</if>
 
-			</when>
-			<otherwise>
-
-			</otherwise>
-
-		</choose>
-
-
-		limit
-		#{startpage} , 10
-	</select>
 
 
 	<!-- 다음페이지 버튼 크릭후 진입 게시글 리스트 -->
@@ -212,10 +185,6 @@ delete from board where seq=#{seq}
 
 
 
-	<select id="firsttotalrow" resultType="Integer">
-		SELECT count(*) FROM
-		board;
-	</select>
 
 
 	<!-- SELECT MIN(seq) FROM (SELECT * FROM board where content LIKE '%만능%' 

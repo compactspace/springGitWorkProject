@@ -22,24 +22,6 @@ public class BoardController {
 	@Autowired
 	private BoardService boardservice;
 
-	//메뉴 바로 타고오는 최초 게시글 
-	@RequestMapping(value = "/firstgetboad.do")
-	public String getBoard(BoardVO vo, Model model, HttpServletRequest req) {
-		Integer startpage = Integer.parseInt(req.getParameter("startpage"));
-		System.out.println("리밋 절의 시작페이지 변수 값"+startpage);
-
-		List<BoardVO> firstboardlist = boardservice.getBoard(vo,startpage);
-		
-		
-//		for(BoardVO bvo : firstboardlist) {			
-//			System.out.println("bvo.getNextpage()->>"+bvo.getNextpage());			
-//		}
-		
-		model.addAttribute("boardlist", firstboardlist);
-	
-		return "getboardlist2.jsp";
-
-	}
 	
 	
 	

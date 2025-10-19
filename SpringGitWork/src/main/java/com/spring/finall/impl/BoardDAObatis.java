@@ -17,79 +17,7 @@ public class BoardDAObatis {
 	@Autowired
 	private SqlSessionTemplate mybatis;
 
-	//페이지 최초 진입
-	public List<BoardVO> getBoard(BoardVO vo, Integer startpage) {
-			
-		
-		//게시판만 있고 내용물이 없다면 mybatis.selectOne("BoardDAO.totalrow"); 널포인트 익셉션 발생하니
-		try {
-			Integer	totalrow=mybatis.selectOne("BoardDAO.firsttotalrow");
-			Integer quotient=totalrow/10;
-			Integer rest=totalrow%10;
-			Integer nextpage=0;
-			Integer backpage=-1;
-			Integer startbtn=0;
-			Integer endbtn=0;
-			Boolean flagendpage;
-			System.out.println("목은 "+quotient+"  나머지는 "+rest);
-			
-			if(quotient==0) {		
-				nextpage=0;
-				startbtn=0;
-				flagendpage=true;
-				
-			}else {
-				flagendpage=false;
-				if(quotient>5) {
-					nextpage=50;
-					startbtn=0;
-					endbtn=startbtn+4;
-					totalrow=totalrow-50;
-				}else {
-					
-					//1 그리고 3+1 
-					startbtn=0;
-					endbtn=startbtn+quotient;
-					flagendpage=true;
-				}
-				
-			}
-			
-			
-			
-			System.out.println("---- ----------------최초페이지 진입 연산후---------------------------");
-			System.out.println(
-					
-					"다음페이지 값"+nextpage+
-					" 이전페이지 값"+backpage+
-					" 시작 btn"+startbtn+
-					" 종료btn "+endbtn+
-					" 토탈로우 "+totalrow				
-					);	
-			
-			
-		
-			//---추가코드 구분선-----
-			//빌더 패턴을 적용하지 않아 이렇게라도 한다.
-			vo.setBtncounting(btncounting(vo));	
-			
-			List<BoardVO> list=mybatis.selectList("BoardDAO.getBoard",startpage);
-			list.get(0).setNextpage(nextpage);
-			list.get(0).setBackpage(backpage);
-			list.get(0).setStartbtn(startbtn);
-			list.get(0).setEndbtn(endbtn);
-			list.get(0).setTotalrow(totalrow);
-			list.get(0).setFlagendpage(flagendpage);
-			return list;
-			
-		}catch(Exception e) {
-			System.out.println(e);
-			return null;
-		}
-		
 
-	}
-	
 	
 	//각 버튼에 대한
 	

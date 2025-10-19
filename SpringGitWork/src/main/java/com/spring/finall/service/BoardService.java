@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.spring.finall.BoardVO;
 public interface BoardService {
 	
-	public abstract List<BoardVO> getBoard(BoardVO vo, Integer startpage);
+
 	
 	public abstract List<BoardVO> geteachbtnBoard(BoardVO vo);
 	
