@@ -78,8 +78,7 @@
 		<mapper resource="mappings/UserMapper.xml" />
 		<mapper resource="mappings/productvo-mapping.xml" />
 		<mapper resource="mappings/cartvo-mapping.xml" />
-		<mapper resource="mappings/Receipt-mapping.xml" />
-		<mapper resource="mappings/Boardvo-mapping.xml" />
+		<mapper resource="mappings/Receipt-mapping.xml" />	
 		<mapper resource="mappings/BoardinfoVO-mapping.xml" />
 
 		<mapper resource="mappings/AuthVO-mapping.xml" />
