@@ -78,12 +78,7 @@ public class CartServiceImpl implements CartService {
 		return cartdao.getupdateOne(vo);
 	}
 
-	@Override
-	public boolean dropcart(CartVO vo) {
 
-		return cartdao.dropcart(vo);
-
-	}
 
 	@Override
 	public void afterpaydeletecart(Integer cart_id) {

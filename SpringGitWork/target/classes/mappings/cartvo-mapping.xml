@@ -124,13 +124,8 @@ select cart_quantity from cart where id=#{id} and product_cod=#{product_cod}
 update cart  set cart_quantity=(select cart_quantity from cart where id=#{id} and product_cod=#{product_cod} )-#{plusone} where id=#{id} and product_cod=#{product_cod} 
 </update>
 
-<!-- <delete id="dropcart" parameterType="java.util.HashMap">
-delete from cart where id=#{id} and product_cod=#{code}
-</delete> -->
 
-<delete id="dropcart" parameterType="CartVO">
-delete from cart where id=#{id} and product_cod=#{product_cod}
-</delete>
+
 
 
 

@@ -37,7 +37,6 @@ public interface CartService {
     public abstract List<CartVO> getupdateOne(CartVO vo);
     
     
-    public abstract boolean dropcart(CartVO vo);
     
     public abstract void afterpaydeletecart(Integer cart_id);
     

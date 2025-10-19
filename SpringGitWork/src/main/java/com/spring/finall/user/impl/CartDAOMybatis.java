@@ -211,23 +211,7 @@ public class CartDAOMybatis {
 		return mybatis.selectList("CartVO.getupdateOne", vo);
 	}
 
-	public boolean dropcart(CartVO vo) {
 
-		int check = mybatis.delete("CartVO.dropcart", vo);
-
-		System.out.println("아이디값" + vo.getId());
-		System.out.println("코드값 +" + vo.getProduct_cod());
-
-		System.out.println("삭제시는 인트값은?" + check);
-
-		if (check >= 1) {
-			return true;
-
-		} else {
-			return false;
-		}
-
-	}
 
 	public void afterpaydeletecart(Integer cart_id) {
 
