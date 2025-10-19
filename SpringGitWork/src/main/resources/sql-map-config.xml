@@ -32,7 +32,7 @@
 			alias="memberVO" />
 		<typeAlias type="com.spring.finall.user.ReceiptVO"
 			alias="receiptVO" />
-		<typeAlias type="com.spring.finall.BoardVO" alias="boardVO" />
+	
 		<typeAlias type="com.spring.finall.BoardinfoVO"
 			alias="boardinfoVO" />
 

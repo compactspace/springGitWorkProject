@@ -32,8 +32,9 @@
 			alias="memberVO" />
 		<typeAlias type="com.spring.finall.user.ReceiptVO"
 			alias="receiptVO" />
-		<typeAlias type="com.spring.finall.BoardVO" alias="boardVO" />
 	
+		<typeAlias type="com.spring.finall.BoardinfoVO"
+			alias="boardinfoVO" />
 
 		<typeAlias type="com.spring.finall.AuthVO" alias="authnumVO" />
 		<typeAlias type="com.spring.finall.user.OneDayClassVO"
@@ -78,7 +79,7 @@
 		<mapper resource="mappings/productvo-mapping.xml" />
 		<mapper resource="mappings/cartvo-mapping.xml" />
 		<mapper resource="mappings/Receipt-mapping.xml" />	
-		
+		<mapper resource="mappings/BoardinfoVO-mapping.xml" />
 
 		<mapper resource="mappings/AuthVO-mapping.xml" />
 		<mapper resource="mappings/OneDayClassVO-mapping.xml" />
