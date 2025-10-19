@@ -249,15 +249,7 @@ public class AuthnumController {
 
 	}
 
-	// 핸드폰가입자 로그인시도시작
-	@RequestMapping(value = "/phonelogin.do")
-	public String phonelogin(UserVO vo, HttpSession session, HttpServletRequest req) throws Exception {
 
-		session.setAttribute("userId", vo.getId());
-		System.out.println("vo.getId()->>" + vo.getId());
-		return "worklist.jsp";
-
-	}//
 
 	// 단순 결제 인증
 	@RequestMapping(value = "/payforauthnum.do")
