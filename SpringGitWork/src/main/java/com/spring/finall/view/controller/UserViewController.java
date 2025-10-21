@@ -2,6 +2,7 @@ package com.spring.finall.view.controller;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import com.spring.finall.reqDto.orderRequest.OrderRequestDTO;
 import com.spring.finall.reqDto.payMentRequest.PaymentDTO;
 import com.spring.finall.reqDto.wrapperRequest.OrderPaymentRequestDTO;
 import com.spring.finall.security.UserDetailsVO2;
+import com.spring.finall.service.ArtworkService;
 import com.spring.finall.service.MemberService;
 import com.spring.finall.service.OneDayClassService;
 import com.spring.finall.service.OrderService;
@@ -50,6 +52,11 @@ public class UserViewController {
 	
 	@Autowired
 	private ReserveService reserveService;
+	
+	@Autowired
+	private ArtworkService  artworkService;
+	
+	
 	
 	// "가맹점 식별코드 값으로 설정"
 	public static final String IMPKEY = "imp77544746";
@@ -344,6 +351,30 @@ public class UserViewController {
 	
 		@RequestMapping("/get-free-write-gasigle")
 		public String showFreeWriteGasipanPage(@AuthenticationPrincipal UserDetailsVO2 userDetails, Model model) {
+			
+						
+			int userCode=userDetails.getUser_code();
+			
+			List<Map<String,Object>>  unfinishedDraftForUser	=artworkService.findDraftByUserCode(userCode);			
+			
+			if (unfinishedDraftForUser != null && !unfinishedDraftForUser.isEmpty()) {
+			    Map<String, Object> firstDraft = unfinishedDraftForUser.get(0);
+
+			  
+			    model.addAttribute("unfinishedDraftArtWorkText", firstDraft.get("artworks"));
+
+			    // artwork_images 가 없거나 null일 수도 있으니 널 체크
+			    Object images = firstDraft.get("artwork_images");
+			    if (images instanceof List) {
+			        model.addAttribute("unfinishedDraftArtWorkImages", images);
+			    } else {
+			        model.addAttribute("unfinishedDraftArtWorkImages", Collections.emptyList());
+			    }
+			}else {
+				
+				artworkService.insertDraftArtwork(userCode);
+				
+			}			
 			
 			
 			return "freeWriteGasiglePage/freeWriteGasiglePage";

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ArtworkMapper">
+
+	<select id="findDraftByUserCode" parameterType="int"
+		resultType="java.util.Map">
+		SELECT
+		a.id as id,
+		a.user_code as user_code,
+		a.title as title,
+		a.content as content,
+		a.is_draft as is_draft,
+		a.created_at as
+		created_at,
+		a.updated_at as updated_at,
+		ai.id as ai_id,
+		ai.artwork_id as
+		artwork_id,
+		ai.file_url as file_url,
+		ai.file_name as file_name,
+		ai.uploaded_at as uploaded_at
+		FROM artworks a
+		INNER JOIN artwork_images
+		ai ON a.id = ai.artwork_id
+		WHERE a.user_code = #{userCode}
+		AND
+		a.is_draft = TRUE
+	</select>
+
+
+	<insert id="insertDraftArtwork"
+		parameterType="com.spring.finall.user.ArtworkVO"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO artworks (user_code)
+		VALUES (#{userCode})
+	</insert>
+
+
+	<update id="updateArtWorkStatus"
+		parameterType="java.util.Map">
+		update artworks set is_draft = FALSE, content=#{content} where user_code= #{userCode}
+
+	</update>
+
+
+
+
+
+
+	<select id="currentDraftArtWorkId" parameterType="int"
+		resultType="int">
+		SELECT id FROM artworks WHERE user_code = #{userCode} AND is_draft = TRUE
+	</select>
+
+
+
+
+	<insert id="insertDraftArtworkImage" parameterType="Map">
+		insert into
+		artwork_images (artwork_id,file_url,file_name) values
+		(#{currentDraftArtWorkId},#{uploadDir},#{finalFileName})
+	</insert>
+
+<delete id="deleteArtWorkDraftImage" parameterType="Map">
+	DELETE FROM artwork_images 
+	WHERE artwork_id = #{currentDraftArtWorkId} 
+	  AND file_url = #{fordName} 
+	  AND file_name = #{fileName};
+</delete>
+
+
+</mapper>

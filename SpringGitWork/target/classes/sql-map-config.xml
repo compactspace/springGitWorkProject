@@ -32,8 +32,8 @@
 			alias="memberVO" />
 		<typeAlias type="com.spring.finall.user.ReceiptVO"
 			alias="receiptVO" />
-	
-	
+
+
 
 		<typeAlias type="com.spring.finall.AuthVO" alias="authnumVO" />
 		<typeAlias type="com.spring.finall.user.OneDayClassVO"
@@ -59,10 +59,23 @@
 			type="com.spring.finall.reqDto.orderRequest.OrderPersonDTO"
 			alias="OrderPersonDTO" />
 
-	<typeAlias
+		<typeAlias
 			type="com.spring.finall.reqDto.wrapperRequest.OrderPaymentRequestDTO"
 			alias="OrderPaymentRequestDTO" />
+
+
+
+		<typeAlias type="com.spring.finall.user.ArtworkVO"
+			alias="ArtworkVO" />
+		<typeAlias type="com.spring.finall.user.ArtworkImageVO"
+			alias="ArtworkImageVO" />
+
+
+
 	</typeAliases>
+
+
+
 
 
 
@@ -77,7 +90,7 @@
 		<mapper resource="mappings/UserMapper.xml" />
 		<mapper resource="mappings/productvo-mapping.xml" />
 		<mapper resource="mappings/cartvo-mapping.xml" />
-		<mapper resource="mappings/Receipt-mapping.xml" />	
+		<mapper resource="mappings/Receipt-mapping.xml" />
 
 		<mapper resource="mappings/AuthVO-mapping.xml" />
 		<mapper resource="mappings/OneDayClassVO-mapping.xml" />
@@ -86,6 +99,7 @@
 		<mapper resource="mappings/ReserveInfoVO-mapping.xml" />
 		<mapper resource="mappings/ReserveMapper.xml" />
 		<mapper resource="mappings/SecurityUserVO-mapping.xml" />
+<mapper resource="mappings/ArtworkMapper.xml" />
 
 
 		<mapper resource="mappings/OrderMapper.xml" />

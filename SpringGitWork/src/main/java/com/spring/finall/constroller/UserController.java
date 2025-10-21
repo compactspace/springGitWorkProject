@@ -1,6 +1,10 @@
 package com.spring.finall.constroller;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,27 +20,34 @@ import javax.validation.Valid;
 import org.aspectj.lang.annotation.Aspect;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.finall.apiResponseController.ApiResponse;
+import com.spring.finall.businessresult.ArtWorkImagesDeleteResult;
 import com.spring.finall.businessresult.CheckCurrentPwdResult;
 import com.spring.finall.businessresult.SmsSendResult;
+import com.spring.finall.exception.artworkexception.ArtWorkCompleteException;
 import com.spring.finall.impl.SmsServiceRedisDao;
 import com.spring.finall.impl.WorkServcieRedisDao;
-import com.spring.finall.importutil.ImportUtil;
 import com.spring.finall.redisutil.RedisUtil;
 import com.spring.finall.reqDto.orderRequest.OrderRequestDTO;
 import com.spring.finall.reqDto.payMentRequest.PaymentDTO;
@@ -45,11 +56,11 @@ import com.spring.finall.reqDto.writeWorkComment.WorkCommentDTO;
 import com.spring.finall.security.SecurityUserVO;
 import com.spring.finall.security.SecurityUserVOService;
 import com.spring.finall.security.UserDetailsVO2;
+import com.spring.finall.service.ArtworkService;
 import com.spring.finall.service.MemberService;
 import com.spring.finall.service.OneDayClassService;
 import com.spring.finall.service.OrderService;
 import com.spring.finall.service.ReserveService;
-import com.spring.finall.service.SendMessageApiService;
 import com.spring.finall.service.SmsService;
 import com.spring.finall.service.WorkService;
 import com.spring.finall.user.CartService;
@@ -59,8 +70,6 @@ import com.spring.finall.user.OrderInfoService;
 import com.spring.finall.user.OrderInfoVO;
 import com.spring.finall.user.PayService;
 import com.spring.finall.user.PayVO;
-import com.spring.finall.user.ProductService;
-import com.spring.finall.user.ReserveRestVOService;
 import com.spring.finall.user.UserVO;
 
 @Aspect
@@ -92,23 +101,17 @@ public class UserController {
 	public static final String IMPKEY = "imp77544746";
 
 	@Autowired
-	private SendMessageApiService sendmessageservice;
+	private SmsService smsService;
 
 	@Autowired
-	private SmsService smsService;
-	
-	@Autowired
 	private SmsServiceRedisDao smsServiceDao;
-	
+
 	@Autowired
 	private WorkServcieRedisDao workServiceRedisDao;
 
 	boolean PASSWORDCHANGE;
 
 	// 서비스호출위해 자동주입
-
-	@Autowired
-	private ImportUtil importutil;
 
 	@Autowired
 	private RedisTemplate<String, String> redisTemplate;
@@ -123,16 +126,10 @@ public class UserController {
 	private ReserveService reserveService;
 
 	@Autowired
-	private ReserveRestVOService reserveRestServie;
-
-	@Autowired
 	private WorkService workService;
 
 	@Autowired
 	private CartService cartService;
-
-	@Autowired
-	private ProductService protService;
 
 	@Autowired
 	private MemberService memberService;
@@ -149,7 +146,8 @@ public class UserController {
 	@Autowired
 	private OrderService orderService;
 
-
+	@Autowired
+	private ArtworkService artworkService;
 
 	@RequestMapping(value = "/403", method = { RequestMethod.GET, RequestMethod.POST })
 	public String error403() {
@@ -161,7 +159,7 @@ public class UserController {
 	@ResponseBody
 	public ApiResponse<Boolean> processPayment(@RequestBody OrderPaymentRequestDTO OrderPaymentRequestDTO,
 			@AuthenticationPrincipal UserDetailsVO2 user) {
-		
+
 		int userCode = user.getUser_code();
 
 		OrderRequestDTO orderRequestDTO = OrderPaymentRequestDTO.getOrder();
@@ -226,7 +224,7 @@ public class UserController {
 	@ResponseBody
 	public ApiResponse<SmsSendResult> requestSmsCode(@AuthenticationPrincipal UserDetailsVO2 userDetails,
 			HttpServletRequest req, @RequestParam("phone") String phone, Model model) {
-	
+
 		String userId = userDetails.getId();
 
 		// 서비스에 위임
@@ -262,7 +260,8 @@ public class UserController {
 	@PostMapping("/verify-sms-code")
 	@ResponseBody
 	public ApiResponse<SmsSendResult> verifySmsCode(@AuthenticationPrincipal UserDetailsVO2 userDetails,
-			HttpServletRequest req, @RequestParam("code") String inputCode, @RequestParam("token") String token,Model model) {
+			HttpServletRequest req, @RequestParam("code") String inputCode, @RequestParam("token") String token,
+			Model model) {
 
 		String userId = userDetails.getId();
 		HttpSession session = req.getSession();
@@ -271,81 +270,56 @@ public class UserController {
 		// 결과에 따라 반환 (문자 발송 성공시 token 반환, 아니면 상태 문자열)
 		if (smsSendResult.isSuccess()) {
 			model.addAttribute("smsVerified", true);
-			return ApiResponse.<SmsSendResult>builder().code(201).success(true).message("인증이 완료되었습니다.").data(smsSendResult)
-					.build();
+			return ApiResponse.<SmsSendResult>builder().code(201).success(true).message("인증이 완료되었습니다.")
+					.data(smsSendResult).build();
 		} else {
 			return ApiResponse.<SmsSendResult>builder().code(201).success(true).message("인증 실패").data(smsSendResult)
 					.build();
 		}
 	}
-	
-	
-	
-	
-	
-	//코멘트
+
+	// 코멘트
 	@RequestMapping(value = "/write-work-comments", produces = "application/json; charset=UTF-8")
 	@ResponseBody
-	public ResponseEntity<Map<String,Object>> writeWorkComments(
-	        @Valid WorkCommentDTO workCommentDTO,
-	        BindingResult bindingResult,
-	        @AuthenticationPrincipal UserDetailsVO2 userDetail,
-	        Model model, HttpServletRequest req) {
+	public ResponseEntity<Map<String, Object>> writeWorkComments(@Valid WorkCommentDTO workCommentDTO,
+			BindingResult bindingResult, @AuthenticationPrincipal UserDetailsVO2 userDetail, Model model,
+			HttpServletRequest req) {
 
-	    int userCode = userDetail.getUser_code();
+		int userCode = userDetail.getUser_code();
 
-	    Map<String,Object> map = new HashMap<>();
-	    if (bindingResult.hasErrors()) {
-	        String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
-	        map.put("falseCauz", "댓글달 내용이 없습니다.");
-	        return ResponseEntity
-	                .badRequest()
-	                .header("Content-Type", "application/json; charset=UTF-8")
-	                .body(map);
-	    }
-	    
-	    
-	    
-	   Map<Object,Object> dangerousUser=workServiceRedisDao.getAttemptCntDangerousUser(userCode);
-	   if(dangerousUser!=null&& !dangerousUser.isEmpty()) {
-		   	map.put("success", false);
-	        map.put("falseCauz", "해당 댓글 서비스를 이용할 수 없습니다. 서비스 이용에 제한되었습니다 관리자에게 문의해주세요");
-		   return ResponseEntity
-				   		.ok()
-	                .header("Content-Type", "application/json; charset=UTF-8")
-	                .body(map);
-	   }
-	   
-	    Long  attemptCnt=  workServiceRedisDao.getAttemptCntCommentWrite(workCommentDTO, userCode);
-	    
-	    if(attemptCnt>=3) {
-	    	 	map.put("success", false);
-		        map.put("falseCauz", "너무 빠른삽입입니다.");
-	    	return ResponseEntity
-	    			.ok()
-	                .header("Content-Type", "application/json; charset=UTF-8")
-	                .body(map);	    	
-	    } 
-	    
-	    
-	    Long commentId = workService.writeWorkComment(workCommentDTO, userCode);
+		Map<String, Object> map = new HashMap<>();
+		if (bindingResult.hasErrors()) {
+			String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
+			map.put("falseCauz", "댓글달 내용이 없습니다.");
+			return ResponseEntity.badRequest().header("Content-Type", "application/json; charset=UTF-8").body(map);
+		}
 
-	    if (commentId != null && commentId > 0) {
-	        map.put("success", true);
-	        map.put("commentId", commentId);
-	        return ResponseEntity
-	                .ok()
-	                .header("Content-Type", "application/json; charset=UTF-8")
-	                .body(map);
-	    } else {
-	        map.put("success", false);
-	        return ResponseEntity
-	                .ok()
-	                .header("Content-Type", "application/json; charset=UTF-8")
-	                .body(map);
-	    }
-	}	
-	
+		Map<Object, Object> dangerousUser = workServiceRedisDao.getAttemptCntDangerousUser(userCode);
+		if (dangerousUser != null && !dangerousUser.isEmpty()) {
+			map.put("success", false);
+			map.put("falseCauz", "해당 댓글 서비스를 이용할 수 없습니다. 서비스 이용에 제한되었습니다 관리자에게 문의해주세요");
+			return ResponseEntity.ok().header("Content-Type", "application/json; charset=UTF-8").body(map);
+		}
+
+		Long attemptCnt = workServiceRedisDao.getAttemptCntCommentWrite(workCommentDTO, userCode);
+
+		if (attemptCnt >= 3) {
+			map.put("success", false);
+			map.put("falseCauz", "너무 빠른삽입입니다.");
+			return ResponseEntity.ok().header("Content-Type", "application/json; charset=UTF-8").body(map);
+		}
+
+		Long commentId = workService.writeWorkComment(workCommentDTO, userCode);
+
+		if (commentId != null && commentId > 0) {
+			map.put("success", true);
+			map.put("commentId", commentId);
+			return ResponseEntity.ok().header("Content-Type", "application/json; charset=UTF-8").body(map);
+		} else {
+			map.put("success", false);
+			return ResponseEntity.ok().header("Content-Type", "application/json; charset=UTF-8").body(map);
+		}
+	}
 
 	public String addredis(HttpServletRequest req) {
 		redisutil.RedisAllSerializer();
@@ -498,8 +472,6 @@ public class UserController {
 
 	}
 
-
-
 	// 일반 상품 장바구니에서 수량 + - 하는 함수
 	@RequestMapping(value = "/plusminus.do")
 	@ResponseBody
@@ -567,7 +539,6 @@ public class UserController {
 
 	// 회원가입 시작! 바로위 아작스 처리후 주석 해제할것
 	// 여기 url에서 새로고침하면 자꾸 데이터들어감 우찌 고치냐
-	
 
 //바로 밑에 있는 로그인 시도 login 메소드를 도와주는  일반 메소드로
 //아이디있는지 없는지 를 먼저 판별하게 해준다.
@@ -662,7 +633,6 @@ public class UserController {
 
 //  개인정보수정중  원래비밀번호먼저확인하기 아작스
 
-
 	// 비밀번호 변경 아작스 !
 	// 네임값도 겹치니 그냥 아작스로 처리
 	@RequestMapping(value = "/changepassword.do")
@@ -724,12 +694,6 @@ public class UserController {
 
 	}
 
-
-
-
-
-
-
 	// 결제현황
 	@RequestMapping(value = "/mypayinfo.do")
 	public String mypayinfo(PayVO pvo, Model model, HttpSession session) {
@@ -769,9 +733,6 @@ public class UserController {
 
 	}
 
-	
-	
-	
 //  참고
 	@RequestMapping(value = "/checkpassword")
 	@ResponseBody
@@ -784,21 +745,21 @@ public class UserController {
 
 		if (attemptCnt >= 3) {
 			smsServiceDao.removeVerified(userId);
-			CheckCurrentPwdResult checkCurrentPwdResult= new CheckCurrentPwdResult(attemptCnt,false);
-			return ApiResponse.<CheckCurrentPwdResult>builder().code(201).success(true).message("3회 초과하였습니다." + "" + "관리자에게 문의 바랍니다.")
-					.data(checkCurrentPwdResult).build();
+			CheckCurrentPwdResult checkCurrentPwdResult = new CheckCurrentPwdResult(attemptCnt, false);
+			return ApiResponse.<CheckCurrentPwdResult>builder().code(201).success(true)
+					.message("3회 초과하였습니다." + "" + "관리자에게 문의 바랍니다.").data(checkCurrentPwdResult).build();
 		}
 
 		userVO.setId(userId);
 		String HahsedPwd = memberService.getHashedPassword(userVO);
 
 		if (HahsedPwd == null) {
-			
+
 			memberService.incrementPasswordFailCount(userId);
 			attemptCnt = memberService.isPasswordFailLimitExceeded(userId); // 증가된 값 반영
-			CheckCurrentPwdResult checkCurrentPwdResult= new CheckCurrentPwdResult(attemptCnt,false);
-			return ApiResponse.<CheckCurrentPwdResult>builder().code(201).success(true).message("비밀번호가 일치하지 않습니다.").data(checkCurrentPwdResult)
-					.build();
+			CheckCurrentPwdResult checkCurrentPwdResult = new CheckCurrentPwdResult(attemptCnt, false);
+			return ApiResponse.<CheckCurrentPwdResult>builder().code(201).success(true).message("비밀번호가 일치하지 않습니다.")
+					.data(checkCurrentPwdResult).build();
 		}
 
 		String currentUnHashPwd = userVO.getPassword();
@@ -806,47 +767,199 @@ public class UserController {
 		System.out.println("ispasswrodback->>>>>>>>>>" + checkpassword);
 
 		if (checkpassword) {
-			CheckCurrentPwdResult checkCurrentPwdResult= new CheckCurrentPwdResult(attemptCnt,true);
-			return ApiResponse.<CheckCurrentPwdResult>builder().code(201).success(true).message("비밀번호가 확인되었습니다.").data(checkCurrentPwdResult).build();
+			CheckCurrentPwdResult checkCurrentPwdResult = new CheckCurrentPwdResult(attemptCnt, true);
+			return ApiResponse.<CheckCurrentPwdResult>builder().code(201).success(true).message("비밀번호가 확인되었습니다.")
+					.data(checkCurrentPwdResult).build();
 
 		} else {
-			 memberService.incrementPasswordFailCount(userId);
-			 attemptCnt = memberService.isPasswordFailLimitExceeded(userId); // 증가된 값 반영
-			 CheckCurrentPwdResult checkCurrentPwdResult= new CheckCurrentPwdResult(attemptCnt,false);
-			return ApiResponse.<CheckCurrentPwdResult>builder().code(201).success(true).message("비밀번호가 일치하지 않습니다.").data(checkCurrentPwdResult)
-					.build();
+			memberService.incrementPasswordFailCount(userId);
+			attemptCnt = memberService.isPasswordFailLimitExceeded(userId); // 증가된 값 반영
+			CheckCurrentPwdResult checkCurrentPwdResult = new CheckCurrentPwdResult(attemptCnt, false);
+			return ApiResponse.<CheckCurrentPwdResult>builder().code(201).success(true).message("비밀번호가 일치하지 않습니다.")
+					.data(checkCurrentPwdResult).build();
 		}
 
 	}
+
 	@RequestMapping(value = "/onedayclass-applicant")
 	@ResponseBody
-	public Object onedayclassApplicant(@AuthenticationPrincipal UserDetailsVO2 userDetails, @RequestParam Map<String, Object> paramMap) {
+	public Object onedayclassApplicant(@AuthenticationPrincipal UserDetailsVO2 userDetails,
+			@RequestParam Map<String, Object> paramMap) {
 		String userId = userDetails.getId();
-		int user_code = userDetails.getUser_code();		
-		   // ✅ merchant_uid 생성
-	    String merchant_uid = "order_" + userId + "_" + System.currentTimeMillis();
+		int user_code = userDetails.getUser_code();
+		// ✅ merchant_uid 생성
+		String merchant_uid = "order_" + userId + "_" + System.currentTimeMillis();
 
-	    // ✅ paramMap에 추가
-	    paramMap.put("merchant_uid", merchant_uid);
-	    paramMap.put("user_code", user_code);
-	    paramMap.put("payment_method", "Credit Card");
-	   
-	
-		
+		// ✅ paramMap에 추가
+		paramMap.put("merchant_uid", merchant_uid);
+		paramMap.put("user_code", user_code);
+		paramMap.put("payment_method", "Credit Card");
+
 		try {
 			reserveService.makeReservation(paramMap);
-			
+
 			return ApiResponse.<Boolean>builder().code(201).success(true).message("결제 성공").data(true).build();
 		} catch (Exception e) {
 			System.err.println("[ERROR] 예약 결제중 예외 발생 환불 API호출!!: " + e.getMessage());
-			
+
 			return ApiResponse.<Boolean>builder().code(500).success(false).message("결제 실패").data(false).build();
-		}	
-		
-		
+		}
+
 	}
+
+	@PostMapping("/uploadImage")
+	@ResponseBody
+	public Map<String, Object> artWorkDraftUploadImage(@RequestParam("file") MultipartFile file,
+			@AuthenticationPrincipal UserDetailsVO2 userDetails) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		// 🔹 파일 비어있는지 확인
+		if (file.isEmpty()) {
+			map.put("success", false);
+			map.put("status", 400);
+			return map;
+		}
+
+		int userCode = userDetails.getUser_code();
+		Map<String, Object> executeQueryInfo = artworkService.artWorkDraftUploadImage(userCode, file);
+
+		Object successObj = executeQueryInfo.get("success");
+
+		boolean success = false;
+
+		if (successObj instanceof Boolean) {
+			success = (Boolean) successObj;
+		} else if (successObj instanceof String) {
+			success = Boolean.parseBoolean((String) successObj);
+		}
+
+		if (success) {
+			map.put("success", true);
+			map.put("status", 200);
+			map.put("folder", "/userArtwork/");
+			map.put("fileName", executeQueryInfo.get("finalFileName"));
+		} else {
+			map.put("success", false);
+			map.put("status", 500);
+		}
+
+		return map;
+
+	}
+
+	@PostMapping("/delete-draft-image")
+	@ResponseBody
+	public ApiResponse<ArtWorkImagesDeleteResult> artWorkDraftDeleteImage(
+			@AuthenticationPrincipal UserDetailsVO2 userDetails, @RequestParam("folder") String folder,
+			@RequestParam("fileName") String fileName
+
+	) {
+
+		int userCode = userDetails.getUser_code();
+
+		if (folder == null || fileName == null || (!folder.equals("/userArtwork/") )) {
+
+			return ApiResponse.<ArtWorkImagesDeleteResult>builder().code(403).success(false).message("폴더 접근권한 없음")
+					.data(null).build();
+
+		}
+
+		if (!fileName.startsWith(userCode + "_")) {
+			return ApiResponse.<ArtWorkImagesDeleteResult>builder().code(403).success(false).message("사진 접근권한 없음")
+					.data(null).build();
+
+		}
+
+		Map<String, Object> executeQueryInfo = artworkService.deleteArtWorkDraftImage(userCode, folder, fileName);
+
+		boolean fileDeleteStauts = (boolean) executeQueryInfo.get("delte-status");
+
+		if (fileDeleteStauts) {
+			// ApiResponse.<Boolean>builder().code(201).success(true).message("결제
+			// 성공").data(true).build();
+
+			ArtWorkImagesDeleteResult artImageDeleteResult = new ArtWorkImagesDeleteResult(204, true);
+
+			return ApiResponse.<ArtWorkImagesDeleteResult>builder().code(204).success(true).message("결제 성공")
+					.data(artImageDeleteResult).build();
+
+		} else {
+			ArtWorkImagesDeleteResult artImageDeleteResult = new ArtWorkImagesDeleteResult(201, false,
+					(String) executeQueryInfo.get("faile-reason"));
+
+			return ApiResponse.<ArtWorkImagesDeleteResult>builder().code(500).success(false).message("결제 성공")
+					.data(artImageDeleteResult).build();
+		}
+
+	}
+
+	@GetMapping("/get-draft-image")
+	public ResponseEntity<Resource> servePrivateDraftImage(@RequestParam("folder") String folder, // ex: /userArtwork/
+			@RequestParam("name") String fileName, @AuthenticationPrincipal UserDetailsVO2 userDetails) {
+		try {
+			// ✅ 보안 상 폴더 경로 정규화 방어
+			if (folder.contains("..") || folder.contains("\\") || !folder.startsWith("/")) {
+				return ResponseEntity.badRequest().build();
+			}
+
+			// ✅ 서버 내부 절대 경로 설정
+			String rootBaseDir = "C:/"; // 또는 환경변수로 뺄 수도 있음
+			String fullPath = rootBaseDir + folder + fileName;
+			Path filePath = Paths.get(fullPath).normalize();
+
+			// ✅ 사용자 소유 파일인지 검증 (ex: 파일명이 userCode로 시작)
+			int userCode = userDetails.getUser_code();
+			if (!fileName.startsWith(userCode + "_")) {
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
+
+			if (!Files.exists(filePath)) {
+				return ResponseEntity.notFound().build();
+			}
+
+			// 이 시점까지는 파일 스트림이 열리지 않은 상태입니다.
+			// 아래 UrlResource 객체 생성은 단순히 파일 위치 정보를 갖는 객체를 만드는 것일 뿐, 스트림을 열지 않습니다.
+			Resource resource = new UrlResource(filePath.toUri());
+
+			// 파일의 MIME 타입을 검사합니다.
+			String contentType = Files.probeContentType(filePath);
+			if (contentType == null)
+				contentType = "application/octet-stream";
+
+			// 아래 ResponseEntity를 반환하는 순간,
+			// Spring 내부에서 HTTP 응답을 처리할 때 resource.getInputStream()이 호출되어
+			// **여기서부터 파일 스트림이 열리고, 클라이언트로 데이터 전송이 시작됩니다.**
+			// public class ResourceHttpMessageConverter 클래스의 protected void writeContent
+			// 메서드에서 톰캣 응답스트림과, 파일객체의 스트림을 적절히 결합한다.
+			// 전송이 완료되면 스트림은 자동으로 닫힙니다.
+			return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
+	@PostMapping("/draft-artwork-complete")
+	@ResponseBody
+	public ApiResponse<ArtWorkImagesDeleteResult> completeDraftArtWork(@RequestParam("content") String content,
+			@AuthenticationPrincipal UserDetailsVO2 userDetails) {
+		
+		int userCode=userDetails.getUser_code();		
+
+		try {
+			Map<String, Object> executeQueryInfo = artworkService.completeDraftArtWork(content, userCode);
+			
+		return	ApiResponse.<ArtWorkImagesDeleteResult>builder().code(201).success(true)
+			.message("별탈없이 DB에 작업물이 저장됨").data(null).build();
+			
+		} catch (ArtWorkCompleteException e) {
+
+			return ApiResponse.<ArtWorkImagesDeleteResult>builder().code(e.getBussinessCode()).success(false)
+					.message(e.getBussinessExceptionMessage()).data(null).build();
+
+		}
+
 	
-	
-	
-	
+	}
+
 }
