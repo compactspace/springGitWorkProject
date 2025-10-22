@@ -126,6 +126,8 @@ WHERE work_id=#{work_id}
   LIMIT #{limit} OFFSET #{offset}
 </select>
 
+
+<!--  foreach 구문은 그저 where   parent_id IN (1,2,3,4)  이다.-->
 <select id="selectChildrenByParentIds" resultType="map" parameterType="list">
   SELECT *
   FROM work_comment

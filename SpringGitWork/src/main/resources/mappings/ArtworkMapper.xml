@@ -21,7 +21,7 @@
 		ai.file_name as file_name,
 		ai.uploaded_at as uploaded_at
 		FROM artworks a
-		INNER JOIN artwork_images
+		LEFT JOIN artwork_images
 		ai ON a.id = ai.artwork_id
 		WHERE a.user_code = #{userCode}
 		AND
@@ -39,7 +39,7 @@
 
 	<update id="updateArtWorkStatus"
 		parameterType="java.util.Map">
-		update artworks set is_draft = FALSE, content=#{content} where user_code= #{userCode}
+		update artworks set is_draft = FALSE, content=#{content} where user_code= #{userCode} and id=#{id}
 
 	</update>
 
@@ -62,12 +62,92 @@
 		(#{currentDraftArtWorkId},#{uploadDir},#{finalFileName})
 	</insert>
 
-<delete id="deleteArtWorkDraftImage" parameterType="Map">
+<delete id="deleteArtWorkDraftImage"   parameterType="Map">
 	DELETE FROM artwork_images 
 	WHERE artwork_id = #{currentDraftArtWorkId} 
 	  AND file_url = #{fordName} 
 	  AND file_name = #{fileName};
 </delete>
+
+
+
+
+<select id="getArtWorkList" parameterType="java.util.Map" resultType="java.util.Map" >
+
+	SELECT
+	a.title,
+	ai.artwork_id,
+	ai.file_url,
+	ai.file_name,
+	a.created_at
+	
+	FROM
+	artworks AS a
+	INNER JOIN artwork_images AS ai
+
+	ON
+	a.id = ai.artwork_id
+
+	group by a.id
+
+	order by a.created_at desc
+
+	limit #{offset} ,#{limit}
+
+</select>
+
+
+<select id="getArtWorkDetail" parameterType="int" resultType="java.util.Map" >
+
+	SELECT
+	
+	a.title,
+	a.content,
+	ai.artwork_id,
+	ai.file_url,
+	ai.file_name,
+	a.created_at
+	
+	FROM
+	artworks AS a
+	INNER JOIN artwork_images AS ai
+
+	ON
+	a.id = ai.artwork_id
+
+	where ai.artwork_id=#{artWorkId}
+	
+	group by ai.artwork_id
+
+</select>
+
+
+
+
+<select id="flatTopCommentPagedParents" resultType="map" parameterType="map">
+  SELECT *
+  FROM artwork_comment
+  WHERE parent_comment_id IS NULL AND artwork_id = #{artworkId}
+  ORDER BY artwork_comment_id
+  LIMIT #{limit} OFFSET #{offset}
+</select>
+
+
+<!--  foreach 구문은 그저 where   parent_id IN (1,2,3,4)  이다.-->
+<select id="flatToSelectChildrenByParentIds" resultType="map" parameterType="list">
+  SELECT *
+  FROM artwork_comment
+  WHERE parent_comment_id IN
+  <foreach item="parentId" collection="list" open="(" separator="," close=")">
+    #{parentId}
+  </foreach>
+</select>
+
+
+
+
+
+
 
 
 </mapper>

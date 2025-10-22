@@ -2,9 +2,11 @@
 <%@ page language="java" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta charset="UTF-8">
 <sec:csrfMetaTags />
 <title>Insert title here</title>
@@ -142,8 +144,7 @@ a {
 
 /* 쓰기버튼 종료 */
 </style>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 <script>
 $(document).ready(function() {
 	  const token = $("meta[name='_csrf']").attr("content");
@@ -154,9 +155,9 @@ $(document).ready(function() {
 	      xhr.setRequestHeader(header, token);
 	    }
 	  });
+});
 	  
 </script>
-
 
 
 </head>
@@ -220,14 +221,14 @@ if (request.getParameter("cmd") != null)
     </div>
 
 
-    <!-- ✅ 2행: 메뉴 + 검색창 -->
-   
+    <!-- ✅ 2행: 메뉴 + 검색창 -->   
 
 
     <div class="header_bottom" >
         <a href="${pageContext.request.contextPath}/guest/productlist" >미술용품</a>
         <a href="${pageContext.request.contextPath}/guest/get-onedayclass-detail-one-page" >미술수업</a>
-        
+         <a href="${pageContext.request.contextPath}/guest/communityPage" >커뮤니티</a>
+         
         <!-- 🔍 검색창 삽입 -->
         <div class="search_box" id="top_search2" >
             <div class="search_section">
@@ -252,7 +253,7 @@ if (request.getParameter("cmd") != null)
         
            <!-- ✅ 글쓰기 버튼 추가 -->
         <sec:authorize access="!isAuthenticated()">
-            <button class="write-btn" onclick="window.location.href='${pageContext.request.contextPath}/guest/get-signup-page'">
+            <button class="write-btn" onclick="window.location.href='${pageContext.request.contextPath}/guest/login'">
                 글쓰기
             </button>
         </sec:authorize>

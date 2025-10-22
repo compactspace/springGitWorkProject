@@ -13,7 +13,6 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,9 +21,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.finall.WorkImgVO;
+import com.spring.finall.impl.ArtworkServiceDAO;
 import com.spring.finall.impl.WorkServcieRedisDao;
 import com.spring.finall.security.UserDetailsVO2;
+import com.spring.finall.service.ArtworkService;
 import com.spring.finall.service.OneDayClassService;
 import com.spring.finall.service.WorkService;
 import com.spring.finall.user.OneDayClassVO;
@@ -47,10 +49,16 @@ public class GuestViewController {
 
 	@Autowired
 	private WorkService workService;
-
+	
+	
+	@Autowired
+	private ArtworkService artWorkService;
+	
 	@Autowired
 	private WorkServcieRedisDao workServiceRedisDao;
 	
+	@Autowired
+	private ArtworkServiceDAO artworkServiceDAO;
 	
 	@Autowired
 	private RedisTemplate<String, String> redisTemplate;
@@ -74,6 +82,34 @@ public class GuestViewController {
 		return "onedayclass"; // 뷰리졸버에 의해 /WEB-INF/views/login.jsp로 매핑됨
 	}
 
+	@RequestMapping(value = "/communityPage")
+	public String showCommunityPage(@RequestParam(defaultValue = "0") int offset, Model model) {
+
+	    Map<String, Object> artWorkInfo = artWorkService.getArtWorkList(offset);
+	    
+	    // artWorkList를 받아서 Model에 추가
+	    model.addAttribute("artWorkList", (List<Map<String, Object>>) artWorkInfo.get("artWorkList"));
+	    model.addAttribute("hasNext", artWorkInfo.get("hasNext"));
+	    
+	    return "communityPage/communityPage";
+	}
+	
+	
+	//artWorkDetailPage
+	@RequestMapping(value = "/get-artwork-detail")
+	public String showArtWorkDetailPage(@RequestParam("artWorkID") int artWorkID, Model model) {   
+	    
+	    Map<String, Object> artWorkDetail = artWorkService.getArtWorkDetail(artWorkID);
+		
+		
+	    model.addAttribute("artWorkDetail", artWorkDetail);
+	    
+	    
+	    return "artWorkDetailPage/ArtWorkDetailPage";
+	}
+	
+	
+	
 	@GetMapping("/onedayclass-intro")
 	public String showOnedayclassIntro(OneDayClassVO ovo, Model model) {
 
@@ -288,6 +324,16 @@ public class GuestViewController {
 
 	}
 
-	
+	@RequestMapping(value = "/artwork-comment")
+	public String test(Model model) throws Exception {
+	    List<Map<String, Object>> list = artworkServiceDAO.getMoreWorkComments(1, 10, 0);
+
+	    ObjectMapper mapper = new ObjectMapper();
+	    String jsonList = mapper.writeValueAsString(list);
+
+	    model.addAttribute("listJson", jsonList);
+
+	    return "compoents/artWorkDetailPage/artWorkCommentFragment";
+	}
 	
 }

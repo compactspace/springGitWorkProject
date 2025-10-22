@@ -21,5 +21,9 @@ public Map<String,Object> completeDraftArtWork( String content , int userCode );
 public int currentDraftArtWorkId(int userCode);
 
 
+public Map<String, Object> getArtWorkList(int offset);
+
+public  Map<String, Object> getArtWorkDetail(int artWorkId);
+
 	
 }

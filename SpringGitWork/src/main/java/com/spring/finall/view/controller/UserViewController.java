@@ -75,6 +75,8 @@ public class UserViewController {
 	
 	
 	
+	
+	
 	@RequestMapping(value = "/mypersonalinfo")
 	public String mypersonalinfo(  @AuthenticationPrincipal UserDetailsVO2 userDetails, Model model) {
 

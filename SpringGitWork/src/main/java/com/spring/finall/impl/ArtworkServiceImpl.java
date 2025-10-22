@@ -23,6 +23,9 @@ public class ArtworkServiceImpl implements ArtworkService {
 	@Autowired
 	private ArtworkServiceDAO artworkServiceDAO;
 
+	
+	
+	
 	@Override
 	public List<Map<String, Object>> findDraftByUserCode(int userCode) {
 		// TODO Auto-generated method stub
@@ -191,7 +194,7 @@ public class ArtworkServiceImpl implements ArtworkService {
 				throw new ArtWorkCompleteException("본인 소유권이 아닌 초안을 완성하려함", 500);
 			}
 
-			int affectedRow = artworkServiceDAO.updateArtWorkStatus(content, userCode);
+			int affectedRow = artworkServiceDAO.updateArtWorkStatus(content, userCode,currentDraftArtWorkId);
 			if (affectedRow == 0) {
 				map.put("faile-reason", "DB is_draft 컬럼 업데이트문 실패");
 				throw new ArtWorkCompleteException("DB is_draft 컬럼 업데이트문 실패", 500);
@@ -209,6 +212,18 @@ public class ArtworkServiceImpl implements ArtworkService {
 		map.put("completeDraftArtWork-status", true);
 
 		return map;
+	}
+
+	@Override
+	public Map<String, Object> getArtWorkList(int offset) {
+		
+		return artworkServiceDAO.getArtWorkList(offset);
+	}
+
+	@Override
+	public Map<String, Object> getArtWorkDetail(int artWorkId) {
+		// TODO Auto-generated method stub
+		return  artworkServiceDAO.getArtWorkDetail(artWorkId);
 	}
 
 }

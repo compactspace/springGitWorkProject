@@ -10,6 +10,7 @@
 <meta charset="UTF-8">
 <title>Summernote 테스트</title>
 
+
 <!-- Summernote CSS -->
 <link
 	href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-lite.min.css"
@@ -202,6 +203,7 @@ h2 {
 	let insertedImageSet=new Set();
     let content=null;
     
+    
 $(document).ready(function() {
     let maxImages = 3;
     initUI();
@@ -227,6 +229,9 @@ $(document).ready(function() {
             ['insert', ['picture']],  // 이미지 업로드 버튼
             ['height', ['height']]
         ],
+        popover: {
+            image: [] // ✅ 이 부분이 이미지 팝업 제거 핵심입니다.
+        },
         callbacks: {
         	
             onImageUpload: function(files) {
@@ -245,12 +250,43 @@ $(document).ready(function() {
                 
                 
             },
+            
             onMediaDelete: function(target) {
+            	console.log("target: "+target)
                 uploadedImages--;  // 삭제 시 카운트 감소
             }
         }
     });
+    
+    
+    
+    
+    $('#summernote').on('summernote.change', function(we, contents, $editable) {
+        const currentImages = $($editable).find('img');
 
+        insertedImageSet.forEach((url) => {
+            const stillExists = currentImages.filter(function() {
+                return $(this).attr('src') === url;
+            }).length > 0;
+
+            if (!stillExists) {
+                console.log("이미 삭제된 이미지:", url);
+                
+                // 업로드 카운트 및 셋에서 제거
+                insertedImageSet.delete(url);
+                uploadedImages--;
+                $("#current-uploadedcnt").text(uploadedImages);
+             // 💡 버튼 UI 복원 - 문자열 결합 방식
+                $(".insert-draft-image[data-url='" + url + "']").show();
+                $(".insert-draft-image[data-url='" + url + "']")
+                    .siblings(".insert-rollback-draft-image")
+                    .hide();
+                
+            }
+        });
+    });   
+    
+    
     function uploadImage(file) {
         var data = new FormData();
         data.append("file", file);
@@ -382,11 +418,13 @@ function initUI() {
                     const $insertBtn = $(this);
                     const $rollbackBtn = $insertBtn.siblings(".insert-rollback-draft-image");
 
+                    
                     if (insertedImageSet.has(dbImage)) return;                    
                     insertedImageSet.add(dbImage);
                     $(".draft-images-null").hide();
                     $('#summernote').summernote('insertImage', dbImage, function ($image) {
                         $image.attr('alt', '첨부 이미지');
+                        $image.attr('draggable', false); // ✅ 드래그 비활성화
                         $insertBtn.hide();
                         $rollbackBtn.show();
 
@@ -402,10 +440,10 @@ function initUI() {
             
             
             contentWriteEvent: function() {
-            	console.log("글쓰기이벤트")
+            
                 $('#summernote').on('summernote.change', function(we, contents, $editable) {
                     content = contents;
-                    console.log("에디터 내용 변경됨:", content);
+                 /*    console.log("에디터 내용 변경됨:", content); */
                     $(".text-content-null").hide();
                 });
             }
@@ -443,6 +481,15 @@ function initUI() {
                 });
             }
   
+           	,
+           	//에디터에 첨부된 사진을 벡스페이스 가시적으로 지우는 경우를 의함
+           	deleteUIImage:function(){
+           		
+           		
+           	}
+           
+            
+            
             
             
         }

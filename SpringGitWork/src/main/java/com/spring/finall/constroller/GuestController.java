@@ -1,5 +1,9 @@
 package com.spring.finall.constroller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,9 +13,15 @@ import javax.servlet.http.HttpSession;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -253,5 +263,47 @@ public class GuestController {
 		}
 
 	} 
+	
+
+	@GetMapping("/get-artwork-image")
+	public ResponseEntity<Resource> servePrivateDraftImage(@RequestParam(defaultValue = "/userArtwork/") String folder, // ex: /userArtwork/
+			@RequestParam("name") String fileName) {
+		try {
+			// ✅ 보안 상 폴더 경로 정규화 방어
+			if (folder.contains("..") || folder.contains("\\") || !folder.startsWith("/")) {
+				return ResponseEntity.badRequest().build();
+			}
+
+			// ✅ 서버 내부 절대 경로 설정
+			String rootBaseDir = "C:/"; // 또는 환경변수로 뺄 수도 있음
+			String fullPath = rootBaseDir + folder + fileName;
+			Path filePath = Paths.get(fullPath).normalize();			
+
+			if (!Files.exists(filePath)) {
+				return ResponseEntity.notFound().build();
+			}
+
+			// 이 시점까지는 파일 스트림이 열리지 않은 상태입니다.
+			// 아래 UrlResource 객체 생성은 단순히 파일 위치 정보를 갖는 객체를 만드는 것일 뿐, 스트림을 열지 않습니다.
+			Resource resource = new UrlResource(filePath.toUri());
+
+			// 파일의 MIME 타입을 검사합니다.
+			String contentType = Files.probeContentType(filePath);
+			if (contentType == null)
+				contentType = "application/octet-stream";
+
+			// 아래 ResponseEntity를 반환하는 순간,
+			// Spring 내부에서 HTTP 응답을 처리할 때 resource.getInputStream()이 호출되어
+			// **여기서부터 파일 스트림이 열리고, 클라이언트로 데이터 전송이 시작됩니다.**
+			// public class ResourceHttpMessageConverter 클래스의 protected void writeContent
+			// 메서드에서 톰캣 응답스트림과, 파일객체의 스트림을 적절히 결합한다.
+			// 전송이 완료되면 스트림은 자동으로 닫힙니다.
+			return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
 
 }

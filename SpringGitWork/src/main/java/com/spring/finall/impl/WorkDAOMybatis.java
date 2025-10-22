@@ -128,7 +128,7 @@ public class WorkDAOMybatis {
 			Map<String, Object> childParams = new HashMap<>();
 			childParams.put("parentIds", parentIds);
 
-			// 자식 댓글 리스트 조회 (IN 절에 parentIds 리스트 전달)
+			// 자식 댓글 리스트 조회 (IN 절에 List자료형  parentIds 리스트로 전달)
 			List<Map<String, Object>> children = mybatis.selectList("selectChildrenByParentIds", parentIds);
 
 			if (children.isEmpty()) {
@@ -137,9 +137,11 @@ public class WorkDAOMybatis {
 
 			allComments.addAll(children);
 
-			// 다음 반복을 위한 부모 ID 갱신
+			// 다음 반복을 위한 부모 ID 리스트를 빈값으로 초기화
 			parentIds.clear();
+			
 			for (Map<String, Object> child : children) {
+				// 다음 반복을 위한  다음 부모 ID 갱신
 				parentIds.add((Integer) child.get("comment_id"));
 			}
 		}
