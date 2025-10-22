@@ -8,132 +8,282 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
 
-<style>
-body {
-    margin: 0;
-    background-color: #FFF !important;
-}
 
-#wrapper {
+<style>
+  /* 폰트 통일 및 기본 세팅 */
+  body {
+    margin: 0;
+    background-color: #fff !important;
+    font-family: 'Sunflower', 'Orbit', sans-serif;
+    color: #333;
+    line-height: 1.5;
+  }
+
+  #wrapper {
     max-width: 1020px;
     margin: 0 auto;
-    padding: 0;
-}
+    padding: 0 15px;
+  }
 
-header {
+  header {
     position: relative;
     height: 70px;
     background: #fff;
-}
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
 
-#carousel {
+  #carousel {
     height: 450px;
     background-color: #BABABA;
-    vertical-align: middle;
-}
-
-#content2 {
-    grid-gap: 10px;
-    display: grid;
-    grid-template-rows: 333px 333px 333px 333px 333px;
-    grid-template-columns: 50% 50%;
-    max-width: 1020px;
-    margin: 20px auto;
-}
-
-.sameinfo {
-    display: grid;
-    grid-template-rows: 80% 20%;
-    background: #fff;
-}
-
-.Section2_2 {
-    box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
-    height: 100%;
-    display: grid;
-    grid-template-rows: 50% 50%;
-}
-
-.imgarea {
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-}
-
-.titleinfo {
-    font-size: 25px;
-    display: block;
-    color: #333333;
-}
-
-.detailinof {
-    display: block;
-}
-
-.addbtn {
-    color: #333333;
-    font-weight: 500;
-    border: 0;
-    background-color: transparent;
-    padding: 10px 0px;
-    font-size: 18px;
-    display: block;
-    margin-right: 0px;
-    margin-left: auto;
-    box-sizing: border-box;
-    border-radius: 3px;
-}
-
-.soldout {
-    color: red;
-    font-weight: 900;
-}
-
-.productgrouparea {
-    max-width: 1020px;
-    margin: 20px auto;
-}
-
-.productul {
     display: flex;
-    list-style-type: none;
-}
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #fff;
+  }
 
-.group {
-    background-color: #cecece;
-    width: 100%;
+  #content1 .article1 {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 15px;
+  }
+
+  #content1 h2#header1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #1a1a1a;
+  }
+
+  #content1 p {
+    font-size: 1.15rem;
+    color: #666;
+  }
+
+  /* 모바일 헤더 */
+  #mobilecontent1 {
+    display: none;
+  }
+
+  .productgrouparea {
+    max-width: 1020px;
+    margin: 30px auto;
+    padding: 0 15px;
+  }
+
+  .productul {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-bottom: 2px solid #eee;
+  }
+
+  .group {
+    background-color: #f5f5f5;
+    flex: 1;
     text-align: center;
-    padding: 10px;
-}
+    padding: 15px 0;
+    font-weight: 600;
+    color: #444;
+    cursor: pointer;
+    border-right: 1px solid #ddd;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    user-select: none;
+  }
 
-@media screen and (max-width: 701px) {
-    #content2 {
-        grid-template-columns: 154px 154px !important;
-        margin: 0 auto;
-        width: 90%;
-    }
+  .group:last-child {
+    border-right: none;
+  }
 
-    .mobileheader {
-        display: block;
+  .group:hover,
+  .group.active {
+    background-color: #4a90e2;
+    color: white;
+    font-weight: 700;
+  }
+
+  #productContainer {
+    max-width: 1020px;
+    margin: 20px auto 60px;
+    padding: 0 15px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  /* 상품 아이템 스타일 (ajax 로드되는 구조에 맞게) */
+  .product-item {
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.07);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.3s ease;
+  }
+
+  .product-item:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  }
+
+  .product-item .imgarea {
+    background-size: cover !important;
+    background-position: center center !important;
+    height: 180px;
+  }
+
+  .titleinfo {
+    font-size: 1.3rem;
+    font-weight: 700;
+    padding: 10px 15px 5px;
+    color: #222;
+  }
+
+  .detailinof {
+    font-size: 1rem;
+    color: #666;
+    padding: 0 15px 10px;
+    flex-grow: 1;
+  }
+
+  .price {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #2c3e50;
+    padding: 0 15px 10px;
+  }
+
+  .addbtn {
+    cursor: pointer;
+    background-color: transparent;
+    border: 2px solid #4a90e2;
+    color: #4a90e2;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 4px;
+    margin: 0 15px 15px;
+    padding: 10px 0;
+    text-align: center;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .addbtn:hover {
+    background-color: #4a90e2;
+    color: #fff;
+  }
+
+  .soldout {
+    color: #e74c3c;
+    font-weight: 900;
+    padding-left: 15px;
+  }
+
+  /* 반응형 */
+  @media screen and (max-width: 701px) {
+    #content1 .article1 {
+      padding: 0 10px;
     }
 
     #mobilecontent1 {
-        display: block;
+      display: block;
+      max-width: 600px;
+      margin: 0 auto 20px;
+      padding: 0 15px;
     }
-}
+
+    .mobilecontent1header h3 {
+      font-size: 1.8rem;
+      margin-bottom: 5px;
+    }
+
+    .mobilecontent1header p {
+      font-size: 1rem;
+      color: #555;
+    }
+
+    .productul {
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      border-bottom: none;
+    }
+
+    .group {
+      flex: none;
+      min-width: 120px;
+      border-right: none;
+      border-radius: 4px;
+      padding: 12px 10px;
+      font-size: 1rem;
+      background-color: #f9f9f9;
+    }
+
+    .group.active,
+    .group:hover {
+      background-color: #4a90e2;
+      color: #fff;
+    }
+
+    #productContainer {
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      margin: 0 auto 40px;
+      width: 90%;
+      gap: 15px;
+    }
+
+    .product-item .imgarea {
+      height: 140px;
+    }
+
+    .titleinfo {
+      font-size: 1.1rem;
+      padding: 8px 10px 4px;
+    }
+
+    .detailinof {
+      font-size: 0.9rem;
+      padding: 0 10px 8px;
+    }
+
+    .price {
+      font-size: 1rem;
+      padding: 0 10px 8px;
+    }
+
+    .addbtn {
+      font-size: 0.95rem;
+      margin: 0 10px 10px;
+    }
+  }
 </style>
+
 
 <script>
 $(document).ready(function() {
     initializePage();  // 페이지 로드 시 필요한 초기 설정 수행
 });
 
+
 // 페이지 초기화 함수
 function initializePage() {
-    // 최초 로드시 기본값 "pencile"에 맞는 상품 목록을 불러옵니다.
-    loadProductList("pencile");
+  const defaultGroup = "pencile";
+  loadProductList(defaultGroup);
 
-    // 상품 그룹 클릭 시 이벤트 핸들러 등록
-    setupProductGroupClickHandler();
+  // 기본 설명 렌더링
+  const groupInfo = groupDescriptions[defaultGroup];
+  if (groupInfo) {
+    $('#groupTitle').text(groupInfo.title);
+    $('#groupDescription').text(groupInfo.description);
+  }
+  
+  
+
+  // 기본 그룹 탭에 active 클래스 추가
+  $('.group').removeClass('active');  // 혹시 모를 기존 상태 제거
+  $(`.group[data-value="${defaultGroup}"]`).addClass('active');
+  // 클릭 핸들러 등록
+  setupProductGroupClickHandler();
 }
 
 
@@ -186,28 +336,60 @@ function loadProductList(productGroup) {
 
 // 상품 그룹 클릭 시 해당 그룹의 상품 목록을 불러오는 함수
 function setupProductGroupClickHandler() {
-    $('.group').on('click', function() {
-        var productGroup = $(this).data('value');  // 클릭된 상품 그룹의 value 값      
-        loadProductList(productGroup);  // 해당 그룹에 맞는 상품 목록을 불러옴
-    });
+  $('.group').on('click', function() {
+    const productGroup = $(this).data('value');  // 예: 'pencile'
+
+    // 상품 목록 로드
+    loadProductList(productGroup);
+
+    // 설명 정보가 있으면 렌더링
+    const groupInfo = groupDescriptions[productGroup];
+    if (groupInfo) {
+      $('#groupTitle').text(groupInfo.title);
+      $('#groupDescription').text(groupInfo.description);
+    }
+
+    // 선택된 탭 스타일링 (선택적)
+    $('.group').removeClass('active');
+    $(this).addClass('active');
+  });
 }
+
+
 
 // 상품 목록을 #productContainer에 업데이트하는 함수
 function updateProductContainer(htmlContent) {
     $("#productContainer").html(htmlContent);  // 받아온 HTML을 #productContainer에 삽입
 }
+
+
+const groupDescriptions = {
+		  pencile: {
+		    title: "연필류",
+		    description: "인물화에 필요한 연필과 지우개로 구성되어 있습니다. 선명한 표현을 위한 기본 아이템입니다."
+		  },
+		  colorpencile: {
+		    title: "색연필류",
+		    description: "색감을 표현하기 위한 파스텔과 수성 색연필로 구성하였습니다."
+		  },
+		  groupdetermined: {
+		    title: "기타",
+		    description: "기본 구성 외에 추가적인 미술용품들로 구성되어 있습니다."
+		  }
+		};
+
 </script>
 
 <body>
     <div class="allwarpper">
         <%@ include file="../pcNave.jsp"%>
-        <div id="content1">
-            <div class="article1">
-                <h2 id="header1">미술용품</h2>
-                <p>합리적인 가격으로 미술용품을 판매하고 있습니다. 가장 기본적인 구성으로, 인물화에 필요한 연필과, 지우개
-                    그리고 색감을 표현하기 위한 파스텔과, 수성 색연필로 구성하였습니다.</p>
-            </div>
-        </div>
+     <div id="content1">
+  <div class="article1">
+    <h2 id="groupTitle">미술용품</h2>
+    <p id="groupDescription">합리적인 가격으로 미술용품을 판매하고 있습니다.</p>
+  </div>
+</div>
+
 
         <div id="mobilecontent1">
             <div class="mobilecontent1header">

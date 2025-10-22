@@ -13,8 +13,9 @@
             padding: 0;
             background-color: #f4f4f4;
         }
+        
         .content2 {
-            width: 80%;
+            width: 100%;
             margin: 0 auto;
             padding: 40px 0;
         }

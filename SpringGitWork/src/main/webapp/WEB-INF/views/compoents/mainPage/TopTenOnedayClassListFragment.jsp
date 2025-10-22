@@ -106,7 +106,7 @@
   </div>
 </div>
 
-<script type="module">
+<script>
   $(document).ready(function() {
 
     const container = $('#onedayclass-slider');
@@ -157,6 +157,8 @@ track.css('transform', 'translateX(' + offset + 'px)');
 
 $(".onedayclass-card").on('click', function() {
     const name = $(this).data("name");
+console.log(name);
+
     const basePath = "${pageContext.request.contextPath}"; // JSTL 변수 JS에 주입
 var url = basePath + "/guest/getonedayclass-info?nextpage=0&onedayclass_name=" + encodeURIComponent(name);
 

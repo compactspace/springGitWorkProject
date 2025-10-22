@@ -789,15 +789,9 @@ const topTenOnedayclassComponentLoad = () => {
 	<div class="allwrapper">
 	
 	
-	 <img src="${pageContext.request.contextPath}/resources/cmd/dot.bmp">
-<script src="${pageContext.request.contextPath}/resources/cmd/dot.bmp">
+<%-- 	 <img src="${pageContext.request.contextPath}/resources/cmd/dot.bmp">
+<script src="${pageContext.request.contextPath}/resources/cmd/dot.bmp"></script> --%>
 
-
-
-
-
-
-</script>
 
 
 		<%@ include file="../pcNave.jsp"%>
@@ -908,6 +902,7 @@ const topTenOnedayclassComponentLoad = () => {
 		<div class="introduce-onedayclass-frgment"></div>
 
 
+
 		<footer class="footer">
 
 			<div class="footercontainer">
@@ -915,7 +910,7 @@ const topTenOnedayclassComponentLoad = () => {
 				<div class="rowwrapper">
 					<div class="rows">
 						<div class="logoarea">
-							<img src="./img_mainhome/logo1.png">
+							<img src="${pageContext.request.contextPath}/resources/img_mainhome/logo1.png">
 						</div>
 						<div class="infoarea">상호 : 아트토리 대표 : 이곤 주소 : 서울시 노원구 상계로 74
 							4F 사업자번호 : 105-17-78854</div>
@@ -923,14 +918,14 @@ const topTenOnedayclassComponentLoad = () => {
 
 					<div class="rows">
 						<div class="logoarea">
-							<img src="./img_mainhome/logo2.png">
+							<img src="${pageContext.request.contextPath}/resources/img_mainhome/logo2.png">
 						</div>
 						<div class="infoarea">male : ###@naver.com</div>
 					</div>
 
 					<div class="rows">
 						<div class="logoarea">
-							<img src="./img_mainhome/logo3.png">
+							<img src="${pageContext.request.contextPath}/resources/img_mainhome/logo3.png">
 						</div>
 						<div class="infoarea">tell : 027-###-###</div>
 					</div>
@@ -1015,7 +1010,7 @@ const topTenOnedayclassComponentLoad = () => {
 			<div class="mainbanner">
 
 				<div class="bannerarea">
-					<img class="bannerimg" src='./img_onedayclass/onedaymain2.png'>
+					<img class="bannerimg" src='${pageContext.request.contextPath}/resources/img_onedayclass/onedaymain2.png'>
 				</div>
 
 				<div class="bannerinfoarea">
@@ -1071,27 +1066,27 @@ const topTenOnedayclassComponentLoad = () => {
 
 				<div class="studentbanner">
 					<div class="bannerarea">
-						<img class="studentimg" src='./img_onedayclass/onedaymain3.jpg'>
+						<img class="studentimg" src='${pageContext.request.contextPath}/resources/img_onedayclass/onedaymain3.jpg'>
 					</div>
 
 					<div class="bannerarea">
-						<img class="studentimg" src='./img_onedayclass/onedaymain3.jpg'>
+						<img class="studentimg" src='${pageContext.request.contextPath}/resources/img_onedayclass/onedaymain3.jpg'>
 					</div>
 
 					<div class="bannerarea">
-						<img class="studentimg" src='./img_onedayclass/onedaymain3.jpg'>
+						<img class="studentimg" src='${pageContext.request.contextPath}/resources/img_onedayclass/onedaymain3.jpg'>
 					</div>
 
 					<div class="bannerarea">
-						<img class="studentimg" src='./img/work_img9.jpg'>
+						<img class="studentimg" src='${pageContext.request.contextPath}/resources/img/work_img9.jpg'>
 					</div>
 
 					<div class="bannerarea">
-						<img class="studentimg" src='./img/work_img8.jpg'>
+						<img class="studentimg" src='${pageContext.request.contextPath}/resources/img/work_img8.jpg'>
 					</div>
 
 					<div class="bannerarea">
-						<img class="studentimg" src='./img/work_img4.jpg'>
+						<img class="studentimg" src='${pageContext.request.contextPath}/resources/img/work_img4.jpg'>
 					</div>
 
 				</div>
@@ -1104,7 +1099,7 @@ const topTenOnedayclassComponentLoad = () => {
 				<div class="rowwrapper">
 					<div class="rows">
 						<div class="logoarea">
-							<img src="./img_mainhome/logo1.png">
+							<img src="${pageContext.request.contextPath}/resources/img_mainhome/logo1.png">
 						</div>
 						<div class="infoarea">상호 : 아트토리 대표 : 이곤 주소 : 서울시 노원구 상계로 74
 							4F 사업자번호 : 105-17-78854</div>
@@ -1112,14 +1107,14 @@ const topTenOnedayclassComponentLoad = () => {
 
 					<div class="rows">
 						<div class="logoarea">
-							<img src="./img_mainhome/logo2.png">
+							<img src="${pageContext.request.contextPath}/resources/img_mainhome/logo2.png">
 						</div>
 						<div class="infoarea">male : ###@naver.com</div>
 					</div>
 
 					<div class="rows">
 						<div class="logoarea">
-							<img src="./img_mainhome/logo3.png">
+							<img src="${pageContext.request.contextPath}/resources/img_mainhome/logo3.png">
 						</div>
 						<div class="infoarea">tell : 027-###-###</div>
 					</div>
@@ -1127,7 +1122,7 @@ const topTenOnedayclassComponentLoad = () => {
 
 			</div>
 		</footer>
-
+		
 	</div>
 </body>
 </html>

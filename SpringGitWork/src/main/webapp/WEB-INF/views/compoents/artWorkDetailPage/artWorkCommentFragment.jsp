@@ -1,21 +1,23 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<sec:csrfMetaTags />
 <style>
   .comment-root {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     max-width: 800px;
-    margin: 20px auto;
-    padding: 0 15px;
+    margin: 20px auto;  
   }
 
 
   ul {
     list-style: none;
-    padding-left: 20px;
     margin: 10px 0;
-    border-left: 2px solid #ddd;
+    padding: 0px 0px;
+    
   }
+
 
   .comment-item {
     margin-top: 30px;
@@ -65,7 +67,13 @@
 
 <div class="comment-root"></div>
 
+
 <script>
+function x(){
+	
+}
+
+
   // ===== 댓글 데이터 준비 =====
   let data = ${listJson};
 
@@ -106,7 +114,10 @@
       }
 
       // 답글 버튼 (부모ID, 조부모ID 저장)
-      html += '<span class="reply-btn" data-mygranparentid="' + comment.parent_comment_id + '" data-myparentid="' + comment.artwork_comment_id + '">답글</span>';
+      if(isAuthenticated){
+          html += '<span class="reply-btn" data-mygranparentid="' + comment.parent_comment_id + '" data-myparentid="' + comment.artwork_comment_id + '">답글</span>';
+   	  
+      }
 
       if (comentCnt > 0) {
         html += '<br/><span class="comment-cnt">열기</span>';
