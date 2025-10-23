@@ -144,10 +144,61 @@
 </select>
 
 
+<insert id="createArtworkComment" parameterType="ArtWorkCommentVO">
+
+	INSERT
+	INTO
+	artwork_comment (artwork_id,
+	user_code,
+	comment_text)
+	VALUES(
+	#{artworkId},
+	#{userCode},
+	#{commentText}
+	)
+
+</insert>
+
+<insert id="applyToComment"
+        parameterType="ArtWorkCommentVO"
+        useGeneratedKeys="true"
+       	keyProperty="artworkCommentId">
+
+    INSERT INTO artwork_comment (
+        artwork_id,
+        parent_comment_id,
+        user_code,
+        comment_text
+    )
+    VALUES (
+        #{artworkId},
+        #{parentCommentId},
+        #{userCode},
+        #{commentText}
+    )
+</insert>
 
 
+<select id="searchyArtWork" parameterType="ArtworkVO" resultType="Map">
+select
+	*
+From
+	artworks a
+inner join artwork_images as ai
 
+on
+	a.id = ai.artwork_id
+  AND a.content LIKE CONCAT('%', #{content}, '%')
+  LIMIT #{offSet}, #{limit}
+</select>
 
+<select id="searchyCntAll" parameterType="ArtworkVO" resultType="int">
+select
+	count(*)
+From
+	artworks a
 
+ WHERE  a.content LIKE CONCAT('%', #{content}, '%')
+</select>
 
 </mapper>

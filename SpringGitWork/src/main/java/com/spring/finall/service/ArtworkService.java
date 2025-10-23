@@ -5,6 +5,9 @@ import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.spring.finall.user.ArtWorkCommentVO;
+import com.spring.finall.user.ArtworkVO;
+
 public interface ArtworkService {
 
 public	List<Map<String, Object>> findDraftByUserCode(int user_code);
@@ -24,6 +27,15 @@ public int currentDraftArtWorkId(int userCode);
 public Map<String, Object> getArtWorkList(int offset);
 
 public  Map<String, Object> getArtWorkDetail(int artWorkId);
+
+
+public int createArtworkComment(ArtWorkCommentVO arworkCommentVO);
+
+public int applyToComment(ArtWorkCommentVO arworkCommentVO);
+
+public	Map<String, Object> searchyArtWork(	ArtworkVO artWorkVO);
+
+public int searchyCntAll(	ArtworkVO artWorkVO);
 
 	
 }

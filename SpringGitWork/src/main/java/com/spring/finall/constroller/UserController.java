@@ -63,6 +63,7 @@ import com.spring.finall.service.OrderService;
 import com.spring.finall.service.ReserveService;
 import com.spring.finall.service.SmsService;
 import com.spring.finall.service.WorkService;
+import com.spring.finall.user.ArtWorkCommentVO;
 import com.spring.finall.user.CartService;
 import com.spring.finall.user.CartVO;
 import com.spring.finall.user.OneDayClassVO;
@@ -958,8 +959,102 @@ public class UserController {
 					.message(e.getBussinessExceptionMessage()).data(null).build();
 
 		}
-
 	
+	}
+	
+	//
+	@PostMapping("/create-artwork-comment")
+	@ResponseBody
+	public ApiResponse<ArtWorkImagesDeleteResult> createArtworkComment(@RequestParam("commentText") String commentText,
+			@RequestParam("artWorkID") int artWorkID, @AuthenticationPrincipal UserDetailsVO2 userDetails) {
+
+		int userCode = userDetails.getUser_code();
+
+		ArtWorkCommentVO artWorkCommentVO = new ArtWorkCommentVO();
+
+		artWorkCommentVO.setUserCode(userCode);
+		artWorkCommentVO.setCommentText(commentText);
+		artWorkCommentVO.setArtworkId(artWorkID);
+
+		try {
+			int affectedRow = artworkService.createArtworkComment(artWorkCommentVO);
+			int code = 0;
+			boolean success = false;
+			String massage = null;
+
+			if (affectedRow > 0) {
+				code = 201;
+				success = true;
+				massage = "별탈없이 DB에 댓글이 창조됨 저장됨";
+			}
+			
+			if (affectedRow <= 0) {
+				code = 500;
+				success = false;
+				massage = "잠시후 다시 시도해주세요";
+			}
+			return ApiResponse.<ArtWorkImagesDeleteResult>builder().code(code).success(success).message(massage)
+					.data(null).build();
+
+		} catch (Exception e) {
+
+			System.out.println(e);
+			return ApiResponse.<ArtWorkImagesDeleteResult>builder().code(500).success(false).message("백엔드 코드 에러")
+					.data(null).build();
+
+		}
+
+	}
+	
+	
+	@PostMapping("/applyTo-artwork-comment")
+	@ResponseBody
+	public ApiResponse<Object> applyToComment(
+			@RequestParam("commentText") String commentText,
+			@RequestParam("artWorkID") int artWorkID,
+			@RequestParam("parentCommentId") int parentCommentId,			
+			@AuthenticationPrincipal UserDetailsVO2 userDetails) {
+
+		int userCode = userDetails.getUser_code();
+
+		ArtWorkCommentVO artWorkCommentVO = new ArtWorkCommentVO();
+
+		artWorkCommentVO.setUserCode(userCode);
+		artWorkCommentVO.setCommentText(commentText);
+		artWorkCommentVO.setArtworkId(artWorkID);
+		artWorkCommentVO.setParentCommentId(parentCommentId);
+
+		try {
+			int generatedPk = artworkService.applyToComment(artWorkCommentVO);
+			int code = 0;
+			boolean success = false;
+			String massage = null;
+
+			Map<String,Object>	data	=new HashMap<>();
+			if (generatedPk > 0) {
+			data.put("artwork_comment_id", generatedPk);
+				code = 201;
+				success = true;
+				massage = "별탈없이 DB에 댓글이 창조됨 저장됨";
+			}
+			
+			if (generatedPk <= 0) {
+				code = 500;
+				success = false;
+				massage = "잠시후 다시 시도해주세요";
+				data=null;
+			}
+			return ApiResponse.<Object>builder().code(code).success(success).message(massage)
+					.data(data).build();
+
+		} catch (Exception e) {
+
+			System.out.println(e);
+			return ApiResponse.<Object>builder().code(500).success(false).message("백엔드 코드 에러")
+					.data(null).build();
+
+		}
+
 	}
 
 }

@@ -172,6 +172,12 @@
 </div>
 
 <script>
+
+/* 글로벌 하위 포함 변수 시작 */
+const artWorkID="${artWorkDetail.artwork_id}"
+/* 글로벌 하위 포함 변수 시작 */
+
+
     $(document).ready(function () {
         $('#artworkContent').summernote({
             lang: 'ko-KR',
@@ -259,21 +265,34 @@
     	            return;
     	        }
 
+    	        
+    	        
+    	        let commentText=content
+    	        
+    	        
+    	        
     	        // Ajax로 서버 전송 (예시)
-    	        $.ajax({
-    	            url: '${pageContext.request.contextPath}/user/artwork-comment/write',
+    	      $.ajax({
+    	            url: '${pageContext.request.contextPath}/api/users/create-artwork-comment',
     	            type: 'POST',
-    	            data: { content: content },
+    	            data: { commentText: commentText,
+    	            	artWorkID:artWorkID
+    	            },
+    	            
     	            success: function (res) {
-    	                alert("댓글이 저장되었습니다!");
     	                $('#commentTextarea').val('');
     	                $('#charCount').text('(0/300자)');
     	                // 필요 시 댓글 리스트 새로고침
+    	                commentText=null;    	               
+    	                
+    	                const contextPath = "${pageContext.request.contextPath}";
+    	                window.location.replace(contextPath + "/guest/get-artwork-detail?artWorkID=" + artWorkID);
+    	                
     	            },
-    	            error: function () {
+    	            error: function (err) {
     	                alert("오류가 발생했습니다. 다시 시도해주세요.");
     	            }
-    	        });
+    	        }); 
     	    });
     }
    

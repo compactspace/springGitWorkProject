@@ -10,6 +10,30 @@ public class ArtworkVO {
 	    private String createdAt;  // String 타입으로 처리, 필요에 따라 Date로 바꿔도 됨
 	    private String updatedAt;
 
+	    
+	    //DB에는 없는 페이징용 필드이다.
+	    private int offSet;
+	    private int limit;
+	     
+		public int getOffSet() {
+			return offSet;
+		}
+
+		public void setOffSet(int offSet) {
+			this.offSet = offSet;
+		}
+
+		public int getLimit() {
+			return limit;
+		}
+
+		public void setLimit(int limit) {
+			this.limit = limit;
+		}
+	    
+	    
+	    
+	    
 	    public ArtworkVO() {}
 
 	    // getter & setter

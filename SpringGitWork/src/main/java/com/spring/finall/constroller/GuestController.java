@@ -32,10 +32,12 @@ import com.spring.finall.apiResponseController.ApiResponse;
 import com.spring.finall.businessresult.SignUpSmsSendResult;
 import com.spring.finall.businessresult.SmsSendResult;
 import com.spring.finall.security.UserDetailsVO2;
+import com.spring.finall.service.ArtworkService;
 import com.spring.finall.service.MemberService;
 import com.spring.finall.service.OneDayClassService;
 import com.spring.finall.service.SignUpSmsSendService;
 import com.spring.finall.service.WorkService;
+import com.spring.finall.user.ArtworkVO;
 import com.spring.finall.user.OneDayClassVO;
 import com.spring.finall.user.ProductService;
 import com.spring.finall.user.ProductVO;
@@ -44,7 +46,7 @@ import com.spring.finall.user.UserVO;
 @Controller
 @RequestMapping("/api/guest")
 public class GuestController {
-
+	
 	@Autowired
 	private ProductService protService;
 
@@ -53,6 +55,9 @@ public class GuestController {
 
 	@Autowired
 	private WorkService workService;
+	
+	@Autowired
+	private ArtworkService artWorkService;
 	
 	@Autowired
 	private MemberService memberService;
@@ -305,5 +310,32 @@ public class GuestController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
+	
+	
+	
+	
+	@GetMapping("/search/ajax")
+	@ResponseBody
+	public Map<String, Object> searchAjax(
+	        @RequestParam String query,
+	        @RequestParam(defaultValue = "1") int page,
+	        @RequestParam(defaultValue = "10") int limit) {  // 기본 10개씩
+
+	    int offSet = (page - 1) * limit;
+	    
+	    ArtworkVO artWorkVO = new ArtworkVO();
+	    artWorkVO.setContent(query);
+	    artWorkVO.setLimit(limit);
+	    artWorkVO.setOffSet(offSet);
+
+	    Map<String, Object> searchData = artWorkService.searchyArtWork(artWorkVO);
+
+	    Map<String, Object> data = new HashMap<>();
+	    data.put("searchyList", searchData.get("searchyList"));
+	
+
+	    return data;
+	}
+
 
 }

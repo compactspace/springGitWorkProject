@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.spring.finall.reqDto.writeWorkComment.WorkCommentDTO;
+import com.spring.finall.user.ArtWorkCommentVO;
 import com.spring.finall.user.ArtworkVO;
 
 @Repository
@@ -283,4 +284,50 @@ public class ArtworkServiceDAO {
 		}
 	
 	
+		
+		public int createArtworkComment(ArtWorkCommentVO arworkCommentVO) {
+
+			int affectedRow = mybatis.insert("ArtworkMapper.createArtworkComment", arworkCommentVO);
+
+			return affectedRow;
+
+		}
+		
+		public int applyToComment(ArtWorkCommentVO arworkCommentVO) {
+
+			int affectedRow = mybatis.insert("ArtworkMapper.applyToComment", arworkCommentVO);
+
+			   return arworkCommentVO.getArtworkCommentId();
+
+		}
+		
+		public Map<String, Object> searchyArtWork(ArtworkVO artWorkVO) {
+
+			artWorkVO.setLimit(artWorkVO.getLimit() + 1);
+
+			Map<String, Object> searchData = new HashMap<>();
+
+			List<Map<String, Object>> searchyList = mybatis.selectList("ArtworkMapper.searchyArtWork", artWorkVO);
+
+			searchData.put("endFlag", true);
+			if (searchyList.size() > 10) {
+				List<Map<String, Object>> findSearchList = searchyList.subList(0, 10);
+				searchData.put("endFlag", false);
+				searchData.put("searchyList", findSearchList);
+			} else {
+				searchData.put("searchyList", searchyList);
+
+			}
+
+			return searchData;
+
+		}
+		
+		public int 	searchyCntAll(ArtworkVO artWorkVO){
+
+			
+
+			   return mybatis.selectOne("ArtworkMapper.searchyCntAll", artWorkVO);
+
+		}
 }

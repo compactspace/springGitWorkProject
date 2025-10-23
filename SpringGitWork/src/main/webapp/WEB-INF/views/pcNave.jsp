@@ -124,6 +124,62 @@ a {
 }
 
 
+/* form 시작 */
+    .search_form {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ccc;
+        border-radius: 30px;
+        overflow: hidden;
+        width: 400px;
+        background-color: #fff;
+    }
+
+    .search_form input[type="text"] {
+        flex: 1;
+        border: none;
+        padding: 10px 15px;
+        font-size: 16px;
+        outline: none;
+        color: #333;
+        background-color: transparent;
+    }
+
+    .search_form select {
+        border: none;
+        outline: none;
+        padding: 0 12px;
+        font-size: 16px;
+        cursor: pointer;
+        background-color: transparent;
+        color: #333;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    .divider {
+        width: 1px;
+        height: 36px;
+        background-color: #ccc;
+    }
+
+    .search_button {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .search_button img {
+        width: 36px;
+        height: 36px;
+    }
+/* form 종료 */
+
 
 /* 쓰기버튼 시작 */
 .write-btn {
@@ -144,6 +200,10 @@ a {
 
 /* 쓰기버튼 종료 */
 </style>
+
+
+
+
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 <script>
 $(document).ready(function() {
@@ -155,8 +215,104 @@ $(document).ready(function() {
 	      xhr.setRequestHeader(header, token);
 	    }
 	  });
+	  
+	  
+		  const 현재저장되어있는검색어=getCurrentCachySearchQueryFromCookie();
+		
+	  if(getCurrentCachySearchQueryFromCookie()!=null){		  
+		  $("#queryTop").val(현재저장되어있는검색어);
+		  
+	  }
+	  
+		  
+	  
 });
 	  
+	  
+	 $(document).ready(function(){
+		 
+		 
+		 // 폼 제출 전에 검색어 체크
+		  $("#searchBarForm").on("submit", function(e) {
+			  
+			  const query = $.trim($("#queryTop").val());
+			  const 현재저장되어있는검색어=getCurrentCachySearchQueryFromCookie();
+			  if(query===현재저장되어있는검색어){
+				    e.preventDefault();  // 제출 막기
+				  return;
+			  }
+			  
+				let cachyedTotalCnt=  getCurrentCachyFromCookie();
+								
+				if(cachyedTotalCnt>0){
+					deleteCachyTotalCntCookie()
+				}		
+			  
+			  
+			  
+		  
+		    if (query === "") {
+		      alert("검색어를 입력해주세요.");
+		      $("#queryTop").focus();
+		      e.preventDefault();  // 제출 막기
+		      return false;
+		    }
+
+		    
+		    
+		    
+		 
+		    
+		    
+		    // 조건 통과하면 그대로 제출 → 페이지 이동
+		  });
+		 
+		 
+	  // 폼 제출 전에 검색어 체크
+		  $("#searchBarForm").on("change", function(e) {
+
+			 
+			
+			  
+		    
+		    
+		  });
+		  
+		 
+		  
+		  
+		  
+		 
+		 
+	 }) 
+	 
+	
+
+	 //쿠키에서 totalCnt 읽기 함수
+function getCurrentCachyFromCookie() {
+    const match = document.cookie.match(/cachyTotalCnt=(\d+)/);
+    
+    return Number(match?.[1] ?? 0);
+}
+
+	 function getCurrentCachySearchQueryFromCookie() {
+		  const match = document.cookie.match(/(?:^|;\s*)query=([^;]+)/);
+		  console.log(match?.[1]);
+
+		  // 디코딩해서 반환 (쿠키는 encodeURIComponent로 저장되었으므로)
+		  return match ? decodeURIComponent(match[1]) : null;
+		}
+
+	 
+
+	 function deleteCachyTotalCntCookie() {
+		// cachyTotalCnt 쿠키 제거
+		 document.cookie = "cachyTotalCnt=; path=/; max-age=0; SameSite=Lax";
+
+		 // query 쿠키 제거
+		 document.cookie = "query=; path=/; max-age=0; SameSite=Lax";
+
+		}
 </script>
 
 
@@ -229,25 +385,27 @@ if (request.getParameter("cmd") != null)
         <a href="${pageContext.request.contextPath}/guest/get-onedayclass-detail-one-page" >미술수업</a>
          <a href="${pageContext.request.contextPath}/guest/communityPage" >커뮤니티</a>
          
+         
+         
         <!-- 🔍 검색창 삽입 -->
         <div class="search_box" id="top_search2" >
             <div class="search_section">
-                <form id="searchBarForm" action="/shopSearch/search.html" method="get" target="_self" enctype="multipart/form-data">
-                    <input id="banner_action" name="banner_action" value="" type="hidden">
-                    <div class="search_form">
-                        <fieldset>
-                          
-                            <input id="keyword" name="keyword" type="hidden" value="11">
-                            <input id="queryTop" name="query" class="inputTypeText"
-                                   placeholder="검색어를 입력하세요"
-                                   type="text" autocomplete="off"
-                                   onkeyup="$('input[name=\'keyword\']').val(this.value);"
-                                   >
-                            <input type="hidden" name="order_by" value="favor">
-                            <input type="image" id="btnTop" src="https://hwabang.net/web/img/icon/search_icon.png" alt="검색" >
-                        </fieldset>
-                    </div>
-                </form>
+       <form id="searchBarForm" method="GET" action="${pageContext.request.contextPath}/guest/search">
+  <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+  
+  <div class="search_form">
+    <input id="queryTop" name="query" type="text" placeholder="검색어를 입력하세요" autocomplete="off" required>
+    <div class="divider"></div>
+    <select class="search_type" name="search_type">
+      <option value="community" selected>커뮤니티</option>
+      <option value="product">상품</option>
+    </select>
+    <div class="divider"></div>
+    <button type="submit" class="search_button">
+      <img src="https://hwabang.net/web/img/icon/search_icon.png" alt="검색" />
+    </button>
+  </div>
+</form>
             </div>
         </div>
         

@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +30,7 @@ import com.spring.finall.security.UserDetailsVO2;
 import com.spring.finall.service.ArtworkService;
 import com.spring.finall.service.OneDayClassService;
 import com.spring.finall.service.WorkService;
+import com.spring.finall.user.ArtworkVO;
 import com.spring.finall.user.OneDayClassVO;
 import com.spring.finall.user.ProductService;
 import com.spring.finall.user.ProductVO;
@@ -335,5 +337,50 @@ public class GuestViewController {
 
 	    return "compoents/artWorkDetailPage/artWorkCommentFragment";
 	}
+	
+	@RequestMapping(value = "/search")
+	public String showSearchResultPage(Model model,
+			@RequestParam(defaultValue = "community") String keywordType,
+			@RequestParam("query") String query	,	
+			  @RequestParam(defaultValue = "1") int page,
+		        @RequestParam(defaultValue = "10") int limit	,
+			 @CookieValue(value = "cachyTotalCnt", defaultValue = "0") String cachyTotalCnt  // 쿠키값 읽기
+			) throws Exception {
+		System.out.println("쿠키 cachyTotalCnt 값: " + cachyTotalCnt);	
+		
+		if(keywordType.equals("community")) {
+			
+			
+			ArtworkVO artWorkVO= new ArtworkVO();
+			 int offSet = (page - 1) * limit;
+			    
+	
+			    artWorkVO.setContent(query);
+			    artWorkVO.setLimit(limit);
+			    artWorkVO.setOffSet(offSet);
+
+			int TotalCnt=Integer.parseInt(cachyTotalCnt);
+			
+			if(TotalCnt<=0) {				
+			int totalCnt=artWorkService.searchyCntAll(artWorkVO);
+			model.addAttribute("totalCnt", totalCnt);
+			}
+			else {
+				
+				model.addAttribute("totalCnt", TotalCnt);
+			}
+			
+			Map<String, Object>  searchData =	artWorkService.searchyArtWork(artWorkVO);
+			model.addAttribute("searchyList", searchData.get("searchyList"));  // List<Map<String,Object>>
+			model.addAttribute("query", query);          // Boolean
+		}
+		
+		
+		
+
+	    return "searchResultPage/searchResultPage";
+	}
+	
+	
 	
 }

@@ -26,11 +26,12 @@
     padding-left: 10px;
   }
 
+
   .comment-text {
     background: #f9f9f9;
-    padding: 10px 12px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 10px 0px;
+  /*   border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); */
     font-size: 14px;
     color: #333;
   }
@@ -76,7 +77,12 @@ function x(){
 
   // ===== 댓글 데이터 준비 =====
   let data = ${listJson};
-
+ 
+  
+  
+  
+  
+  
   if (typeof data === 'string') {
     data = JSON.parse(data);
   }
@@ -94,7 +100,7 @@ function x(){
   }
 
   flattenComments(data); // 작전: 트리 구조를 평탄화
-  console.log("🔥 commentById", commentById);
+/*   console.log("🔥 commentById", commentById); */
 
   // ===== 댓글 트리를 HTML로 렌더링 =====
   function createCommentHTML(comments, openStatus = false) {
@@ -105,9 +111,11 @@ function x(){
       let comentCnt = comment.children.length;
    
      
-
+      
+      
+//' <span class="nickname">' + comment.user_nickname + '</span>
       html += '<li class="comment-item" data-comment-id="' + comment.artwork_comment_id + '">';
-      html += '<div class="comment-text">' + comment.comment_text + ' (<span class="nickname">' + comment.user_nickname + '</span>)</div>';
+      html += '<div class="comment-text">' + comment.comment_text +'</div>';
 
       if (comentCnt > 0) {
         html += '<span class="comment-cnt">답글 ' + comentCnt + '개</span>';
@@ -116,7 +124,7 @@ function x(){
       // 답글 버튼 (부모ID, 조부모ID 저장)
       if(isAuthenticated){
           html += '<span class="reply-btn" data-mygranparentid="' + comment.parent_comment_id + '" data-myparentid="' + comment.artwork_comment_id + '">답글</span>';
-   	  
+   	  	  //여기다가 자연스러운 인풋창 추가
       }
 
       if (comentCnt > 0) {
@@ -154,23 +162,87 @@ function x(){
       $(this).text("열기");
     }
   });
+  
+  
+  
+//===== 답글 버튼 클릭 시 작동 =====
+  $(document).on('click', '.reply-btn', function () {
+    const myParentId = $(this).data('myparentid');
+    const myGrandParentId = $(this).data('mygranparentid');
+    const $this = $(this);
+    const $commentItem = $this.closest('.comment-item');
+    console.log("myParentId: "+myParentId," myGrandParentId: "+myGrandParentId);    
+    
+    // 이미 인풋창이 열려 있으면 제거(토글)
+    if ($commentItem.find('.reply-input-box').length > 0) {
+      $commentItem.find('.reply-input-box').remove();
+      return;
+    }
+
+ // 🔽 인풋창 HTML 추가
+    var inputHTML = ''
+      + '<div class="reply-input-box" style="margin-top:8px; display:flex; gap:6px;">'
+      + '  <textarea class="reply-textarea" placeholder="답글을 입력하세요..." '
+      + '            style="flex:1; padding:6px; font-size:13px; resize:none; border:1px solid #ccc; border-radius:4px;"></textarea>'
+      + '  <button class="reply-submit-btn" '
+      + '          data-myparentid="' + myParentId + '" '
+      + '          data-mygranparentid="' + myGrandParentId + '" '
+      + '          style="background:#0073e6; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;">'
+      + '    등록'
+      + '  </button>'
+      + '</div>';
+
+      
+
+    $this.after(inputHTML);
+  });
+
+  // ===== 답글 등록 버튼 클릭 시 =====
+  $(document).on('click', '.reply-submit-btn', function() {
+    const myParentId = $(this).data('myparentid');
+    const myGrandParentId = $(this).data('mygranparentid');
+    const $commentItem = $(this).closest('.comment-item');
+    const commentText = $commentItem.find('.reply-textarea').val().trim();
+
+    
+
+    
+    if (commentText === '') {
+      alert('답글 내용을 입력해주세요.');
+      return;
+    }
+
+    // 실제 등록 함수 호출
+    applyToComment(myParentId, myGrandParentId, commentText);
+
+    // 입력창 닫기
+    $commentItem.find('.reply-input-box').remove();
+  });
+
+  
+  
+  
+  
 
   // ===== 답글 버튼 클릭 시 작동 =====
-  $(document).on('click', '.reply-btn', function () {
+ /*  $(document).on('click', '.reply-btn', function () {
     const myParentId = $(this).data('myparentid');
     const myGrandParentId = $(this).data('mygranparentid');
 
     
    console.log("myParentId: "+myParentId+" myGrandParentId: "+myGrandParentId);
-   
+   applyToComment(myParentId,myGrandParentId);
     
+   
+   
+   
+   
     
     // 🔥 작전 발동: Map에서 O(1)로 부모/조부모 댓글 찾기
     const parentComment = commentById.get(myParentId);
     const grandParentComment = commentById.get(myGrandParentId);
 
-/*     console.log("🧩 내가 답글 달려는 부모 댓글:", parentComment);
-    console.log("🧩 조부모 댓글:", grandParentComment); */
+
 
     
     // 🔧 테스트용 자동 답글 객체 생성
@@ -216,7 +288,106 @@ function x(){
     
     $childList.append(newReplyHTML); // ✨ 최종 삽입
 
-  });
+  }); */
+  
+  
+  
+  
+  
+  function applyToComment(myParentId,myGrandParentId,commentText){
+	 	const contextPath = "${pageContext.request.contextPath}";
+	    let url = contextPath + "/api/users/applyTo-artwork-comment";
+	    
+	    let parentCommentId=myParentId
+	    if(myParentId===undefined){
+	    	parentCommentId=myGrandParentId
+	    	
+	    	
+	    }
+	   
+	    
+	    
+	    
+	    
+	    
+	    console.log("artWorkID: "+data[0].artwork_comment_id, " parentCommentId: "+parentCommentId);
+	    
+	    
+	  $.ajax({
+		  url:url,
+		  type:"POST",
+		  data:{
+			  artWorkID:data[0].artwork_comment_id,
+			  parentCommentId:parentCommentId,
+			  commentText:commentText
+			  
+		  },
+		  success:function(res){
+			  
+			  
+			  
+			  console.log(res);
+			  const {artwork_comment_id}= res.data
+			  
+			  
+			  // 🔥 작전 발동: Map에서 O(1)로 부모/조부모 댓글 찾기
+			    const parentComment = commentById.get(myParentId);
+			    const grandParentComment = commentById.get(myGrandParentId);
+
+
+			    
+			    
+			    // UI반영
+			    const newReply = {
+			      comment_text: commentText,
+			      user_nickname: "me",
+			      artwork_comment_id: artwork_comment_id,
+			      parent_comment_id: myParentId,
+			      children: []
+			    };
+
+			    
+			    // 🔥 작전 발동: 트리 구조에 삽입
+			    parentComment.children.push(newReply);
+			    commentById.set(newReply.artwork_comment_id, newReply); // Map 최신화
+
+			    // 🔥 작전 발동: DOM에 정확히 삽입
+			    const newReplyHTML = createCommentHTML([newReply], false);
+			    var $parentEl = $('[data-comment-id="' + myParentId + '"]');
+			    console.log($parentEl);
+			    
+			    
+			    
+			 // 🔥 작전 발동: DOM 트리에도 정확하게 삽입
+			    let $childList = $parentEl.children('ul.hidded-children');
+
+
+			    
+			    if ($childList.length === 0) {
+			      // 댓글 자식 영역이 없으면 새로 만들어서 보여줌
+			      $childList = $('<ul class="hidded-children" style="display: block;"></ul>');
+			      $parentEl.append($childList);
+			    } else {
+			      // 🔥 댓글 자식 영역이 이미 있지만 닫혀 있으면 펼쳐줌
+			      if ($childList.css("display") === "none") {
+			        $childList.show();
+
+			        // UX 향상: "열기" → "접기"로 바꿔주기
+			        $parentEl.find(".comment-cnt").last().text("접기");
+			      }
+			    }
+
+			    //console.log( $childList)
+			    
+			    $childList.append(newReplyHTML); // ✨ 최종 삽입
+			     
+		  }
+		  
+		  
+	  })
+	  
+  }
+  
 </script>
 
 

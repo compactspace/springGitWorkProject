@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.spring.finall.exception.artworkexception.ArtWorkCompleteException;
 import com.spring.finall.exception.artworkexception.ArtWorkDelteFileException;
 import com.spring.finall.service.ArtworkService;
+import com.spring.finall.user.ArtWorkCommentVO;
+import com.spring.finall.user.ArtworkVO;
 
 @Service("ArtworkService")
 public class ArtworkServiceImpl implements ArtworkService {
@@ -224,6 +226,38 @@ public class ArtworkServiceImpl implements ArtworkService {
 	public Map<String, Object> getArtWorkDetail(int artWorkId) {
 		// TODO Auto-generated method stub
 		return  artworkServiceDAO.getArtWorkDetail(artWorkId);
-	}
+}
 
+	@Override
+	public int createArtworkComment(ArtWorkCommentVO arworkCommentVO) {
+		
+		int affectedRow=artworkServiceDAO.createArtworkComment(arworkCommentVO);
+		
+		return  affectedRow;
+		
+	}
+	@Override
+	public int applyToComment(ArtWorkCommentVO arworkCommentVO) {
+		
+		int affectedRow=artworkServiceDAO.applyToComment(arworkCommentVO);
+		
+		return  affectedRow;
+		
+	}
+	@Override
+	public	Map<String, Object> searchyArtWork(	ArtworkVO artWorkVO){
+		
+		Map<String, Object> searchyList=artworkServiceDAO.searchyArtWork(artWorkVO);
+		
+		return  searchyList;
+		
+	}
+	@Override
+	public int searchyCntAll(	ArtworkVO artWorkVO){
+		
+		int  searchyAllCnt=artworkServiceDAO.searchyCntAll(artWorkVO);
+		
+		return  searchyAllCnt;
+		
+	}
 }

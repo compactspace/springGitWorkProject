@@ -69,6 +69,8 @@
 			alias="ArtworkVO" />
 		<typeAlias type="com.spring.finall.user.ArtworkImageVO"
 			alias="ArtworkImageVO" />
+			<typeAlias type="com.spring.finall.user.ArtWorkCommentVO"
+			alias="ArtWorkCommentVO" />
 
 
 
