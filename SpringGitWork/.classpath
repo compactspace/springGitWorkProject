@@ -28,6 +28,5 @@
 			<attribute name="owner.project.facets" value="jst.web"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/sts-bundle/sts-3.9.17.RELEASE/lombok-1.18.4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
