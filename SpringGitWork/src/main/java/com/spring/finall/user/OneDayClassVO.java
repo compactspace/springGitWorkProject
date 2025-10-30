@@ -1,9 +1,16 @@
 package com.spring.finall.user;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OneDayClassVO {
+	
+	
+	 int UPDATECOLUMNMAXCNT=10;
+	 
+	
 
 	private String onedayclass_name;
 	private int onedayclass_price;
@@ -11,19 +18,34 @@ public class OneDayClassVO {
 	private String reserve_img;
 	private Integer onedayclass_num;
 	
+	private Long teacher_id;
 	
-	//편의상 뷰 프로젝트의 폴더경로의 사진저장소
-	//편의상 반정규화로 간다.
-	private String imagelocallpath1;
-	private String imagelocallpath2;
-	private String imagelocallpath3;
-	private String imagelocallpath4;
-	private String imagelocallpath5;
+	
+	
+	
 	//각종 간단 정보
 	private String address;
 	private String park;
 	private String playtime;
 	private String maximum_guests;
+	
+	
+	
+	
+	
+	
+	//편의상 뷰 프로젝트의 폴더경로의 사진저장소
+		//편의상 반정규화로 간다.
+		private String imagelocallpath1;
+		private String imagelocallpath2;
+		private String imagelocallpath3;
+		private String imagelocallpath4;
+		private String imagelocallpath5;
+		
+	
+	
+	
+	
 	
 	
 	public String getAddress() {
@@ -140,6 +162,14 @@ public class OneDayClassVO {
 	
 	
 	
+	public Long getTeacher_id() {
+		return teacher_id;
+	}
+
+	public void setTeacher_id(Long teacher_id) {
+		this.teacher_id = teacher_id;
+	}
+
 	public Integer getNextpage() {
 		return nextpage;
 	}
@@ -227,6 +257,30 @@ public class OneDayClassVO {
 		candiImageList.add(this.getImagelocallpath5());
 		return candiImageList;
 	}
+	
+	
+	
+	
+	public Map<String, Object> toFieldMap() {
+	    Map<String, Object> map = new HashMap<>();
+
+	    // VO 내 필드들 중 imagelocallpath1~5 제외
+	    map.put("onedayclass_name", getOnedayclass_name());
+	    map.put("onedayclass_price", getOnedayclass_price());
+	    map.put("onedayclass_info", getOnedayclass_info());
+	    map.put("reserve_img", getReserve_img());
+	    map.put("onedayclass_num", getOnedayclass_num());
+	    map.put("teacher_id", getTeacher_id());
+
+	    map.put("address", getAddress());
+	    map.put("park", getPark());
+	    map.put("playtime", getPlaytime());
+	    map.put("maximum_guests", getMaximum_guests());
+
+	    return map;
+	}
+	
+	
 	
 	
 	

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+        http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+
+
+
+<!-- =========================
+1. Teacher 뷰 (JSP 페이지) 관련 보안
+========================= -->
+<http pattern="/teachers/**" 
+      use-expressions="true" entry-point-ref="teacherAuthenticationEntryPoint">
+
+    <!-- 권한 부족(403) 처리 -->
+    <access-denied-handler ref="teacher403" />
+
+    <!-- /teachers/** 는 로그인된 teacher만 접근 가능 -->
+    <intercept-url pattern="/teachers/**" access="hasRole('ROLE_TEACHER')" />
+
+    <!-- 로그아웃 -->
+    <logout logout-url="/teachers/logout"
+            logout-success-url="/guest/" />
+</http>
+
+<!-- =========================
+2. Teacher API
+========================= -->
+<http pattern="/api/teacher/**" 
+      use-expressions="true" entry-point-ref="teacherAuthenticationEntryPoint">
+
+    <!-- /api/teacher/** 는 로그인된 teacher만 접근 -->
+    <intercept-url pattern="/api/teacher/**" access="hasRole('ROLE_TEACHER')" />
+</http>
+
+<!-- =========================
+3. 기본 영역 (로그인, 공용 API)
+항상 마지막에 위치
+========================= -->
+<http pattern="/teacher/**" use-expressions="true" entry-point-ref="teacherAuthenticationEntryPoint">
+
+    <!-- 로그인 페이지 접근 허용 -->
+    <intercept-url pattern="/teacher/signup-page" access="permitAll" />
+    <intercept-url pattern="/teacher/login-page" access="permitAll" />
+    <intercept-url pattern="/teacher/logingo.do" access="permitAll" />
+  
+    <!-- teacher 로그인 필터 -->
+    <custom-filter before="FORM_LOGIN_FILTER" ref="loginFormTeacherFilter" />
+
+ 
+</http>
+
+    <!-- Teacher 인증 관리자 -->
+    <authentication-manager alias="authenticationManager">
+        <authentication-provider ref="teacherAuthenticationProvider" />
+    </authentication-manager>
+
+    <beans:bean id="teacherAuthenticationProvider"
+        class="com.spring.FormSecurity.teacher.TeacherAuthenticationProvider" />
+
+    <!-- Teacher 로그인 성공 핸들러 -->
+    <beans:bean id="teacherLoginsuccessHandler"
+        class="com.spring.FormSecurity.teacher.TeacherLoginsuccessHandler" />
+           <!-- Teacher 로그인 성공 핸들러 -->
+    <beans:bean id="teacherLoginFailureHandler"
+        class="com.spring.FormSecurity.teacher.TeacherLoginFailureHandler" />
+
+    <!-- Teacher 로그인 필터 -->
+    <beans:bean id="loginFormTeacherFilter"
+        class="com.spring.FormSecurity.teacher.LoginFormTeacherFilter"
+        p:authenticationManager-ref="authenticationManager"
+        p:authenticationSuccessHandler-ref="teacherLoginsuccessHandler"
+        p:authenticationFailureHandler-ref="teacherLoginFailureHandler"
+         />
+
+    <!-- 로그아웃 관련 -->
+    <beans:bean id="fomLogOutSuccessHandler"
+        class="com.spring.FormSecurity.FomLogOutSuccessHandler" />
+
+    <beans:bean id="formLogOutHandler"
+        class="com.spring.FormSecurity.FormLogOutHandler" />
+
+	<beans:bean id="teacherAuthenticationEntryPoint"
+		class="com.spring.FormSecurity.teacher.TeacherAuthenticationEntryPoint" />
+
+    <!-- 권한 없는 접근 처리 -->
+    <beans:bean id="teacher403"
+        class="com.spring.finall.security.MyAccessDeniedHandler">
+        <beans:property name="errorPage" value="403" />
+    </beans:bean>
+
+</beans:beans>

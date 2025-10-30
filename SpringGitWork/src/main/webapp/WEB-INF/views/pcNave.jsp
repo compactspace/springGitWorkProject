@@ -351,12 +351,20 @@ if (request.getParameter("cmd") != null)
 </pre> --%>
 
 	<!-- HEADER 전체 wrapper -->
+	
+
+	
+	
+	
 <div id="header_wrapper" >
 
     <!-- ✅ 1행: 로그인/로그아웃 -->
-    <div class="header_top" >
+    <div class="header_top" >   
+
+     
+     
        <!-- ✅ 로그인 상태일 때 -->
-<sec:authorize access="isAuthenticated()">
+<sec:authorize access="hasAuthority('user')">
     <a href="${pageContext.request.contextPath}/users/mypage">나의정보</a> &nbsp;|&nbsp;
 	<a href="${pageContext.request.contextPath}/users/generalcartlist">장바구니</a> &nbsp;|&nbsp;
     <a href="${pageContext.request.contextPath}/users/payinfo">결제현황</a> &nbsp;|&nbsp;
@@ -365,11 +373,27 @@ if (request.getParameter("cmd") != null)
   <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
   <button type="submit" style="background: none; border: none; color: #333; cursor: pointer;">로그아웃</button>
 </form>
+</sec:authorize>
 
 
+
+<sec:authorize access="hasRole('ROLE_TEACHER')">
+
+
+  <a href="${pageContext.request.contextPath}/teacher/teacher-my-info">나의정보</a> &nbsp;|&nbsp;	
+ <form id="logoutForm" action="${pageContext.request.contextPath}/users/logout" method="POST" style="display: inline;">
+  <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+  <button type="submit" style="background: none; border: none; color: #333; cursor: pointer;">로그아웃</button>
+</form>
 
 
 </sec:authorize>
+
+
+
+
+
+
 <!-- ✅ 비로그인 상태일 때 -->
 <sec:authorize access="!isAuthenticated()">
     <a href="${pageContext.request.contextPath}/guest/login">로그인/가입</a>

@@ -74,6 +74,13 @@
 
 
 
+
+
+
+<typeAlias type="com.spring.FormSecurity.teacher.UserTeacherDetail"
+			alias="UserTeacherDetail" />
+
+
 	</typeAliases>
 
 
@@ -106,9 +113,9 @@
 
 		<mapper resource="mappings/OrderMapper.xml" />
 		<mapper resource="mappings/PaymentMapper.xml" />
+<mapper resource="mappings/UserTeacherDetailMapper.xml" />
 
-
-
+<mapper resource="mappings/ManageOneDayClassMapper.xml" />
 
 
 	</mappers>

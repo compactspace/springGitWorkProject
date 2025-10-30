@@ -18,7 +18,6 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,16 +25,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.finall.WorkImgVO;
 import com.spring.finall.apiResponseController.ApiResponse;
 import com.spring.finall.businessresult.SignUpSmsSendResult;
-import com.spring.finall.businessresult.SmsSendResult;
-import com.spring.finall.security.UserDetailsVO2;
+import com.spring.finall.businessresult.TeacherInsertResult;
+import com.spring.finall.exception.teacherMemberShip.TeacherDocumentException;
 import com.spring.finall.service.ArtworkService;
 import com.spring.finall.service.MemberService;
 import com.spring.finall.service.OneDayClassService;
 import com.spring.finall.service.SignUpSmsSendService;
+import com.spring.finall.service.TeacherMemberService;
 import com.spring.finall.service.WorkService;
 import com.spring.finall.user.ArtworkVO;
 import com.spring.finall.user.OneDayClassVO;
@@ -46,7 +47,7 @@ import com.spring.finall.user.UserVO;
 @Controller
 @RequestMapping("/api/guest")
 public class GuestController {
-	
+
 	@Autowired
 	private ProductService protService;
 
@@ -55,17 +56,18 @@ public class GuestController {
 
 	@Autowired
 	private WorkService workService;
-	
+
 	@Autowired
 	private ArtworkService artWorkService;
-	
+
 	@Autowired
 	private MemberService memberService;
-	
-	
+
 	@Autowired
 	private SignUpSmsSendService signUpSmsSendService;
-	
+
+	@Autowired
+	private TeacherMemberService teacherMemberService;
 
 	@RequestMapping(value = "/productGroupList")
 	public String ajaxProductGroupList(ProductVO vo,
@@ -102,109 +104,94 @@ public class GuestController {
 		return "compoents/onedayclassinfopage/reviewFragment";
 	}
 
-
 	@RequestMapping(value = "/get-more-work-comments")
 	@ResponseBody
-	public List<Map<String, Object>>  getMoreWorkComments(@RequestParam("work_id") int work_id,
-			
-			@RequestParam(defaultValue = "10") int limit,
-			@RequestParam(defaultValue = "0") int offset,
-			
+	public List<Map<String, Object>> getMoreWorkComments(@RequestParam("work_id") int work_id,
+
+			@RequestParam(defaultValue = "10") int limit, @RequestParam(defaultValue = "0") int offset,
 
 			Model model, HttpServletRequest req) {
 
-		List<Map<String, Object>>  treeCommentList=	workService.getMoreWorkComments(work_id, limit,offset);
+		List<Map<String, Object>> treeCommentList = workService.getMoreWorkComments(work_id, limit, offset);
 		model.addAttribute("treeCommentList", treeCommentList);
 
 		return treeCommentList;
 	}
-	
-	
-	
+
 	@PostMapping("/request-signup-sms-code")
 	@ResponseBody
-	public ApiResponse<SignUpSmsSendResult> requestSignUPSmsCode(HttpServletRequest req, @RequestParam("phone") String phone, Model model) {
-	
-	
-		   // 1. 현재 사용자의 HttpSession 객체 획득
-	    HttpSession session = req.getSession();
+	public ApiResponse<SignUpSmsSendResult> requestSignUPSmsCode(HttpServletRequest req,
+			@RequestParam("phone") String phone, Model model) {
 
-	    // 2. 이 사용자의 고유 세션 ID 확인
-	    String sessionId = session.getId();
+		// 1. 현재 사용자의 HttpSession 객체 획득
+		HttpSession session = req.getSession();
 
-	    System.out.println("비로그인 사용자의 세션 ID: " + sessionId);
+		// 2. 이 사용자의 고유 세션 ID 확인
+		String sessionId = session.getId();
 
-	    SignUpSmsSendResult result = signUpSmsSendService.requestSmsCode(sessionId, phone, req.getSession(), model);
+		System.out.println("비로그인 사용자의 세션 ID: " + sessionId);
+
+		SignUpSmsSendResult result = signUpSmsSendService.requestSmsCode(sessionId, phone, req.getSession(), model);
 
 		// 결과에 따라 반환 (문자 발송 성공시 token 반환, 아니면 상태 문자열)
 		if (result.isSuccess()) {
-			return ApiResponse.<SignUpSmsSendResult>builder().code(201).success(true).message("인증번호가 발송되었습니다.").data(result)
-					.build();
+			return ApiResponse.<SignUpSmsSendResult>builder().code(201).success(true).message("인증번호가 발송되었습니다.")
+					.data(result).build();
 		} else {
-			return ApiResponse.<SignUpSmsSendResult>builder().code(201).success(true).message(result.getStatus()).data(result)
-					.build();
+			return ApiResponse.<SignUpSmsSendResult>builder().code(201).success(true).message(result.getStatus())
+					.data(result).build();
 		}
-	
+
 	}
-	
-	
+
 	@PostMapping("/signup-verify-sms-code")
 	@ResponseBody
-	public ApiResponse<SignUpSmsSendResult> verifySmsCode(
-			HttpServletRequest req, @RequestParam("code") String inputCode, @RequestParam("token") String token,Model model) {
-		   // 1. 현재 사용자의 HttpSession 객체 획득
-	    HttpSession session = req.getSession();
+	public ApiResponse<SignUpSmsSendResult> verifySmsCode(HttpServletRequest req,
+			@RequestParam("code") String inputCode, @RequestParam("token") String token, Model model) {
+		// 1. 현재 사용자의 HttpSession 객체 획득
+		HttpSession session = req.getSession();
 
-	    // 2. 이 사용자의 고유 세션 ID 확인
-	    String sessionId = session.getId();
+		// 2. 이 사용자의 고유 세션 ID 확인
+		String sessionId = session.getId();
 
-	    System.out.println("비로그인 사용자의 세션 ID: " + sessionId);
+		System.out.println("비로그인 사용자의 세션 ID: " + sessionId);
 		SignUpSmsSendResult smsSendResult = signUpSmsSendService.verifySmsCode(sessionId, session, inputCode, token);
 
-		
 		// 결과에 따라 반환 (문자 발송 성공시 token 반환, 아니면 상태 문자열)
 		if (smsSendResult.isSuccess()) {
 			model.addAttribute("smsVerified", true);
-			return ApiResponse.<SignUpSmsSendResult>builder().code(201).success(true).message("인증이 완료되었습니다.").data(smsSendResult)
-					.build();
+			return ApiResponse.<SignUpSmsSendResult>builder().code(201).success(true).message("인증이 완료되었습니다.")
+					.data(smsSendResult).build();
 		} else {
-			return ApiResponse.<SignUpSmsSendResult>builder().code(201).success(true).message("인증 실패").data(smsSendResult)
-					.build();
+			return ApiResponse.<SignUpSmsSendResult>builder().code(201).success(true).message("인증 실패")
+					.data(smsSendResult).build();
 		}
 	}
-	
-	
-	
+
 	@PostMapping("/alive-verify-sms-code")
 	@ResponseBody
-	public ApiResponse<SignUpSmsSendResult> aliveVerifySmsCode(
-			HttpServletRequest req, @RequestParam("token") String token,Model model) {
-		   // 1. 현재 사용자의 HttpSession 객체 획득
-	    HttpSession session = req.getSession();
+	public ApiResponse<SignUpSmsSendResult> aliveVerifySmsCode(HttpServletRequest req,
+			@RequestParam("token") String token, Model model) {
+		// 1. 현재 사용자의 HttpSession 객체 획득
+		HttpSession session = req.getSession();
 
-	    // 2. 이 사용자의 고유 세션 ID 확인
-	    String sessionId = session.getId();
+		// 2. 이 사용자의 고유 세션 ID 확인
+		String sessionId = session.getId();
 
-	    System.out.println("비로그인 사용자의 세션 ID: " + sessionId);
+		System.out.println("비로그인 사용자의 세션 ID: " + sessionId);
 		SignUpSmsSendResult smsSendResult = signUpSmsSendService.aliveverifySmsCode(sessionId, session, token);
 
-		
 		// 결과에 따라 반환 (문자 발송 성공시 token 반환, 아니면 상태 문자열)
 		if (smsSendResult.isSuccess()) {
 			model.addAttribute("smsVerified", true);
-			return ApiResponse.<SignUpSmsSendResult>builder().code(201).success(true).message("인증이 완료되었습니다.").data(smsSendResult)
-					.build();
+			return ApiResponse.<SignUpSmsSendResult>builder().code(201).success(true).message("인증이 완료되었습니다.")
+					.data(smsSendResult).build();
 		} else {
-			return ApiResponse.<SignUpSmsSendResult>builder().code(201).success(true).message("인증 실패").data(smsSendResult)
-					.build();
+			return ApiResponse.<SignUpSmsSendResult>builder().code(201).success(true).message("인증 실패")
+					.data(smsSendResult).build();
 		}
 	}
-	
-	
-	
-	
-	
-	
+
 	@PostMapping("/signup-remove-smsCoolDown")
 	@ResponseBody
 	public ApiResponse<String> removeSmsCooldown(HttpServletRequest req) {
@@ -221,16 +208,14 @@ public class GuestController {
 			return response;
 		}
 	}
-	
-	
+
+	// 일반유저 회원가입
 	@RequestMapping(value = "/action-signup")
 	@ResponseBody
 	public String insertMembership(UserVO vo, HttpSession session) throws Exception {
 
 		String password = BCrypt.hashpw(vo.getPassword(), BCrypt.gensalt());
 		vo.setPassword(password);
-
-		
 
 		try {
 			memberService.insertMembership(vo);
@@ -241,37 +226,57 @@ public class GuestController {
 			System.out.println("내가뜨면 아이디 유니크제약조건위배");
 			return "signupfalse";
 		}
-	}// 회원가입 종료
-	
+	}
 
-	
-	//문자인증
+	// 선생님 회원가입
+	@RequestMapping(value = "/teacher-action-signup")
+	@ResponseBody
+	public ApiResponse<TeacherInsertResult> insertTeacher(
+			@RequestParam("id") String id,
+	        @RequestParam("password") String password,
+	        @RequestParam("businessCertificate") MultipartFile file) throws Exception {
+			String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());		
+		
+			
+			try {
+				teacherMemberService.insertTeacherMembership(id, hashedPassword, file);
+				return ApiResponse.<TeacherInsertResult>builder().code(201).success(true).message("회원가입 성공").data(new TeacherInsertResult(201, false, "회원가입성공")).build();
+				
+			}catch(TeacherDocumentException te) {
+			
+			
+				
+				return ApiResponse.<TeacherInsertResult>builder().code(500).success(false).message("회원가입 실패").data(new TeacherInsertResult(500, false, te.getMessage())).build();
+			}
+			
+	}// 회원가입 종료
+
+	// 문자인증
 	@RequestMapping(value = "/signup-page4")
 	public String getMoreWorkComments4() {
 
 		return "securityphonesms";
 	}
-	
+
 	// 회원가입전 이미 있는 아이디 인지 체그하는 아작스 호출
 	@RequestMapping(value = "/checkout-signup-id")
 	@ResponseBody
 	public boolean checkOutPossibleSignUpId(UserVO vo, HttpSession session, HttpServletRequest req) throws Exception {
 
-	
 		boolean check = memberService.checkidMembership(vo);
 
 		if (check) {
-		
+
 			return check;
 		} else {
 			return check;
 		}
 
-	} 
-	
+	}
 
 	@GetMapping("/get-artwork-image")
-	public ResponseEntity<Resource> servePrivateDraftImage(@RequestParam(defaultValue = "/userArtwork/") String folder, // ex: /userArtwork/
+	public ResponseEntity<Resource> servePrivateDraftImage(@RequestParam(defaultValue = "/userArtwork/") String folder, // ex:
+																														// /userArtwork/
 			@RequestParam("name") String fileName) {
 		try {
 			// ✅ 보안 상 폴더 경로 정규화 방어
@@ -282,7 +287,7 @@ public class GuestController {
 			// ✅ 서버 내부 절대 경로 설정
 			String rootBaseDir = "C:/"; // 또는 환경변수로 뺄 수도 있음
 			String fullPath = rootBaseDir + folder + fileName;
-			Path filePath = Paths.get(fullPath).normalize();			
+			Path filePath = Paths.get(fullPath).normalize();
 
 			if (!Files.exists(filePath)) {
 				return ResponseEntity.notFound().build();
@@ -310,32 +315,25 @@ public class GuestController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-	
-	
-	
-	
+
 	@GetMapping("/search/ajax")
 	@ResponseBody
-	public Map<String, Object> searchAjax(
-	        @RequestParam String query,
-	        @RequestParam(defaultValue = "1") int page,
-	        @RequestParam(defaultValue = "10") int limit) {  // 기본 10개씩
+	public Map<String, Object> searchAjax(@RequestParam String query, @RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "10") int limit) { // 기본 10개씩
 
-	    int offSet = (page - 1) * limit;
-	    
-	    ArtworkVO artWorkVO = new ArtworkVO();
-	    artWorkVO.setContent(query);
-	    artWorkVO.setLimit(limit);
-	    artWorkVO.setOffSet(offSet);
+		int offSet = (page - 1) * limit;
 
-	    Map<String, Object> searchData = artWorkService.searchyArtWork(artWorkVO);
+		ArtworkVO artWorkVO = new ArtworkVO();
+		artWorkVO.setContent(query);
+		artWorkVO.setLimit(limit);
+		artWorkVO.setOffSet(offSet);
 
-	    Map<String, Object> data = new HashMap<>();
-	    data.put("searchyList", searchData.get("searchyList"));
-	
+		Map<String, Object> searchData = artWorkService.searchyArtWork(artWorkVO);
 
-	    return data;
+		Map<String, Object> data = new HashMap<>();
+		data.put("searchyList", searchData.get("searchyList"));
+
+		return data;
 	}
-
 
 }

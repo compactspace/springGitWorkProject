@@ -10,9 +10,9 @@ public class HomeViewController {
 
     @GetMapping("/")
     public String showMainHome(HttpServletResponse response) {
-    	  response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-    	    response.setHeader("Pragma", "no-cache");
-    	    response.setHeader("Expires", "0");
+//    	  response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+//    	    response.setHeader("Pragma", "no-cache");
+//    	    response.setHeader("Expires", "0");
         return "mainPage/mainhome";
     }
 }

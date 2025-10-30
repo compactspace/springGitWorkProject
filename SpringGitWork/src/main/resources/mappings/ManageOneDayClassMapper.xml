@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ManageOneDayClassMapper">
+
+<select id="getMyActiveOnedayclass" resultType="map"
+	parameterType="map">
+	SELECT *
+	FROM onedayclass AS o
+	INNER JOIN reserverest AS r
+	ON o.onedayclass_num = r.onedayclass_num
+	WHERE o.teacher_id =
+	#{teacherId}
+	AND DATE_FORMAT(r.openday, '%Y-%m') = #{yearMonth}
+</select>
+
+
+<select id="getMyActiveMonthList" resultType="map" parameterType="map">
+    SELECT DISTINCT DATE_FORMAT(r.openday, '%Y-%m') AS reg_month
+    FROM onedayclass o
+    JOIN reserverest r ON o.onedayclass_num = r.onedayclass_num
+    WHERE o.teacher_id = #{teacherId}
+      AND r.openday >= DATE_FORMAT(NOW(), '%Y-%m-01')  -- 현재 달의 시작일 이후
+    ORDER BY reg_month ASC
+</select>
+
+
+<select id="getMyOneDayClassInfo" resultType="oneDayClassVO" parameterType="Long">
+ select * from onedayclass where teacher_id=#{teacher_id};
+</select>
+
+ <!-- 주의: ${}는 문자열 그대로 삽입, SQL injection 주의 -->
+<update id="updateOneDayClassInfo" parameterType="map">
+    UPDATE onedayclass
+    SET ${updateColumns} 
+    WHERE teacher_id = #{teacherId}
+</update>
+
+
+</mapper>

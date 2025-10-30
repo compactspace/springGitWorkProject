@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserTeacherDetailMapper">
+
+    <!-- username으로 teacher 조회 -->
+    <select id="selectByUsername" parameterType="String" resultType="com.spring.FormSecurity.teacher.UserTeacherDetail">
+        SELECT 
+        	teacher_id,
+            username,
+            password,
+            enabled,
+            approved
+        FROM teacher
+        WHERE username = #{username}
+    </select>
+    
+    
+    
+<insert id="insertTeacherMembership" parameterType="map" useGeneratedKeys="true" keyProperty="teacherId.teacherId">
+    INSERT INTO teacher (username, password)
+    VALUES (#{username}, #{password})
+</insert>
+
+    
+    
+    
+    
+    
+  <insert id="insertTeacherDocument" parameterType="map">
+    INSERT INTO teacher_documents (
+        teacher_id,      
+        file_path
+    ) VALUES (
+        #{teacherId},        <!-- Map에서 teacherId 키 사용 -->
+        #{filePath}          <!-- Map에서 filePath 키 사용 -->
+    )
+</insert>
+
+
+
+
+<select id="currentMyinfo" parameterType="String" resultType="Map">
+SELECT
+	
+t.username as userId,
+
+COALESCE(t.name, '테스용 사이트로 개인정보 삽입금지') as name,
+
+COALESCE(t.email,'테스용 사이트로 개인정보 삽입금지') as email ,
+
+COALESCE(t.phone,'테스용 사이트로 개인정보 삽입금지') as phone,
+
+t.approved,
+
+t.created_at,
+
+td.status
+
+FROM
+	teacher as t
+INNER JOIN teacher_documents AS td  
+
+ON
+	t.teacher_id = td.teacher_id
+
+WHERE t.username=#{username} 
+
+
+</select>
+
+<select id="currentMyDocuments" parameterType="Long" resultType="Map">
+SELECT
+
+-- 평가된 내용
+td.document_type,
+td.status,
+td.uploaded_at,
+td.reviewed_at,
+-- 평가자 정보
+a.full_name,
+a.email,
+a.phone
+
+FROM
+	teacher_documents as td
+	
+	INNER JOIN admin as a
+	
+ON td.reviewer_id=a.admin_id
+	
+WHERE
+	teacher_id = #{teacher_id};
+</select>
+
+
+
+</mapper>

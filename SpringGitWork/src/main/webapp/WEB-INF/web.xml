@@ -9,12 +9,14 @@
 
 	
 	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath:security-context.xml
-			classpath:applicationcontext.xml
-		</param-value>
-	</context-param>
-
+    <param-name>contextConfigLocation</param-name>
+    <param-value>
+    	classpath:security-global.xml
+        classpath:security-context.xml
+   		classpath:security-teacher.xml
+        classpath:applicationcontext.xml
+    </param-value>
+</context-param>
 
 
 

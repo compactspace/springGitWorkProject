@@ -78,6 +78,11 @@ public class GuestViewController {
 		return "loginPage/login"; // 뷰리졸버에 의해 /WEB-INF/views/login.jsp로 매핑됨
 	}
 
+	
+	
+	
+	
+	
 	@GetMapping("/onedayclasses") // 실제 요청 경로: /users/login
 	public String showOnedayClassPage() {
 		
@@ -322,9 +327,43 @@ public class GuestViewController {
 	    	
 	    }
 	
-			return "signupSmsAuthPage/signupSmsAuthPage";
+			return "usersignupSmsAuthPage/signupSmsAuthPage";
 
 	}
+	
+	
+	
+	
+	@RequestMapping(value = "/get-teacher-signup-page")
+
+	public String showTeacherSignUpPage(@AuthenticationPrincipal UserDetailsVO2 userDetails,HttpServletRequest req) {
+		
+	
+		if(userDetails != null && userDetails.getId() != null) {
+			return "mainPage/mainhome";
+		}		
+		   // 1. 현재 사용자의 HttpSession 객체 획득
+	    HttpSession session = req.getSession();
+
+	    // 2. 이 사용자의 고유 세션 ID 확인
+	    String sessionId = session.getId();
+
+	    String verifiedKey = "signup:verified:session:" + sessionId;
+	  
+	    if(redisTemplate.hasKey(verifiedKey)) {
+	    	
+	    	return "teacherSignUpPage/teacherSignUpPage";
+	    	
+	    }
+	
+			return "teachersignupSmsAuthPage/teachersignupSmsAuthPage";
+
+	}
+	
+	
+	
+	
+	
 
 	@RequestMapping(value = "/artwork-comment")
 	public String test(Model model) throws Exception {
