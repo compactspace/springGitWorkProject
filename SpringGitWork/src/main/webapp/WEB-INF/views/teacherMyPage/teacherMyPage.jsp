@@ -1,4 +1,3 @@
-
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="sec"
@@ -15,64 +14,64 @@
 	src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>내 정보 확인</title>
 
 <style>
  html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      font-family: 'Roboto', sans-serif;
-      overflow: hidden; /* 전역 스크롤 제거 */
-    }
+    height: 100%;
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+}
 
-    #pageWrapper {
-      display: flex;
-      height: 100vh;
-    }
+#pageWrapper {
+    display: flex;
+    height: 100vh;
+}
 
-    /* 좌측 메뉴 */
-    #sidebar {
-      width: 250px;
-      border-right: 1px solid #e0e0e0;
-      overflow-y: auto;
-      overflow-x: hidden;
-      scrollbar-width: none; /* Firefox */
-    }
-    #sidebar::-webkit-scrollbar {
-      display: none; /* Chrome/Safari */
-    }
+#sidebar {
+    width: 240px;
+    border-right: 1px solid #e0e0e0;
+    overflow-y: auto;
+}
 
-    /* 우측 콘텐츠 */
-    #mainContent {
-      flex: 1;
-      height: 100%;
-      padding: 24px;
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
+#mainContent {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+}
 
-    /* 콘텐츠 헤더 */
-    #contentHeader {
-      margin-bottom: 20px;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 12px;
-    }
-    #contentHeader h1 {
-      margin: 0;
-      font-size: 1.6em;
-      color: #333;
-    }
+#contentHeader {
+    padding: 20px 24px;
+    background-color: #f5f7fa;
+    border-left: 6px solid #4a90e2;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
 
-    /* 콘텐츠 바디 */
-    #contentBody {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      min-height: 400px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
+#contentHeader h1 {
+    margin: 0;
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #333;
+}
+
+#contentHeader .header-subtitle {
+    margin: 6px 0 0 0;
+    font-size: 0.95em;
+    color: #666;
+}
+
+
+#contentBody {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    min-height: 400px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+
 /* 내정보 시작 */
 .info-container {
 	display: flex;
@@ -80,7 +79,6 @@
 	width: 400px;
 	margin: 40px auto;
 	font-family: 'Arial', sans-serif;
-
 	padding: 20px 30px;
 }
 
@@ -109,51 +107,84 @@
 }
 /* 내정보 종료 */
 </style>
+
 <script>
+const contextPath="${pageContext.request.contextPath}";
 
+window.onload = function(){	
+	const token = $("meta[name='_csrf']").attr("content");
+	const header = $("meta[name='_csrf_header']").attr("content");
 
-const contextPath="${pageContext.request.contextPath}"
-
-
-window.onload=function(){	
-	
-	 const token = $("meta[name='_csrf']").attr("content");
-	  const header = $("meta[name='_csrf_header']").attr("content");
-
-	  $.ajaxSetup({
+	$.ajaxSetup({
 	    beforeSend: function(xhr) {
-	      xhr.setRequestHeader(header, token);
+	        xhr.setRequestHeader(header, token);
 	    }
-	  });  
-	  
-	
+	});  
+
+	getCurrentMyInfo();  
 }
 
+function getCurrentMyInfo(){
+	$.ajax({
+		url: contextPath + "/api/teacher/teacher-current-myinfo",
+		type: "GET",
+		success: function(res){
+			// 받은 데이터 동적으로 채우기
+			$('#userId').text(res.userId || '-');
+			$('#name').text(res.name || '-');
+			$('#email').text(res.email || '-');
+			$('#phone').text(res.phone || '-');
+			$('#approved').text(res.approved ? '승인' : '미승인');
+			$('#created_at').text(res.created_at || '-');
 
-
+			$('#company_name').text(res.company_name || '-');
+			$('#registration_number').text(res.registration_number || '-');
+			$('#representative_name').text(res.representative_name || '-');
+			$('#company_phone').text(res.company_phone || '-');
+			$('#company_email').text(res.email || '-');
+		},
+		error: function(err){
+			console.error(err);
+			alert("내정보를 불러오는 중 오류가 발생했습니다.");
+		}
+	});
+}
 </script>
-
 
 </head>
 <body>
 	<div id="pageWrapper">
 		<!-- 좌측 수직 메뉴 -->
 		<div id="sidebar">
-			<%@ include
-				file="../compoents/teacherVerticalBar/teacherVerticalBar.jsp"%>
+			<%@ include file="../compoents/teacherVerticalBar/teacherVerticalBar.jsp"%>
 		</div>
 
 
 		<!-- 우측 메인 콘텐츠 -->
 		<div id="mainContent">
 			<div id="contentHeader">
-				<h1>수업 월 등록</h1>
+				<h1>정보 확인</h1>
+				<p class="header-subtitle">등록된 회사 그리고 나의 정보를 확인</p>
 			</div>
 			<div id="contentBody">
-				
+				<div class="info-container">
+					<h2>개인 정보</h2>
+					<div class="info-row"><div>아이디</div><div id="userId"></div></div>
+					<div class="info-row"><div>이름</div><div id="name"></div></div>
+					<div class="info-row"><div>이메일</div><div id="email"></div></div>
+					<div class="info-row"><div>전화번호</div><div id="phone"></div></div>
+					<div class="info-row"><div>승인 상태</div><div id="approved"></div></div>
+					<div class="info-row"><div>가입일</div><div id="created_at"></div></div>
+
+					<h2 style="margin-top:30px;">사업자 정보</h2>
+					<div class="info-row"><div>회사명</div><div id="company_name"></div></div>
+					<div class="info-row"><div>사업자등록번호</div><div id="registration_number"></div></div>
+					<div class="info-row"><div>대표자명</div><div id="representative_name"></div></div>
+					<div class="info-row"><div>회사 전화</div><div id="company_phone"></div></div>
+					<div class="info-row"><div>회사 이메일</div><div id="company_email"></div></div>
+				</div>
 			</div>
 		</div>
 	</div>
-
 </body>
 </html>

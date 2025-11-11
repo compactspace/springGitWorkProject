@@ -22,7 +22,7 @@ public class TeacherMemberServiceImpl implements TeacherMemberService {
 
 	@Override
 	@Transactional
-	public TeacherInsertResult insertTeacherMembership(String id, String hashedPassword, MultipartFile file) {
+	public TeacherInsertResult insertTeacherMembership(String id, String hashedPassword, MultipartFile file,Map<String, Object> companyInfo) {
 
 		TeacherInsertResult teacherInsertResult = null;
 
@@ -44,6 +44,15 @@ public class TeacherMemberServiceImpl implements TeacherMemberService {
 				throw new TeacherDocumentException("선생님의 제출서류정보  DB삽입시 에러");
 
 			}
+			
+			companyInfo.put("teacher_id", teacherId);
+			affectedRow =	teacherMemberServiceDAO.insertCompanyInfo(companyInfo);
+			if (affectedRow <= 0) {
+				throw new TeacherDocumentException("기업정보  DB삽입시 에러");
+
+			}
+			
+			
 
 		} catch (TeacherDocumentException de) {
 

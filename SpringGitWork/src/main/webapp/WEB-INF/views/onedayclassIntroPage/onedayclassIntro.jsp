@@ -153,6 +153,25 @@ h1 {
 }
 
 /* 슬라이더 영역 종료*/
+
+ #mobileNave {
+        display: none;
+    }
+    
+    
+/*모바일 시작  */
+@media screen and (max-width: 760px) {
+
+
+    /* 네비게이션 전환 */
+    #pcNave {
+        display: none;
+    }
+    #mobileNave {
+        display: block;
+    }
+}
+/*모바일 종료  */
 </style>
 
 
@@ -173,7 +192,12 @@ h1 {
 </head>
 <body>
 	<div class="wrapper">
-		<%@ include file="../pcNave.jsp"%>
+		<div id="pcNave">
+ <%@ include file="../pcNave.jsp"%>
+</div>
+<div id="mobileNave">
+ <%@ include file="../mobileNave.jsp"%>
+</div>
 		<h1>우리의 원데이 클래스는</h1>
 
 		<div class="intro">
@@ -213,14 +237,13 @@ h1 {
 			🎟️ 수업은 사전 예약제로 운영되며,<br> 참여 인원에 따라 시간과 테마가 달라질 수 있습니다.
 		</div>
 
-		<div class="section">
+		<!-- <div class="section">
 			<h2>📍 위치 & 안내</h2>
 			<p>
 				경기도 안양시 만안구에 위치한 저희 작업실은<br> 조용하고 따뜻한 분위기에서 수업이 진행됩니다.<br>
 				주차 가능 / 대중교통 접근 용이
 			</p>
-		</div>
-				
+		</div> -->			
 
 		<div class="section">
 			<h2>🎨 클래스 둘러보기</h2>

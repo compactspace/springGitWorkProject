@@ -8,7 +8,7 @@
 	type="text/css" />
 <script
 	src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-
+<script src="${pageContext.request.contextPath}/resources/js/common/commonAjax.js"></script>
 
 <head>
 
@@ -16,6 +16,21 @@
     8글자 이상, 영문, 숫자, 특수문자를 모두 사용해야 한다.
     비밀번호 확인 : 비밀번호와 일치해야 한다. -->
 <style>
+
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center; /* 수평 중앙 */
+    align-items: center;     /* 수직 중앙 */  
+}
+
+
+
+
+
+
+
 .alldivwrapper {
 	width: 500px;
 	position: relative;
@@ -488,12 +503,52 @@ $("#finallsubmit").on("click",()=>{
   
   
   
+  
+  
 	$("#idduplicationcheck").on(
 			"click",
-			function() {
+			function() {	
+				
+				ajaxRequest({
+				    url: "${pageContext.request.contextPath}/api/guest/checkout-signup-id", // ✅ 여기 콤마 추가
+				    type: "POST",
+				    dataType: "json",
+				    contentType: "application/x-www-form-urlencoded; charset=UTF-8", // ✅ 여기 변경
+				    data: {
+				        "id": $("#ids").val()
+				    },
+				    success: function(data) {
+				    	console.log(data);
+				    	
+				        let check = document.getElementsByClassName('ok');
+				        if (data) {
+				            idDuplicCheck = true;
+				            $("#pwd").removeAttr("disabled");
+				            $("#checkpwd").attr("disabled", "true");
+				            $("#idduplicationcheck").attr("data-val", "true");
+				            $("#id").attr("data-val", "true");
+				            $(".possible-id").show();
+				        } else {
+				            $(".already-using-id").show();
+				        }
+				    }
+				}, {
+				    client: function(res) {				    	
+				        console.log(res);
+				        $(".already-using-id").show(); 
+				        
+				        
+				    },
+				    server: function(res) {
+				        console.log("🔥 서버 오류:", res);
+				        console.log("서버 오류: " + res.message + " (code: " + res.code + ")");
+				    }
+				});	
 				
 				
-				$.ajax({
+				
+				
+			 /* 	$.ajax({
 					url : "${pageContext.request.contextPath}/api/guest/checkout-signup-id",
 					type : "POST",
 					data : {
@@ -521,7 +576,7 @@ $("#finallsubmit").on("click",()=>{
 
 					}
 
-				})
+				}) */
 
 			})
 

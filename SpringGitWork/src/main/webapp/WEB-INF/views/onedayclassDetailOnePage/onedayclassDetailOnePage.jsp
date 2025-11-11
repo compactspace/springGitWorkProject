@@ -50,6 +50,62 @@
       padding-top: 20px;
     padding-bottom: 20px;
   }  
+  
+  
+  
+  
+  #mobileNave {
+		display: none;
+	}
+	
+@media screen and (max-width: 760px) {
+    html, body {
+        font-size: 15px; /* 전체 폰트 크기 조정 */
+    }
+
+    #allwrapper {
+        padding: 10px;
+    }
+
+    .header-wrapper h2 {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+
+    .header-wrapper .subtitle {
+        font-size: 0.9rem;
+        text-align: center;
+        margin-bottom: 16px;
+    }
+
+    .select-label {
+        font-size: 0.95rem;
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    #classSelect {
+        width: 100%;
+        font-size: 1rem;
+        padding: 10px;
+    }
+
+    #onedayclassDetailOneFragment {
+        padding: 10px 0;
+    }
+
+    /* 네비게이션 전환 */
+    #pcNave {
+        display: none;
+    }
+    #mobileNave {
+        display: block;
+    }
+}
+
+
+  
+  
 </style>
 <script>
 
@@ -182,7 +238,13 @@ const classExtraInfoMap = {
 
 <body>
   <div id="allwrapper">
-    <%@ include file="../pcNave.jsp"%>
+   
+<div id="pcNave">
+ <%@ include file="../pcNave.jsp"%>
+</div>
+<div id="mobileNave">
+ <%@ include file="../mobileNave.jsp"%>
+</div>
 
     <div class="header-wrapper">
       <h2>수업 소개</h2>

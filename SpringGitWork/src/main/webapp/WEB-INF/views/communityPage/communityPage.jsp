@@ -94,6 +94,29 @@ body {
 .load-more button:hover {
 	background-color: #0056b3;
 }
+
+
+
+#mobileNave{
+
+  display: none;
+}
+
+/*모바일 시작  */
+@media screen and (max-width: 760px) {
+
+
+    /* 네비게이션 전환 */
+    #pcNave {
+        display: none;
+    }
+    #mobileNave {
+        display: block;
+    }
+}
+/*모바일 종료  */
+
+
 </style>
 
 
@@ -147,7 +170,12 @@ $(document).ready(function() {
 
 </script>
 <body>
-	<%@ include file="../pcNave.jsp"%>
+		<div id="pcNave">
+ <%@ include file="../pcNave.jsp"%>
+</div>
+<div id="mobileNave">
+ <%@ include file="../mobileNave.jsp"%>
+</div>
 
 
 <div class="container-wrapper">

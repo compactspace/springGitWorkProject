@@ -256,6 +256,25 @@
       margin: 0 10px 10px;
     }
   }
+  
+  #mobileNave{
+  display: none;
+}
+
+
+ /*모바일 시작  */
+@media screen and (max-width: 760px) {
+
+
+    /* 네비게이션 전환 */
+    #pcNave {
+        display: none;
+    }
+    #mobileNave {
+        display: block;
+    }
+}
+/*모바일 종료  */ 
 </style>
 
 
@@ -380,9 +399,16 @@ const groupDescriptions = {
 
 </script>
 
+
 <body>
     <div class="allwarpper">
-        <%@ include file="../pcNave.jsp"%>
+       		<div id="pcNave">
+ <%@ include file="../pcNave.jsp"%>
+</div>
+<div id="mobileNave">
+ <%@ include file="../mobileNave.jsp"%>
+</div>
+
      <div id="content1">
   <div class="article1">
     <h2 id="groupTitle">미술용품</h2>

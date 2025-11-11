@@ -63,6 +63,15 @@ public class TeacherMemberServiceDAO {
 	}
 	
 
+   public int insertCompanyInfo(Map<String,Object> companyInfo) {
+	   
+		int  afftectedRow	=mybatis.insert("UserTeacherDetailMapper.insertCompanyInfo",companyInfo);
+	   
+	   return afftectedRow;
+	   
+   }
+	
+	
 	public List<Map<String,Object>>  currentMyDocuments(Long teacher_id){
 		
 		List<Map<String,Object>> currentMyDocuments	=mybatis.selectList("UserTeacherDetailMapper.currentMyDocuments",teacher_id);

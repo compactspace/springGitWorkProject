@@ -11,6 +11,7 @@
 <meta charset="UTF-8" />
 <title>주문 확인 및 결제</title>
 <style>
+
 /* === 기본 스타일 === */
 body {
 	margin: 0;
@@ -19,60 +20,140 @@ body {
 }
 
 .wrapper {
-	width: 100%;
-	max-width: 1080px;
-	margin: 0 auto;
-	padding: 20px;
+  max-width: 800px;
+  margin: 60px auto;
+  padding: 40px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.wrapper h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+}
+
+/* === 상품 목록 === */
+#product-list {
+  margin-bottom: 32px;
 }
 
 .product {
-	background: #fff;
-	padding: 16px;
-	margin-bottom: 16px;
-	display: flex;
-	border-radius: 8px;
+  background: #fafbfc;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  transition: all 0.25s ease;
+}
+
+.product:hover {
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+  transform: translateY(-2px);
 }
 
 .product img {
-	width: 120px;
-	height: 120px;
-	object-fit: cover;
-	margin-right: 20px;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 20px;
 }
 
-.product-info {
-	flex: 1;
+.product-info h4 {
+  font-size: 17px;
+  margin-bottom: 6px;
+  color: #333;
+}
+.product-info p {
+  font-size: 14px;
+  color: #555;
+  margin: 2px 0;
 }
 
-.info-section {
-	background: #fff;
-	padding: 16px;
-	border-radius: 8px;
-	margin-top: 20px;
-}
-
-.info-section h3 {
-	margin-top: 0;
-}
-
-.info-section div {
-	margin-bottom: 10px;
+/* === 주문자 정보 입력란 === */
+.wrapper > div:not(.info-section):not(#product-list) {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
 label {
-	display: inline-block;
-	width: 120px;
-	font-weight: bold;
+  display: inline-block;
+  width: 140px;
+  font-weight: 600;
+  color: #333;
 }
 
-input, select {
-	padding: 6px 8px;
-	box-sizing: border-box;
+input[type="text"],
+input[type="number"] {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
 }
 
-input[readonly] {
-	background: #eee;
+input[type="text"]:focus,
+input[type="number"]:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
 }
+
+.error-msg {
+  margin-left: 10px;
+  font-size: 13px;
+  color: #e74c3c;
+}
+
+/* === 결제 정보 === */
+.payment-info {
+  background: #f8f9fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 28px;
+}
+
+.payment-info h3 {
+  font-size: 18px;
+  color: #222;
+  margin-bottom: 14px;
+}
+
+.payment-info input[readonly] {
+  background: #e9ecef;
+}
+
+
+
+#test {
+  background: linear-gradient(135deg, #007bff, #0056d2);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#test:hover {
+  background: linear-gradient(135deg, #0056d2, #003f9c);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+
+
 
 /* === 모달 스타일 === */
 .modal-backdrop {
@@ -263,12 +344,39 @@ button.back-btn {
 	width: 100%;
 }
 
-/* step1 모달 종료 */
+/*모달 종료 */
+
+
+
+@media screen and (max-width: 600px) {
+  .wrapper {
+    padding: 20px;
+  }
+
+  .wrapper > div:not(.info-section):not(#product-list) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  label {
+    width: 100%;
+    margin-bottom: 6px;
+  }
+
+  #test {
+    width: 100%;
+  }
+}
+
+
 </style>
 
-<script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
-<script>
 
+<script  src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+<script type="module" src="http://localhost:7010/fake-pg/script2.js"></script>
+
+
+<script>
 
 //✅ CSRF 토큰을 모든 AJAX 요청에 자동으로 포함시킴
 const token = $("meta[name='_csrf']").attr("content");
@@ -320,11 +428,11 @@ $.ajaxSetup({
 	</div>
 
 	<!-- === 결제 모달 === -->
-	<div class="modal-backdrop" id="paymentModal">
+<!-- 	<div class="modal-backdrop" id="paymentModal">
 		<div class="modal" id="modalStep1">
-			<!--  <div class="modal-header">카드 선택
+			 <div class="modal-header">카드 선택
   <span class="modal-close" onclick="closeModal()">×</span>
-</div> -->
+</div>
 
 			<div class="modal-body-grid">
 				<div class="col-1">
@@ -332,7 +440,7 @@ $.ajaxSetup({
 				</div>
 
 				<div class="col-2">
-					<!-- 약관들 -->
+					약관들
 					<div class="row-box selectbox">
 						<div>전자금융거래 이용약관</div>
 						<div>
@@ -346,7 +454,7 @@ $.ajaxSetup({
 						</div>
 					</div>
 
-					<!-- 카드 버튼들 -->
+					카드 버튼들
 					<div class="card-buttons">
 						<button class="card-button card-hyundai" data-card="현대카드">현대카드</button>
 						<button class="card-button card-shinhan" data-card="신한카드">신한카드</button>
@@ -359,7 +467,7 @@ $.ajaxSetup({
 						<div class="col-box col-box-summary">
 							<p id="product-summary"
 								style="font-size: 14px; margin-bottom: 12px; font-weight: bold;">
-								<!-- 상품명 + 외 N건 텍스트가 여기 들어감 -->
+								상품명 + 외 N건 텍스트가 여기 들어감
 							</p>
 
 							<p style="font-size: 16px;">
@@ -408,7 +516,7 @@ $.ajaxSetup({
 					</div>
 				</div>
 
-				<!-- ✅ 공통 3열 -->
+				✅ 공통 3열
 				<div class="col-3" style="text-align: right;">
 					<div class="col-box col-box-col-3">
 						<div class="col-box col-box-summary">
@@ -487,8 +595,244 @@ $.ajaxSetup({
 			</div>
 		</div>
 
-	</div>
-	<script>
+	</div> -->
+	
+	
+	
+	
+	<%-- <c:out value="${param.product_name}" escapeXml="false"/> --%>
+	
+	
+<button onclick="openPayment()">결제하기</button>
+<!-- 결제 모달 영역 -->
+<div id="paymentModal2" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    <div style="position:relative; background:#fff; width:100%; height:100%; border-radius:10px; display:flex; flex-direction:column;">
+        <iframe id="pg-iframe" style="flex:1; border:none;"></iframe>
+        <button id="closeModal" style="padding:10px; margin:10px;">닫기</button>
+    </div>
+</div>
+
+
+
+	<script >
+	
+	let x="${pgUrl}";
+
+	function openPayment() {
+	    var merchantId = '${merchantId}';
+	    var merchant_uid = "${merchant_uid}";
+	    var pgUrl = '${pgUrl}';
+	    console.log("pgUrl: " + pgUrl);
+
+	    // iframe src 설정
+	    var iframe = document.getElementById('pg-iframe');
+	    iframe.src = pgUrl + "?merchantId=" + merchantId;
+
+	    // 모달 표시
+	    var modal = document.getElementById('paymentModal2');
+	    modal.style.display = 'flex';
+
+	    const amountValue = Number($("#amount").val()) || 0;
+	    const formattedAmount = "₩" + amountValue.toLocaleString();
+
+	    
+	    
+	    
+	    // iframe가 로드되면 아이프레임으로 데이터 전달
+	    iframe.onload = function() {
+	        var paymentData = {
+	        	type: "PAYMENT_DATA",  // ← 여기 타입 추가,
+	            merchant_id: merchantId,
+	            merchant_uid: merchant_uid,
+	            amountValue: amountValue,
+	            formattedAmount: formattedAmount,
+	            cart: cart,
+	            selectedCart: selectedCart,
+	            userId: 1234,
+	            order: {
+	                userId: 1234,
+	                merchantUid:merchant_uid,
+	                items: selectedCart.map(item => ({
+	                    productId: item.productCod,
+	                    productName: item.productName,
+	                    quantity: item.quantity,
+	                    pricePerUnit: Number(item.productPrice)
+	                })),
+	                person: {
+	                    name: $("#orderer_name").val().trim(),
+	                    email: $("#orderer_email").val().trim(),
+	                    phone: $("#orderer_phone").val().trim()
+	                }
+	            },
+	            payment: {
+	                paymentNumber: "P1234567890", // 예시로 설정
+	                paymentMethod: "Credit Card"  // 예시로 설정
+	            }
+	        };
+	        
+	        iframe.contentWindow.postMessage({ type: "PAYMENT_DATA", ...paymentData }, "*");
+
+	       
+	        
+	        
+	        
+	        
+	        
+	       
+	        
+	   		 onPaymentComplete(function(res) {
+		        console.log("JSP에서 SDK 콜백 호출됨:", res);
+		        
+		        const {success}=res;
+		        
+		        
+		        if(success){
+		        	const {successCode,successMassage,imp_uid}=res
+		        	
+		        	// 아임포트 결제 완료 콜백 등에서 imp_uid 값을 받은 다음
+		        	const impUid = imp_uid; // 예: imp_123456789012
+
+		        	// 전송 직전에 깊은 복사 후 impUid 추가
+		        	const dataToSend = structuredClone(paymentData);
+		        	dataToSend.payment.impUid = impUid;
+		        	
+		        	
+		        	console.log(dataToSend);	
+		        	
+		        	  $.ajax({
+		        			url: "${pageContext.request.contextPath}/api/users/after-successpayment-complement",
+		        			type: "POST",
+		        			contentType: "application/json",
+		        			data: JSON.stringify(dataToSend),
+		        			success: function(response) {
+		        				console.log("서버 응답:", response);
+
+		        		        if (response.success) {
+		        		            alert("결제 성공!");
+		        		            // 필요하면 response.data로 후속 처리
+		        		            
+		        		            
+		        		            // localStorage에서 최신 cart 읽기
+		        		            const currentCart = JSON.parse(localStorage.getItem("cart") || "[]");
+		        		            console.log("-----")
+		        		            console.log(currentCart)
+		        		           console.log("-----")
+		        		            // selected가 true인 아이템만 삭제
+		        		            const remainingCart = currentCart.filter(item => !(item && item.selected === true));
+		        		            console.log("-----")
+		        		            console.log(remainingCart)	            
+		        		                 console.log("-----")
+		        		            // 남은 아이템 저장      
+		        		            
+		        		            localStorage.setItem("cart", JSON.stringify(remainingCart));
+		        		            
+		        		            
+		        		            
+		        		        } else {
+		        		            alert("결제 실패: " + response.message);
+		        		        }
+		        			},
+		        			error: function(xhr, status, error) {
+		        				console.error("에러 발생:", error);
+		        			}
+		        		});
+		        	
+		        	
+		        }else{
+		        		//말그대로 결제 실패,
+		        	const {errorCode,errorMassage}=res
+		        	//씨발	        	  
+		        	  $.ajax({
+		        			url: "${pageContext.request.contextPath}/api/users/after-successpayment-complement",
+		        			type: "POST",
+		        			contentType: "application/json",
+		        			data: JSON.stringify(paymentData),
+		        			success: function(response) {
+		        				console.log("서버 응답:", response);
+
+		        		        if (response.success) {
+		        		            alert("결제 성공!");
+		        		            // 필요하면 response.data로 후속 처리
+		        		            
+		        		            
+		        		            // localStorage에서 최신 cart 읽기
+		        		            const currentCart = JSON.parse(localStorage.getItem("cart") || "[]");
+		        		            console.log("-----")
+		        		            console.log(currentCart)
+		        		           console.log("-----")
+		        		            // selected가 true인 아이템만 삭제
+		        		            const remainingCart = currentCart.filter(item => !(item && item.selected === true));
+		        		            console.log("-----")
+		        		            console.log(remainingCart)	            
+		        		                 console.log("-----")
+		        		            // 남은 아이템 저장      
+		        		            
+		        		            localStorage.setItem("cart", JSON.stringify(remainingCart));
+		        		            
+		        		            
+		        		            
+		        		        } else {
+		        		            alert("결제 실패: " + response.message);
+		        		        }
+		        			},
+		        			error: function(xhr, status, error) {
+		        				console.error("에러 발생:", error);
+		        			}
+		        		});
+		        		
+		        	
+		        }
+		        
+		        const currentCart = JSON.parse(localStorage.getItem("cart") || "[]");
+	            console.log("-----")
+	            console.log(currentCart)
+	           console.log("-----")
+	            // selected가 true인 아이템만 삭제
+	            const remainingCart = currentCart.filter(item => !(item && item.selected === true));
+	            console.log("-----")
+	            console.log(remainingCart)	            
+	                 console.log("-----")
+	            // 남은 아이템 저장      
+	            
+	            localStorage.setItem("cart", JSON.stringify(remainingCart));    	
+		        	
+		        	
+		    }); 
+	    
+	    
+		    
+		    
+		    
+	   		 
+	   		 
+		    
+		    
+	    };	    
+	  
+	    
+	    
+	    
+	    
+	    
+	    // 부모 페이지에서 아이프레임 메시지 수신
+	   /*  window.addEventListener("message", function(e) {
+	        if (!e.data) return;
+	        console.log("부모가 받은 메시지:", e.data); // 결제 완료 로그
+	    }, false); */
+	}
+
+	
+	
+
+	// 모달 닫기 버튼
+	document.getElementById('closeModal').addEventListener('click', function() {
+	    var modal = document.getElementById('paymentModal');
+	    modal.style.display = 'none';
+	    // iframe 초기화
+	    document.getElementById('pg-iframe').src = '';
+	});
+	
+	
 const cart = JSON.parse(localStorage.getItem("cart") || "[]");
 const $list = $("#product-list");
 let totalAmount = 0;
@@ -557,11 +901,13 @@ function validateOrdererInfo() {
 
   return isValid;
 }
+
+
 $("#test").click(() => {
-/*  if (!validateOrdererInfo()) {
+/*   if (!validateOrdererInfo()) {
     alert("주문자 정보를 다시 확인해주세요.");
     return;
-  }  */
+  }   */
   openPaymentModal();
 });
 
@@ -575,6 +921,9 @@ function openPaymentModal() {
   $("#finalizePayment").prop("disabled", true);
   updatePaymentSummary();
 }
+
+
+
 
 
 
@@ -674,8 +1023,14 @@ $("#agreeCheck").change(function() {
   $("#finalizePayment").prop("disabled", !this.checked);
 });
 
+
+
+
+
+
 $("#finalizePayment").click(() => {
 	const orderData = {
+			
 			  userId: 1234,
 			  order: {
 			    userId: 1234,
@@ -803,23 +1158,23 @@ function updatePaymentSummary() {
 
 
 function updateStep4Summary() {
-	  console.log("=== updateStep4Summary 시작 ===");
+	/*   console.log("=== updateStep4Summary 시작 ==="); */
 
 	  // 장바구니 상품 리스트 출력
 	  const $finalCartList = $("#final-cart-list");
 	  $finalCartList.empty();
-	  console.log("selectedCart 배열:", selectedCart);
+	/*   console.log("selectedCart 배열:", selectedCart); */
 
 	  selectedCart.forEach(item => {
 	    const quantity = item.quantity !== undefined ? item.quantity : 1;
 	    const price = Number(item.productPrice);
 	    const sum = quantity * price;
 
-	    console.log('item.productName:', item.productName);
+	   /*  console.log('item.productName:', item.productName);
 	    console.log('quantity:', quantity);
 	    console.log('price:', price);
 	    console.log('sum:', sum);
-	    console.log('상품: ' + item.productName + ', 수량: ' + quantity + ', 가격: ' + price + ', 합계: ' + sum);
+	    console.log('상품: ' + item.productName + ', 수량: ' + quantity + ', 가격: ' + price + ', 합계: ' + sum); */
 
 	    $finalCartList.append('<li>' + item.productName + ' - 수량: ' + quantity + '개, 합계: ' + sum.toLocaleString() + '원</li>');
 	  });
@@ -829,9 +1184,9 @@ function updateStep4Summary() {
 	  const email = $("#orderer_email").val().trim();
 	  const phone = $("#orderer_phone").val().trim();
 
-	  console.log("주문자 이름:", name);
+	/*   console.log("주문자 이름:", name);
 	  console.log("주문자 이메일:", email);
-	  console.log("주문자 연락처:", phone);
+	  console.log("주문자 연락처:", phone); */
 
 	  $("#final-orderer-info").html(
 	    '이름: ' + name + '<br />' +
@@ -843,16 +1198,16 @@ function updateStep4Summary() {
 	  const amountValue = Number($("#amount").val()) || 0;
 	  const formattedAmount = "₩" + amountValue.toLocaleString();
 	  const cardInfoText = selectedCard ? "선택한 카드: " + selectedCard : "카드가 선택되지 않았습니다.";
-
+/* 
 	  console.log("결제 금액:", amountValue);
-	  console.log("선택 카드:", selectedCard);
+	  console.log("선택 카드:", selectedCard); */
 
 	  $("#final-payment-info").html(
 	    '총 결제 금액: <strong>' + formattedAmount + '</strong><br />' +
 	    cardInfoText
 	  );
 
-	  console.log("=== updateStep4Summary 끝 ===");
+/* 	  console.log("=== updateStep4Summary 끝 ==="); */
 	}
 
 	// 스탭4 열릴 때 호출
@@ -875,7 +1230,6 @@ function updateStep4Summary() {
 
 
 // 모달 열릴 때 함수 호출
-
 function openPaymentModal() {
   $("#paymentModal").show();
   $("#modalStep1").show();

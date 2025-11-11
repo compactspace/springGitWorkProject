@@ -112,8 +112,9 @@
 			width: 85%;
 		}
 
+
 		form {
-			height: 530px;
+			height: 100px;
 			width: 100%;
 		}
 
@@ -620,6 +621,9 @@ $(".smsforminputbro2").on("click",function(){
 	</script>
 </head>
 
+
+
+
 <body>
 	<div class="all">
 		<div class="alldivwrapper">
@@ -627,10 +631,9 @@ $(".smsforminputbro2").on("click",function(){
 				<div class="smswrapper">
 					<div class="smsformheader">
 						<div class="sms2formheader">
-							<button id="goBackbtn">
-								<span class="goback"></span>
+						<button id="goBackbtn">
+								<span class="goback" onclick="window.location.href='${pageContext.request.contextPath}/teacher/login-page'"></span>
 							</button>
-
 
 							<h3 class="m-0"><span>문자 하기</span></h3>
 					

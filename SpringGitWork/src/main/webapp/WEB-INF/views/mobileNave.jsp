@@ -1,128 +1,172 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page import="java.util.*,java.io.*"%>
+<%@ page language="java" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<sec:csrfMetaTags />
+<title>Mobile Navigation</title>
+
 <style>
-/* 모바일 전용..후 */	
-@media screen and (max-width: 701px) {
-
-
-* {
+/* ✅ 기본 세팅 */
+body {
 	margin: 0;
 	padding: 0;
+	font-family: 'Noto Sans KR', sans-serif;
+	background-color: #fff;
+	color: #333;
 }
 
-body {
-	margin: 0 0 0 0px;
-	box-shadow: 0 0 17px 3px rgb(171 171 171/ 50%);
-	background-color: #FFF !important;
-}
-
-
-
-
-
-
-
-.menudiv a {
+a {
 	text-decoration: none;
-	color: #333333 !important;
+	color: inherit;
 }
 
-.menudiv li {
-	display: inline-block !important;
-	width: 30% !important;
-	text-align: center;
-	color: #333333 !important;
-	letter-spacing: .01em !important;
-	font-style: normal;
-	font-weight: 300 !important;
+/* ✅ 전체 래퍼 */
+#header_wrapper {
+	width: 100%;
+	border-bottom: 1px solid #eee;
+	background-color: #fff;
 }
 
-
-
-	.mobileheader {
-		flex-direction: column;
-		display: flex;
-		height: 80px !important;
-		justify-content: center;
-	}
-	.homeicon {
-		background-image: url('./img_icon/homeicon.png');
-		background-position: center;
-		background-repeat: no-repeat;
-		background-attachment: scroll;
-		background-size: cover;
-		width: 40px !important;
-		height: 39.5px !important;
-	}
-	.navebar {
-		display: flex;
-		justify-content: space-between;
-		margin-right: auto;
-		margin-left: auto;
-		max-width: 1050px;
-		color: black;
-		/*   background: #1a73e8; */
-		font-size: 13px !important;
-		font-weight: 600;
-	}
-	.navebar div {
-		line-height: 3em !important;
-	}
-	
-	.navebar div ul{
-	
+/* ✅ 상단 로그인/로그아웃 영역 */
+.header_top {
 	display: flex;
-	list-style-type: none;
+	justify-content: flex-end;
+	align-items: center;
+	padding: 8px 12px;
+	font-size: 13px;
+	color: #666;
+	background-color: #fafafa;
+}
 
+.header_top a, 
+.header_top button {
+	color: #555;
+	font-size: 13px;
+}
+
+.header_top button {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+	font-family: inherit;
+}
+
+/* ✅ 하단 메뉴 영역 */
+.header_bottom {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	padding: 10px 0;
+	background-color: #fff;
+	border-top: 1px solid #eee;
+}
+
+.header_bottom a {
+	font-size: 15px;
+	font-weight: 600;
+	color: #333;
+	text-align: center;
+	flex: 1;
+}
+
+/* ✅ 글쓰기 버튼 */
+.write-btn {
+	background-color: #ff7a00;
+	color: #fff;
+	border: none;
+	padding: 8px 14px;
+	font-size: 14px;
+	font-weight: 600;
+	border-radius: 18px;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.write-btn:hover {
+	background-color: #e56c00;
+}
+
+/* ✅ 반응형 (작은 화면에 맞춤) */
+@media screen and (max-width: 480px) {
+	.header_top {
+		font-size: 12px;
+		padding: 6px 10px;
 	}
-	
-	
-	.menudiv {
-		width: 300px;
-		padding-left: 10px;
+	.header_bottom a {
+		font-size: 14px;
+	}
+	.write-btn {
+		padding: 6px 12px;
+		font-size: 13px;
 	}
 }
 </style>
+
+<script>
+$(document).ready(function() {
+	const token = $("meta[name='_csrf']").attr("content");
+	const header = $("meta[name='_csrf_header']").attr("content");
+
+	$.ajaxSetup({
+		beforeSend: function(xhr) {
+			xhr.setRequestHeader(header, token);
+		}
+	});
+});
+</script>
+
 </head>
 <body>
 
-	<!-- ..모바일 디자인 후... -->
-	<div class="mobileheader">
-		<div class="navebar">
-			<a href="${pageContext.request.contextPath}/">
-				<div class="homeicon"></div>
-			</a>
-			<div class="menudiv">
-				<ul>
-					<c:choose>
-						<c:when test="${userId ne null || user_where=='finalluser'}">
-							<li><c:if test="${user_where=='finalluser'}">
-									<a class="nav-link" href="mypersonalinfo.do?id=${userId}">정보수정</a>
-								</c:if></li>
-							<li class="nav-item active"><a class="nav-link"
-								href="generalcartlist.do?id=${userId}">장바구니</a></li>
-							<li><a href="myreserveinfo.do?user_code=${user_code}">예약현황</a></li>
-							<li class="nav-item active"><a class="nav-link"
-								href="mypayinfo.do?user_code=${user_code}&id=${userId}">결제현황</a></li>
-							<li><a href="logout.do">로그아웃</a></li>							
-							<!-- <li><a href="getreserve.do?nextpage=0">테스트예약페이지</a></li>	 -->											
-						</c:when>
-												
-						<c:otherwise>
-						
-							<li class="nav-item active"><a class="nav-link" href="${pageContext.request.contextPath}/users/login">로그인</a></li>
-							<!-- <li class="nav-item active"><a class="nav-link" href="phonesms.jsp">가입</a></li> -->
-						</c:otherwise>
-					</c:choose>
-				</ul>
-			</div>
-		</div>
+<div id="header_wrapper">
+
+	<!-- ✅ 로그인/로그아웃 -->
+	<div class="header_top">
+		<sec:authorize access="hasAuthority('user')">
+			<a href="${pageContext.request.contextPath}/users/mypage">나의정보</a>&nbsp;|&nbsp;
+			<a href="${pageContext.request.contextPath}/users/generalcartlist">장바구니</a>&nbsp;|&nbsp;
+			<a href="${pageContext.request.contextPath}/users/payinfo">결제현황</a>&nbsp;|&nbsp;
+			<a href="${pageContext.request.contextPath}/users/get-my-reserve-page">예약현황</a>&nbsp;|&nbsp;
+			<form id="logoutForm" action="${pageContext.request.contextPath}/users/logout" method="POST" style="display:inline;">
+				<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+				<button type="submit">로그아웃</button>
+			</form>
+		</sec:authorize>
+
+		<sec:authorize access="hasRole('ROLE_TEACHER')">
+			<a href="${pageContext.request.contextPath}/teacher/teacher-my-info">나의정보</a>&nbsp;|&nbsp;
+			<form id="logoutForm" action="${pageContext.request.contextPath}/users/logout" method="POST" style="display:inline;">
+				<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+				<button type="submit">로그아웃</button>
+			</form>
+		</sec:authorize>
+
+		<sec:authorize access="!isAuthenticated()">
+			<a href="${pageContext.request.contextPath}/guest/login">로그인/가입</a>
+		</sec:authorize>
 	</div>
+
+	<!-- ✅ 메뉴 + 글쓰기 버튼 -->
+	<div class="header_bottom">
+		<a href="${pageContext.request.contextPath}/guest/productlist">미술용품</a>
+		<a href="${pageContext.request.contextPath}/guest/get-onedayclass-detail-one-page">미술수업</a>
+		<a href="${pageContext.request.contextPath}/guest/communityPage">커뮤니티</a>
+
+		<sec:authorize access="!isAuthenticated()">
+			<button class="write-btn" onclick="window.location.href='${pageContext.request.contextPath}/guest/login'">글쓰기</button>
+		</sec:authorize>
+
+		<sec:authorize access="isAuthenticated()">
+			<button class="write-btn" onclick="window.location.href='${pageContext.request.contextPath}/users/get-free-write-gasigle'">글쓰기</button>
+		</sec:authorize>
+	</div>
+</div>
+
 </body>
 </html>

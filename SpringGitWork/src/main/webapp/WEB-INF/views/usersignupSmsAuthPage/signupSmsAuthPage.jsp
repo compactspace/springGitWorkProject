@@ -113,9 +113,10 @@
 		}
 
 		form {
-			height: 530px;
+			height: 100px;
 			width: 100%;
 		}
+
 
 
 		.smsformheader {
@@ -620,6 +621,13 @@ $(".smsforminputbro2").on("click",function(){
 	</script>
 </head>
 
+
+
+
+
+
+
+
 <body>
 	<div class="all">
 		<div class="alldivwrapper">
@@ -628,7 +636,7 @@ $(".smsforminputbro2").on("click",function(){
 					<div class="smsformheader">
 						<div class="sms2formheader">
 							<button id="goBackbtn">
-								<span class="goback"></span>
+								<span class="goback" onclick="window.location.href='${pageContext.request.contextPath}/guest/login'"></span>
 							</button>
 
 

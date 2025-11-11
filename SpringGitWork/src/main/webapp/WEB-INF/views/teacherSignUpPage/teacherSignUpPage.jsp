@@ -16,13 +16,27 @@
     8글자 이상, 영문, 숫자, 특수문자를 모두 사용해야 한다.
     비밀번호 확인 : 비밀번호와 일치해야 한다. -->
 <style>
+
+
+
+
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center; /* 수평 중앙 */
+    align-items: center;     /* 수직 중앙 */  
+}
+
+
+
+
 .alldivwrapper {
 	width: 500px;
 	position: relative;
 	margin-left: auto;
 	margin-right: auto;
 }
-
 
 img {
 	position: absolute;
@@ -35,7 +49,6 @@ img {
 #membershipform {
 	border: 1px solid #ddd;
 }
-
 
 #idspattern {
 	display: none;
@@ -95,53 +108,151 @@ img {
 	line-height: 30px;
 }
 
-
 #currentPasswordMessage.verification-message {
-  max-width: 500px;
-  margin: 10px auto;
-  padding: 8px 12px;
-  border: 1px solid #1a70dc;
-  border-radius: 6px;
-  background-color: #f0f5ff;
-  font-family: 'Noto Sans KR', sans-serif;
-  color: #333;
-  font-size: 13px;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+	max-width: 500px;
+	margin: 10px auto;
+	padding: 8px 12px;
+	border: 1px solid #1a70dc;
+	border-radius: 6px;
+	background-color: #f0f5ff;
+	font-family: 'Noto Sans KR', sans-serif;
+	color: #333;
+	font-size: 13px;
+	box-sizing: border-box;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
-
 
 /* 인증 만료 시작  */
 #currentPasswordMessage.verification-message .info-text {
-  flex: 1;
-  margin-right: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+	flex: 1;
+	margin-right: 8px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 #countdown-timer {
-  font-weight: 700;
-  color: #1a70dc;
-  white-space: nowrap;
+	font-weight: 700;
+	color: #1a70dc;
+	white-space: nowrap;
 }
 
 #countdown-timer.red-alert {
-  color: #e63946;
+	color: #e63946;
 }
 /* 인증 만료 종료  */
+
+/* 사업자 정보 필드 시작 */
+
+/* 전체 wrapper 스타일 */
+#documentWraaper {
+	display: none; /* 기존 숨김 유지 */
+	max-width: 600px;
+	margin: 30px auto;
+	padding: 25px;
+	border: 1px solid #ddd;
+	border-radius: 10px;
+	background-color: #f9f9f9;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+	font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 안내 문구 스타일 */
+.info-text {
+
+	color: #006064;
+	border-radius: 6px;
+	font-size: 0.95em;
+	line-height: 1.5;
+}
+
+/* 제목 */
+#documentWraaper h3 {
+	margin-bottom: 20px;
+	font-size: 1.2em;
+	color: #333;
+}
+
+/* 회사 정보 필드 & 파일 업로드 필드 공통 스타일 */
+#documentWraaper .company-info-field, #documentWraaper .document-field {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 15px;
+}
+
+/* 라벨 스타일 */
+#documentWraaper label {
+	font-weight: 500;
+	margin-bottom: 5px;
+	color: #555;
+}
+
+/* 입력창 스타일 */
+#documentWraaper input[type="text"], #documentWraaper input[type="email"],
+	#documentWraaper input[type="file"] {
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	font-size: 0.95em;
+	transition: border 0.2s, box-shadow 0.2s;
+}
+
+/* 포커스 효과 */
+#documentWraaper input[type="text"]:focus, #documentWraaper input[type="email"]:focus,
+	#documentWraaper input[type="file"]:focus {
+	border-color: #007bff;
+	box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+	outline: none;
+}
+
+/* 제출 버튼 스타일 */
+#documentWraaper #submitDocuments {
+	padding: 12px 20px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	font-size: 1em;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+/* 버튼 호버 효과 */
+#documentWraaper #submitDocuments:hover {
+	background-color: #0056b3;
+}
+
+/* readonly 입력창 배경 색 */
+#documentWraaper input[readonly] {
+	background-color: #e9ecef;
+	cursor: not-allowed;
+}
+
+/* 반응형 */
+@media ( max-width : 640px) {
+	#documentWraaper {
+		padding: 20px;
+		margin: 20px;
+	}
+}
+/* 사업자 정보 필드 종료 */
 </style>
 <script>	
 
+
+
 window.onpopstate = function(event) {
+	
+	
 	  console.log("popstate 발생!");
 	  console.log(event.state); // pushState로 저장했던 state 객체
 	};
+	
 	
 	let authToken = null;
 	 window.onload = function() {				 
@@ -256,72 +367,113 @@ window.onpopstate = function(event) {
 </head>
 
 <body>
-  <!-- <button id="test">히스토리 추가</button> -->
- 
+	<!-- <button id="test">히스토리 추가</button> -->
+
 	<div class="alldivwrapper">
-    <div id="currentPasswordMessage" class="verification-message">
-        <span class="info-text">인증기한 만료 시 재인증이 필요합니다.</span>
-        <span id="countdown-timer">
-            인증번호 유효시간: <strong id="time-remaining">--</strong>초 남음
-        </span>
-    </div>
+		<div id="currentPasswordMessage" class="verification-message">
+			<span class="info-text">인증기한 만료 시 재인증이 필요합니다.</span> <span
+				id="countdown-timer"> 인증번호 유효시간: <strong id="time-remaining">--</strong>초
+				남음
+			</span>
+		</div>
 
 
-    <div id="loginformwrapper">
+		<div id="loginformwrapper">
 
-        <!-- <form action="insertmembership.do" id="membershipform" method="post"> -->
-        <div class="iddiv">
-            <h3>등록할아이디</h3>
-            <input type="text" class="idsinput" id="ids" name="id" data-val="false" placeholder="ID 입력">
-            
-            <span id="idspattern">
-                아이디 형식이 올바르지 않습니다. 아이디는 4자 이상 7자 이하입니다.
-            </span>
-            <span class="possible-id" style="display: none;">사용 가능한 아이디입니다.</span>
-            <span class="already-using-id" style="display: none;">이미 사용 중인 아이디입니다.</span>
-            <input type="button" id="idduplicationcheck" data-val="false" value="아이디 중복 확인">
-        </div>
+			<!-- <form action="insertmembership.do" id="membershipform" method="post"> -->
+			<div class="iddiv">
+				<h3>등록할아이디</h3>
+				<input type="text" class="idsinput" id="ids" name="id"
+					data-val="false" placeholder="ID 입력"> <span id="idspattern">
+					아이디 형식이 올바르지 않습니다. 아이디는 4자 이상 7자 이하입니다. </span> <span class="possible-id"
+					style="display: none;">사용 가능한 아이디입니다.</span> <span
+					class="already-using-id" style="display: none;">이미 사용 중인
+					아이디입니다.</span> <input type="button" id="idduplicationcheck"
+					data-val="false" value="아이디 중복 확인">
+			</div>
 
-        <div class="passworddiv">
-            <h3>비밀번호</h3>
-            <input type="password" class="pwdinput" id="pwd" name="password" data-val="false">
-            <span class="step1pwderr" style="display: none;">비밀번호 형식이 올바르지 않습니다.</span>
+			<div class="passworddiv">
+				<h3>비밀번호</h3>
+				<input type="password" class="pwdinput" id="pwd" name="password"
+					data-val="false"> <span class="step1pwderr"
+					style="display: none;">비밀번호 형식이 올바르지 않습니다.</span> <input
+					type="password" class="checkpwdinput" id="checkpwd" name="checkpwd"
+					value="${userVO.password}"> <span class="step2pwderr"
+					style="display: none;">비밀번호가 일치하지 않습니다.</span>
+			</div>
 
-            <input type="password" class="checkpwdinput" id="checkpwd" name="checkpwd" value="${userVO.password}">
-            <span class="step2pwderr" style="display: none;">비밀번호가 일치하지 않습니다.</span>
-        </div>
+			<input type="hidden" class="user_where" id="user_where"
+				name="user_where" value="finalluser">
+			<!-- <input type="hidden" class="user_code" id="user_code" name="user_code"> -->
 
-        <input type="hidden" class="user_where" id="user_where" name="user_where" value="finalluser">
-        <!-- <input type="hidden" class="user_code" id="user_code" name="user_code"> -->
+			<br>
+			<br>
+			<div class="login_membershipdivwrapper">
+				<input class="finallsubmitinput" id="finallsubmit" type="button"
+					value="다음단계">
+			</div>
 
-        <br><br>
-        <div class="login_membershipdivwrapper">
-            <input class="finallsubmitinput" id="finallsubmit" type="button" value="다음단계">
-        </div>
-
-    </div>
-    
-    
-    
-    
-<div id="documentWraaper" style="display: none">
-    <h3>사업자등록증명원 제출: 사진 파일로 등록해주세요 (ex: jpg, png)</h3>
-    <form id="documentForm" enctype="multipart/form-data">
-        <div class="document-field">
-            <label for="businessCertificate">사업자등록증명원:</label>
-            <input type="file" id="businessCertificate" name="businessCertificate" accept="image/jpeg, image/png" required>
-        </div>
-
-        <button type="button" id="submitDocuments">서류 제출</button>
-    </form>
-</div>
+		</div>
 
 
-    
-    
-</div>
 
-<script>
+
+		<div id="documentWraaper" style="display: none">
+			<h3>회사 정보 기재</h3>
+			<p class="info-text">
+				✨ 이 폼은 포트폴리오용 데모입니다.<br> 실제 제출 기능은 동작하지만, 모든 개인정보는 허구의 데이터입니다.<br>
+				예를 들어 회사명, 대표자명, 사업자번호 등은 샘플 데이터로 작성되어 있습니다.<br> 사업자등록증명원 업로드
+				시에도 실제 문서가 아닌, 의미 없는 예시 사진(jpg, png)을 사용해주세요.<br> 안전하게 제출
+				테스트용으로만 이용하실 수 있습니다.
+			</p>
+
+			<form id="documentForm" enctype="multipart/form-data">
+				<!-- 하드코딩된 회사 정보 입력 -->
+				<div class="company-info-field">
+					<label for="company_name">회사명:</label> <input type="text"
+						id="company_name" name="company_name" value="홍길동컴퍼니" readonly>
+				</div>
+				<div class="company-info-field">
+					<label for="registration_number">사업자번호:</label> <input type="text"
+						id="registration_number" name="registration_number"
+						value="123-45-67890" readonly>
+				</div>
+				<div class="company-info-field">
+					<label for="representative_name">대표자명:</label> <input type="text"
+						id="representative_name" name="representative_name" value="홍길동"
+						readonly>
+				</div>
+				<div class="company-info-field">
+					<label for="company_phone">전화번호:</label> <input type="text"
+						id="company_phone" name="company_phone" value="010-1234-5678"
+						readonly>
+				</div>
+				<div class="company-info-field">
+					<label for="address">주소:</label> <input type="text" id="address"
+						name="address" value="서울시 강남구 테헤란로 123" readonly>
+				</div>
+				<div class="company-info-field">
+					<label for="email">이메일:</label> <input type="email" id="email"
+						name="email" value="example@company.com" readonly>
+				</div>
+
+				<!-- 기존 사업자등록증 파일 업로드 -->
+				<div class="document-field">
+					<label for="businessCertificate">사업자등록증명원: 사진 파일로 등록해주세요
+						(ex: jpg, png)</label> <input type="file" id="businessCertificate"
+						name="businessCertificate" accept="image/jpeg, image/png" required>
+				</div>
+
+				<button type="button" id="submitDocuments">서류 제출</button>
+			</form>
+		</div>
+
+
+
+
+	</div>
+
+	<script>
 var idDuplicCheck=false;
 var 패스워드1차2차검증=false;
 
@@ -512,6 +664,16 @@ $("#submitDocuments").on("click", function() {
     formData.append("id", $("#ids").val());
     formData.append("password", $("#pwd").val());
     formData.append("businessCertificate", file);
+    
+    
+    
+ 	// 하드코딩 회사 정보 추가
+    formData.append("company_name", $("#company_name").val());
+    formData.append("registration_number", $("#registration_number").val());
+    formData.append("representative_name", $("#representative_name").val());
+    formData.append("company_phone", $("#company_phone").val());
+    formData.append("address", $("#address").val());
+    formData.append("email", $("#email").val());
 
     
     $.ajax({

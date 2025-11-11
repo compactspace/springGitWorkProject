@@ -38,4 +38,13 @@
 </update>
 
 
+<insert id="openMonthOnedayClass" parameterType="map">
+  INSERT INTO reserverest (onedayclass_num, openday, rest)
+  VALUES
+  <foreach collection="opendayArr" item="day" separator=",">
+    (#{onedayclass_num}, #{day}, 10)
+  </foreach>
+</insert>
+
+
 </mapper>

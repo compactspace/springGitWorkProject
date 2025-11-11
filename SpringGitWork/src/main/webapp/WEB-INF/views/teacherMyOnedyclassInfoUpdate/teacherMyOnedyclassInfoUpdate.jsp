@@ -10,11 +10,95 @@
 <sec:csrfMetaTags />
 
 <style>
-body {
-  font-family: 'Noto Sans KR', sans-serif;
-  background-color: #f8f9fa;
-  padding: 30px;
+
+
+/* 공통 CSS시작 */
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
 }
+
+#pageWrapper {
+    display: flex;
+    height: 100vh;
+}
+
+#sidebar {
+    width: 240px;
+    border-right: 1px solid #e0e0e0;
+    overflow-y: auto;
+}
+
+#mainContent {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+}
+
+#contentHeader {
+    padding: 20px 24px;
+    background-color: #f5f7fa;
+    border-left: 6px solid #4a90e2;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+#contentHeader h1 {
+    margin: 0;
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #333;
+}
+
+#contentHeader .header-subtitle {
+    margin: 6px 0 0 0;
+    font-size: 0.95em;
+    color: #666;
+}
+
+
+#contentBody {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    min-height: 400px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+#sidebar {
+    width: 240px;
+    border-right: 1px solid #e0e0e0;
+    overflow-y: auto;
+}
+
+#mainContent {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+}
+
+#contentHeader {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 12px;
+}
+
+#contentHeader h1 {
+    margin: 0;
+    font-size: 1.6em;
+    color: #333;
+}
+
+#contentBody {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    min-height: 400px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+/* 공통 CSS 종료 */
+
 
 .form-container {
   max-width: 800px;
@@ -116,7 +200,21 @@ button:hover:not(:disabled) {
 </head>
 <body>
 
-<div class="form-container">
+<div id="pageWrapper">
+    <!-- 좌측 수직 메뉴 -->
+    <div id="sidebar">
+        <%@ include file="../compoents/teacherVerticalBar/teacherVerticalBar.jsp"%>
+    </div>
+
+
+    <!-- 우측 메인 콘텐츠 -->
+    <div id="mainContent">
+        <div id="contentHeader">
+            <h1>등록된 수업정보 </h1>
+            <p class="header-subtitle">등록된 수업정보를 수정</p>
+        </div>
+        <div id="contentBody">
+          <div class="form-container">
   <h2>원데이 클래스 정보 수정</h2>
 
   <form id="editForm">
@@ -165,6 +263,13 @@ button:hover:not(:disabled) {
     <button id="updateBtn" disabled>수정하기</button>
   </form>
 </div>
+        </div>
+    </div>
+</div>
+
+
+<!--종료  -->
+
 
 <!-- 모달 -->
 <div class="modal-overlay">

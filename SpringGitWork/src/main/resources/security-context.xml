@@ -14,6 +14,14 @@
 			http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
 
 
+<http pattern="/api/guest/**" use-expressions="true" entry-point-ref="myAuthenticationEntryPoint">
+ <csrf disabled="true" />
+    <intercept-url pattern="/api/guest/**" access="permitAll" />
+</http>
+
+
+
+
 	<!-- 1. 사용자 뷰 (JSP 페이지) 관련 보안 설정 -->
 	<http pattern="/users/**" 
 		use-expressions="true" entry-point-ref="myAuthenticationEntryPoint">
@@ -22,7 +30,7 @@
 
 		<!-- /users/** 경로는 로그인(인증)된 사용자만 접근 가능 -->
 		<intercept-url pattern="/users/**"
-			access="isAuthenticated()" />
+			access="isAuthenticated() and !hasRole('ROLE_TEACHER')" />
 
 		
 		<logout logout-url="/users/logout" logout-success-url="/guest/" />
@@ -34,10 +42,16 @@
 
 
 	<!-- 2. 사용자 API -->
-	<http pattern="/api/user/**" 
+	<http pattern="/api/users/**" 
 		use-expressions="true" entry-point-ref="myAuthenticationEntryPoint">
-		<intercept-url pattern="/api/user/**"
-			access="isAuthenticated()"  />
+		
+		<access-denied-handler ref="my403" />
+		<intercept-url pattern="/api/users/**"
+               access="isAuthenticated() and !hasRole('ROLE_TEACHER')" />
+		
+		
+		<!-- <intercept-url pattern="/api/user/**"
+			access="isAuthenticated()"  /> -->
 	</http>	
 
 
@@ -66,6 +80,15 @@
         default-target-url="/users/dashboard"
         authentication-failure-url="/guest/login?error=true" /> -->
 </http>
+
+
+
+
+
+
+
+
+
 
 <http pattern="/" use-expressions="true" entry-point-ref="myAuthenticationEntryPoint">
     <intercept-url pattern="/" access="permitAll"/>

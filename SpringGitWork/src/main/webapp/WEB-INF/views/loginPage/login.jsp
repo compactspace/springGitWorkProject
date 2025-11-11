@@ -30,10 +30,12 @@
     align-items: center;
   }
 
+
+
   .container {
     background: #fff;
     width: 100%;
-    max-width: 400px;
+   min-width: 360px;
     padding: 2.5rem 2rem 3rem;
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
@@ -119,6 +121,7 @@
   }
 </style>
 
+
 <script>
   $(function() {
     $("#naver").click(function() {
@@ -131,7 +134,7 @@
 </head>
 <body>
 <div class="container">
-  <div class="title">Login</div>
+  <div class="title">학생 Login</div>
 
   <!-- 로그인 유형 선택 버튼 추가 -->
   <div style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
@@ -159,16 +162,12 @@
   </form>
 
   <div role="button" tabindex="0" class="membership-btn" onclick="location.href='${pageContext.request.contextPath}/guest/get-signup-page'">회원가입</div>
-  <div role="button" tabindex="0" class="membership-btn" onclick="location.href='${pageContext.request.contextPath}/teacher/signup-page'">모두의 화방 선생님되기</div>
 </div>
 
 <script>
-  // 로그인 버튼 클릭 시 동작
-  document.getElementById('studentLoginBtn').addEventListener('click', function() {
-    // 현재 페이지 그대로 (학생 로그인 폼 유지)
-    document.getElementById('studentLoginForm').style.display = 'block';
-  });
-
+ 
+ 
+ 
   document.getElementById('teacherLoginBtn').addEventListener('click', function() {
     // 선생님 로그인 페이지로 이동
     location.href = '${pageContext.request.contextPath}/teacher/login-page';

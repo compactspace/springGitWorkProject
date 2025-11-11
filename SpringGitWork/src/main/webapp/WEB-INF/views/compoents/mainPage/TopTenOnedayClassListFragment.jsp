@@ -79,6 +79,29 @@
 	border-radius: 4px;
 	font-size: 0.9em;
 }
+
+
+
+
+
+@media (max-width: 768px) {
+  .onedayclass-card {
+    width: 240px; /* 모바일에 맞게 축소 */
+    margin-right: 20px;
+    padding: 15px;
+  }
+
+  .slider-wrapper {
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch; /* 스와이프 부드럽게 */
+  }
+
+  .slider-controls {
+    display: none; /* 모바일에서는 버튼 대신 스와이프 */
+  }
+}
+
+
 </style>
 <div id="onedayclass-slider">
   <div class="slider-wrapper">  

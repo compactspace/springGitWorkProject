@@ -1,10 +1,17 @@
 package com.spring.finall.reqDto.orderRequest;
 
+
+
 public class OrderItemDTO {
-	  private Long productId;
+	  	private Long productId;
 	    private String productName;
 	    private int quantity;
 	    private int pricePerUnit;
+	    
+	    
+	    private Long orderItemId;
+	    
+	    
 		public Long getProductId() {
 			return productId;
 		}
@@ -29,8 +36,15 @@ public class OrderItemDTO {
 		public void setPricePerUnit(int pricePerUnit) {
 			this.pricePerUnit = pricePerUnit;
 		}
+		public Long getOrderItemId() {
+			return orderItemId;
+		}
+		public void setOrderItemId(Long orderItemId) {
+			this.orderItemId = orderItemId;
+		}
 	    
 	    
+		
 	    
 
 }

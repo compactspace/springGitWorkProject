@@ -9,7 +9,7 @@ import com.spring.finall.businessresult.TeacherInsertResult;
 
 public interface TeacherMemberService {
 
-	public abstract TeacherInsertResult insertTeacherMembership(String id, String hashedPassword, MultipartFile file);
+	public abstract TeacherInsertResult insertTeacherMembership(String id, String hashedPassword, MultipartFile file, Map<String, Object> companyInfo);
 	
 	public Map<String,Object>  currentMyinfo(String username);
 	

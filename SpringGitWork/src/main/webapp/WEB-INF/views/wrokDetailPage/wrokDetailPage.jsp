@@ -287,6 +287,29 @@ display: inline-block;
 .ui-dialog-buttonpane button:last-child:hover {
 	background-color: #aaa;
 }
+
+
+
+    #mobileNave{
+
+  display: none;
+}
+
+/*모바일 시작  */
+@media screen and (max-width: 760px) {
+
+
+    /* 네비게이션 전환 */
+    #pcNave {
+        display: none;
+    }
+    #mobileNave {
+        display: block;
+    }
+}
+/*모바일 종료  */
+
+
 </style>
 
 
@@ -866,6 +889,13 @@ let buildedTreeData=null
 </head>
 <body>
 
+ 	<div id="pcNave">
+ <%@ include file="../pcNave.jsp"%>
+</div>
+<div id="mobileNave">
+ <%@ include file="../mobileNave.jsp"%>
+</div>
+
 	<!-- 컨테이너 시작 -->
 	<div class="container">
 
@@ -884,10 +914,10 @@ let buildedTreeData=null
 		</div>
 
 
-		<div class="right-sub-container">
 
+		<div class="right-sub-container">
 			<div class="right-comment">
-				<h3>댓글</h3>
+				<!-- <h3>댓글</h3> -->
 				<!-- 댓글들만 넣는 별도 영역 -->
 				<div class="comments-container"></div>
 			</div>

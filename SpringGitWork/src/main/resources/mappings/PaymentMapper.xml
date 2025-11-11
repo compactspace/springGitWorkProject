@@ -5,8 +5,9 @@
 <mapper namespace="PaymentDAO">
 
 <insert id="insertPayment" parameterType="PaymentDTO" useGeneratedKeys="true" keyProperty="paymentId">
-    INSERT INTO payment (order_info_id, payment_number, amount, payment_method, created_at)
-    VALUES (#{orderInfoId}, #{paymentNumber}, #{amount}, #{paymentMethod}, NOW())
+    INSERT INTO payment (order_info_id, payment_number, amount, payment_method, imp_uid, created_at)
+    VALUES (#{orderInfoId}, #{paymentNumber}, #{amount}, #{paymentMethod}, #{impUid}, NOW())
 </insert>
+
 
 </mapper>

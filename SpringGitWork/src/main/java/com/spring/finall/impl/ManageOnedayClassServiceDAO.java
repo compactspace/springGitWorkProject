@@ -91,6 +91,16 @@ public class ManageOnedayClassServiceDAO {
 		return oneDayClassVO;
 	}
 
+	
+	public int openMonthOnedayClass(Map<String, Object> bodyParam) {
+		int 	affectedRow=mybatis.insert("ManageOneDayClassMapper.openMonthOnedayClass",bodyParam);
+		return affectedRow;
+	}
+
+	
+	
+	
+	
 	public int updateOneDayClassInfo(Long teacherId, OneDayClassVO oneDayClass, String updateColumns) {
 	    // Map에 파라미터 담기
 	    Map<String, Object> paramMap = new HashMap<>();

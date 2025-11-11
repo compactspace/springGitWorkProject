@@ -18,6 +18,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,9 +30,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.finall.WorkImgVO;
 import com.spring.finall.apiResponseController.ApiResponse;
+import com.spring.finall.businessresult.DuplicateCheckResult;
 import com.spring.finall.businessresult.SignUpSmsSendResult;
 import com.spring.finall.businessresult.TeacherInsertResult;
 import com.spring.finall.exception.teacherMemberShip.TeacherDocumentException;
+import com.spring.finall.security.UserDetailsVO2;
 import com.spring.finall.service.ArtworkService;
 import com.spring.finall.service.MemberService;
 import com.spring.finall.service.OneDayClassService;
@@ -68,10 +71,28 @@ public class GuestController {
 
 	@Autowired
 	private TeacherMemberService teacherMemberService;
+	
+	
+	@PostMapping("/test")
+	@ResponseBody
+	public ResponseEntity<ApiResponse<Boolean>>  testFNC(){
+		  ApiResponse<Boolean> response = ApiResponse.<Boolean>builder()
+	                .code(502)
+	                .success(false)
+	                .message("커스텀코드는 502 이고 그냥 문자열 커스텀데이터")
+	                .data(false)
+	                .build();
+		  
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		
+	}
+	
+	
 
 	@RequestMapping(value = "/productGroupList")
 	public String ajaxProductGroupList(ProductVO vo,
 			@RequestParam(value = "product_group", required = false, defaultValue = "pencile") String product_group,
+			@AuthenticationPrincipal UserDetailsVO2 user,
 			Model model) {
 
 		if ("groupdetermined".equals(product_group)) {
@@ -82,7 +103,9 @@ public class GuestController {
 		List<Map<String, Object>> grouplist = protService.productGroupLlist(vo);
 		model.addAttribute("productService", grouplist);
 
-		System.out.println(grouplist);
+		Boolean isAuthenticated=user!=null ? true : false;
+		model.addAttribute("isAuthenticated", isAuthenticated);
+		
 		// ✅ 이 JSP는 #content2 부분만 포함한 "조각 페이지"여야 함
 		return "compoents/productGroupList";
 	}
@@ -232,24 +255,41 @@ public class GuestController {
 	@RequestMapping(value = "/teacher-action-signup")
 	@ResponseBody
 	public ApiResponse<TeacherInsertResult> insertTeacher(
-			@RequestParam("id") String id,
-	        @RequestParam("password") String password,
-	        @RequestParam("businessCertificate") MultipartFile file) throws Exception {
-			String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());		
-		
-			
-			try {
-				teacherMemberService.insertTeacherMembership(id, hashedPassword, file);
-				return ApiResponse.<TeacherInsertResult>builder().code(201).success(true).message("회원가입 성공").data(new TeacherInsertResult(201, false, "회원가입성공")).build();
-				
-			}catch(TeacherDocumentException te) {
-			
-			
-				
-				return ApiResponse.<TeacherInsertResult>builder().code(500).success(false).message("회원가입 실패").data(new TeacherInsertResult(500, false, te.getMessage())).build();
-			}
-			
-	}// 회원가입 종료
+	        @RequestParam Map<String, Object> allParams,
+	        @RequestParam("businessCertificate") MultipartFile file
+	) throws Exception {
+
+	    // Map에서 id, password 추출
+	    String id = String.valueOf(allParams.get("id"));
+	    String password = String.valueOf(allParams.get("password"));
+	    String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
+	    // Map에서 id, password 제거하고 나머지를 회사 정보로 사용
+	    allParams.remove("id");
+	    allParams.remove("password");
+	    Map<String, Object> companyInfo = allParams;
+
+	    try {
+	        teacherMemberService.insertTeacherMembership(id, hashedPassword, file,companyInfo);
+	       
+	        
+	        return ApiResponse.<TeacherInsertResult>builder()
+	                .code(201)
+	                .success(true)
+	                .message("회원가입 성공")
+	                .data(new TeacherInsertResult(201, false, "회원가입성공"))
+	                .build();
+
+	    } catch (TeacherDocumentException te) {
+	        return ApiResponse.<TeacherInsertResult>builder()
+	                .code(500)
+	                .success(false)
+	                .message("회원가입 실패")
+	                .data(new TeacherInsertResult(500, false, te.getMessage()))
+	                .build();
+	    }
+	}
+
 
 	// 문자인증
 	@RequestMapping(value = "/signup-page4")
@@ -261,15 +301,38 @@ public class GuestController {
 	// 회원가입전 이미 있는 아이디 인지 체그하는 아작스 호출
 	@RequestMapping(value = "/checkout-signup-id")
 	@ResponseBody
-	public boolean checkOutPossibleSignUpId(UserVO vo, HttpSession session, HttpServletRequest req) throws Exception {
+	public ResponseEntity<ApiResponse<DuplicateCheckResult>> checkOutPossibleSignUpId(UserVO vo, HttpSession session, HttpServletRequest req) throws Exception {
 
 		boolean check = memberService.checkidMembership(vo);
 
-		if (check) {
+		
 
-			return check;
+		
+		
+		if (check) {
+			DuplicateCheckResult  duplicateCheckResult = new DuplicateCheckResult(200,true);
+			
+			  ApiResponse<DuplicateCheckResult> response = ApiResponse.<DuplicateCheckResult>builder()
+		                .code(200)
+		                .success(false)
+		                .message("")
+		                .data(duplicateCheckResult)
+		                .build();
+			  
+		        return ResponseEntity.status(HttpStatus.OK).body(response);
+			
+		
 		} else {
-			return check;
+			DuplicateCheckResult  duplicateCheckResult = new DuplicateCheckResult(409,false,"이미 존재하는 아이디 입니다.");
+			
+			  ApiResponse<DuplicateCheckResult> response = ApiResponse.<DuplicateCheckResult>builder()
+		                .code(409)
+		                .success(false)
+		                .message("")
+		                .data(duplicateCheckResult)
+		                .build();
+			  
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
 
 	}

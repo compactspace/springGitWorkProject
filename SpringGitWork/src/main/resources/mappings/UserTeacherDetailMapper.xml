@@ -40,6 +40,30 @@
 
 
 
+
+<insert id="insertCompanyInfo" parameterType="map">
+    INSERT INTO company_info (
+    	teacher_id,
+        company_name,
+        registration_number,
+        representative_name,
+        company_phone,
+        address,
+        email
+    ) VALUES (
+    	#{teacher_id},
+        #{company_name},
+        #{registration_number},
+        #{representative_name},
+        #{company_phone},
+        #{address},
+        #{email}
+    )
+</insert>
+
+
+
+
 <select id="currentMyinfo" parameterType="String" resultType="Map">
 SELECT
 	
@@ -51,22 +75,34 @@ COALESCE(t.email,'테스용 사이트로 개인정보 삽입금지') as email ,
 
 COALESCE(t.phone,'테스용 사이트로 개인정보 삽입금지') as phone,
 
+
 t.approved,
 
 t.created_at,
 
-td.status
+td.status,
+-- 사업자 정보
+ci.company_name,
+ci.registration_number,
+ci.representative_name,
+ci.company_phone,
+ci.email
 
 FROM
 	teacher as t
 INNER JOIN teacher_documents AS td  
 
+
 ON
 	t.teacher_id = td.teacher_id
 
-WHERE t.username=#{username} 
+INNER JOIN company_info AS ci  
 
 
+ON
+	t.teacher_id =ci.teacher_id
+
+WHERE t.username=#{username}
 </select>
 
 <select id="currentMyDocuments" parameterType="Long" resultType="Map">
@@ -85,7 +121,7 @@ a.phone
 FROM
 	teacher_documents as td
 	
-	INNER JOIN admin as a
+	LEFT JOIN  admin as a
 	
 ON td.reviewer_id=a.admin_id
 	

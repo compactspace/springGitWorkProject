@@ -2,6 +2,7 @@ package com.spring.finall.constroller;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -76,6 +78,84 @@ public class TeacherController {
 		return redMap;
 	}
 
+	
+	
+	
+	
+	@RequestMapping(value = "/open-month-onedyaclass", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> openMonthOnedyaclass(
+	        @AuthenticationPrincipal UserTeacherDetail userTeacherDetail,
+	        @RequestBody Map<String, Object> bodyParam) {
+
+		
+		Long teacher_id=userTeacherDetail.getTeacher_id();
+		
+		
+		
+		
+		
+		
+	    // 1️⃣ onedayclass_num 안전하게 읽기
+	    Integer onedayclassNum = null;
+	    Object onedayObj = bodyParam.get("onedayclass_num");
+	    if (onedayObj instanceof Number) {
+	        onedayclassNum = ((Number) onedayObj).intValue();
+	    } else if (onedayObj instanceof String) {
+	        onedayclassNum = Integer.parseInt((String) onedayObj);
+	    }
+
+	    // 2️⃣ openday 배열 안전하게 읽기
+	 // 2️⃣ openday 배열 안전하게 읽기
+	    List<String> opendayArr = new ArrayList<>();
+	    Object opendayObj = bodyParam.get("openday");
+	    String openYYYYMM = null;
+
+	    if (opendayObj instanceof List<?>) {
+	        List<?> list = (List<?>) opendayObj;
+
+	        for (Object o : list) {
+	            opendayArr.add(o.toString());
+	        }
+
+	        // 대표월 지정 (첫 번째 요소에서 yyyy-MM 추출)
+	        if (!list.isEmpty()) {
+	            String firstDate = list.get(0).toString(); // 예: "2025-12-03"
+	            if (firstDate.length() >= 7) {
+	                openYYYYMM = firstDate.substring(0, 7); // "2025-12"
+	            }
+	        }
+	    }
+
+
+	 
+
+	    // 3️⃣ DB 작업 예시
+	    Map<String, Object> paramMap = new HashMap<>();
+	    paramMap.put("onedayclass_num", onedayclassNum);
+	    paramMap.put("opendayArr", opendayArr);
+
+	    int 	affectedRow=manageOnedayClassService.openMonthOnedayClass(paramMap);
+
+        List<Map<String, Object>> activeMonthList =userTeacherDetail.getActiveMonthList();
+        if (affectedRow>0) {
+        	   Map<String, Object> addactiveMonth = new HashMap<>();
+        	   addactiveMonth.put("reg_month",openYYYYMM);
+        	activeMonthList.add(addactiveMonth);
+        	
+        	userTeacherDetail.setActiveMonthList(activeMonthList);
+        }  
+	    
+	    
+	    
+	    // 응답
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("status", "success");
+	    return result;
+	}
+
+
+	
 	
 	
 	@RequestMapping(value = "/update-onedayclassinfo")

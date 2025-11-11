@@ -21,7 +21,7 @@ import com.spring.finall.security.UserDetailsVO2;
 public class UserFormAuthenticationProvider implements AuthenticationProvider {
 
 	public UserFormAuthenticationProvider() {
-		System.out.println("FormAuthenticationProvider 자동주입?");
+		System.out.println("UserFormAuthenticationProvider 자동주입?");
 	}
 
 	@Autowired
@@ -39,7 +39,7 @@ System.out.println();
 	    UserDetails userDetails = userDetailsServiceImpl2.loadUserByUsername(user_id);
 	    
 	    
-	    System.out.println("유저디테일정보:"+userDetails);
+	    //System.out.println("유저디테일정보:"+userDetails);
 	    
 	    
 
@@ -56,9 +56,9 @@ System.out.println();
 	    UserDetailsVO2 user = (UserDetailsVO2) userDetails;
 
 	    
-	    System.out.println("✅ 로그인 유저 이름: " + user.getUser_name());
-	    System.out.println("✅ 로그인 유저 권한: " + user.getUser_role());
-	    System.out.println("✅ 일반 유저 로그인 인증 성공: " + user.getUsername());
+//	    System.out.println("✅ 로그인 유저 이름: " + user.getUser_name());
+//	    System.out.println("✅ 로그인 유저 권한: " + user.getUser_role());
+//	    System.out.println("✅ 일반 유저 로그인 인증 성공: " + user.getUsername());
 
 	    
 	    

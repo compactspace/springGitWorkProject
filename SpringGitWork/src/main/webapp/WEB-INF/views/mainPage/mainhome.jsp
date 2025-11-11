@@ -17,15 +17,15 @@
 <script
 	src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
-
-
+<script src="${pageContext.request.contextPath}/resources/js/common/commonAjax.js"></script>
 <!-- <script type="text/javascript"
 	src="//dapi.kakao.com/v2/maps/sdk.js?appkey=cec9a6b4bed5ff14412ea02035eb0e4a"></script> -->
 <style>
 .mobileallwrapper {
-	max-width: 344px;
+/* 	max-width: 344px; */
 	display: none;
 }
+
 
 .firstgetboad {
 	border-radius: 10px;
@@ -34,210 +34,12 @@
 	background-color: rgb(255, 88, 98);
 }
 
-@media screen and (max-width: 701px) {
-	html, body {
-		max-width: 344px !important;
-		margin: 0px auto !important;
-		padding: 0px 0px !important;
-	}
-
-	/* .nave ul {
-		display: flex;
-		flex-direction: row;
-		justify-content: end;
-	} */
-	a {
-		color: #0275d8;
-		text-decoration: none !important;
-	}
-	a:visited {
-		text-decoration: none;
-	}
-	.allwrapper {
-		display: none;
-	}
-	.mobileallwrapper {
-		display: block;
-	}
-	.center {
-		display: flex;
-		flex-direction: column;
-	}
-	.centertitle {
-		text-align: center;
-		font-family: 'NanumPen';
-	}
-	.contents {
-		display: grid;
-		grid-template-columns: 50% 50%;
-		grid-gap: 5px;
-		grid-template-rows: 50% 50%;
-	}
-	.classcontent {
-		background-image: url('./img_icon/classicon.png');
-		background-repeat: no-repeat;
-		background-size: cover;
-		background-position: center;
-		width: 60px;
-		height: 60px;
-		margin: 0px auto;
-		height: 60px;
-	}
-	.contentsitems {
-		display: flex;
-		flex-direction: column;
-	}
-	.contentsitems h4 {
-		margin: 0px 0px;
-		font-size: 10px;
-		text-align: center;
-	}
-
-	/* .classcontent:after {
-		content: "원데이클래스";
-		position: absolute;
-		left: 0px;
-		bottom: -2px;
-		height: 3px;
-		width: 100px;
-		background: red;
-	} */
-	.productcontent {
-		background-image: url('./img_icon/producticon.png');
-		background-repeat: no-repeat;
-		background-size: cover;
-		background-position: center;
-		width: 60px;
-		height: 60px;
-		margin: 0px auto;
-		height: 60px;
-	}
-	.workcontent {
-		background-image: url('./img_icon/worklisticon.jpg');
-		background-repeat: no-repeat;
-		background-size: cover;
-		background-position: center;
-		width: 60px;
-		height: 60px;
-		margin: 0px auto;
-		height: 60px;
-	}
-	.boardcontent {
-		background-image: url('./img_icon/gasipanicon.png');
-		background-repeat: no-repeat;
-		background-size: cover;
-		background-position: center;
-		width: 60px;
-		height: 60px;
-		margin: 0px auto;
-		height: 60px;
-	}
-	#introarea {
-		padding: 30px 0;
-		max-width: 344px;
-		margin: 0 auto;
-	}
-	.infotitel  h2 {
-		font-family: 'NanumPen';
-		font-size: 25px;
-		padding-bottom: 10px;
-	}
-	.infotitel  p {
-		font-family: 'NanumPen';
-		font-size: 15px;
-		padding-bottom: 10px;
-	}
-	.mainbanner {
-		padding-bottom: 30px;
-		grid-gap: 0px !important;
-		display: grid;
-		grid-template-columns: 50% 50%;
-		max-width: 344px;
-		margin: 0 auto;
-	}
-	.bannerinfo {
-		margin-top: 0px !important;
-		top: 0px !important;
-		position: absolute;
-	}
-	.infotitle {
-		padding-top: 2px;
-		text-align: center;
-		font-size: 13px;
-		font-family: 'NanumPen';
-	}
-	.infocontent {
-		font-size: 10px !important;
-	}
-	.bannerinfobtn a {
-		font-size: 6px !important;
-	}
-	.bannerarea {
-		padding: 0px 0px !important;
-		color: white;
-	}
-	.cutlinearea {
-		height: auto !important;
-		background-color: rgb(255, 88, 98);
-	}
-	.cutline {
-		font-size: 15px !important;
-		font-weight: 600;
-		color: white;
-		padding-top: 5px !important;
-		text-align: center;
-		width: 60% !important;
-		margin: 0 auto;
-	}
-	.cutline h3 {
-		display: none;
-	}
-	.studentarea h3 {
-		font-size: 13px !important;
-		font-family: 'NanumPen' !important;
-	}
-	.footer {
-		max-width: 344px;
-	}
-	.footercontainer {
-		padding: 0px 0px !important;
-	}
-	.footercontainer .rowwrapper {
-		margin: 0px 0px !important;
-		gap: 0px !important;
-	}
-	.rowwrapper {
-		flex-direction: column;
-	}
-	.rows {
-		flex-direction: row !important;
-		padding: 10px 5px !important;
-	}
-	.infoarea {
-		font-size: 12px;
-	}
-} /* 반응형종료 */
 .allwrapper {
 	height: 100%;
 	position: relative;
 }
 
-/* ul {
-	display: flex;
-	list-style-type: none;
-}
 
-
-li {
-	display: inline-block;
-	width: 30%;
-	text-align: center;
-	color: #333333;
-	letter-spacing: .01em;
-	font-style: normal;
-	font-weight: 300;
-}
- */
 .headerarea {
 	background-image: url('./img_mainhome/banner1.jpeg');
 	background-color: aqua;
@@ -248,15 +50,7 @@ li {
 	height: 100%;
 }
 
-/* .item_bg {
-	background-image: url('./img_mainhome/banner1.jpeg');
-	background-color: aqua;
-	background-position: center;
-	background-repeat: no-repeat;
-	background-attachment: scroll;
-	background-size: cover;
-	height: 100%;
-} */
+
 .spacingcenter {
 	margin-top: 60px;
 	margin-bottom: 60px;
@@ -557,8 +351,9 @@ li {
 	justify-content: center;
 }
 
+
 .footercontainer .rowwrapper {
-	width: 80%;
+/* 	width: 80%; */
 	margin: 10px auto;
 	display: flex;
 }
@@ -573,20 +368,286 @@ li {
 	text-align: center;
 	flex-direction: column;
 }
+
+
+
+
+
+
+/*반응형 시작  */
+@media screen and (max-width: 701px) {
+	html, body {
+	
+		padding: 0px 10px !important;
+	}
+.centermenutitlearea {
+	text-align: left;
+	margin-bottom: 15px;
+}
+
+.centermenu {
+    padding: 80px 0 130px 0;
+}
+
+
+
+	.allwrapper {
+		display: none;
+	}
+	.mobileallwrapper {
+		display: block;
+	}
+
+
+	a {
+		color: #0275d8;
+		text-decoration: none !important;
+	}
+	a:visited {
+		text-decoration: none;
+	}
+
+	.center {
+		display: flex;
+		flex-direction: column;
+	}
+	
+	.centertitle {
+		padding:10px 10px;
+		text-align: center;
+		font-family: 'NanumPen';
+	}
+	.contents {
+	padding: 20px 0 20px 0;
+	display: flex;
+    flex-direction: row;
+    justify-content: space-around;    
+	}
+	
+	.classcontent {
+		background-image:	url('${pageContext.request.contextPath}/resources/img_icon/classicon.png');
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-position: center;
+		width: 60px;
+		height: 60px;
+		margin: 0px auto;
+		height: 60px;
+	}
+	.contentsitems {
+		display: flex;
+		flex-direction: column;
+	}
+	.contentsitems h4 {
+		margin: 0px 0px;
+		font-size: 10px;
+		text-align: center;
+	}
+
+
+	.productcontent {
+		background-image: url('${pageContext.request.contextPath}/resources/img_icon/producticon.png');
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-position: center;
+		width: 60px;
+		height: 60px;
+		margin: 0px auto;
+		height: 60px;
+	}
+	.workcontent {
+		background-image: url('${pageContext.request.contextPath}/resources/img_icon/worklisticon.jpg');
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-position: center;
+		width: 60px;
+		height: 60px;
+		margin: 0px auto;
+		height: 60px;
+	}
+	
+	.boardcontent {
+		background-image: url('${pageContext.request.contextPath}/resources/img_icon/gasipanicon.png');
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-position: center;
+		width: 60px;
+		height: 60px;
+		margin: 0px auto;
+		height: 60px;
+	}
+	#introarea {
+		padding: 30px 0;
+		max-width: 344px;
+		margin: 0 auto;
+	}
+	.infotitel  h2 {
+		font-family: 'NanumPen';
+		font-size: 25px;
+		padding-bottom: 10px;
+	}
+	.infotitel  p {
+		font-family: 'NanumPen';
+		font-size: 15px;
+		padding-bottom: 10px;
+	}
+	.mainbanner {
+		padding-bottom: 30px;
+		grid-gap: 0px !important;
+		display: grid;
+		grid-template-columns: 50% 50%;
+		max-width: 344px;
+		margin: 0 auto;
+	}
+	.bannerinfo {
+		margin-top: 0px !important;
+		top: 0px !important;
+		position: absolute;
+	}
+	.infotitle {
+		padding-top: 2px;
+		text-align: center;
+		font-size: 13px;
+		font-family: 'NanumPen';
+	}
+	.infocontent {
+		font-size: 10px !important;
+	}
+	.bannerinfobtn a {
+		font-size: 6px !important;
+	}
+	.bannerarea {
+		padding: 0px 0px !important;
+		color: white;
+	}
+	.cutlinearea {
+		height: auto !important;
+		background-color: rgb(255, 88, 98);
+	}
+	.cutline {
+		font-size: 15px !important;
+		font-weight: 600;
+		color: white;
+		padding-top: 5px !important;
+		text-align: center;
+		width: 60% !important;
+		margin: 0 auto;
+	}
+	.cutline h3 {
+		display: none;
+	}
+	.studentarea h3 {
+		font-size: 13px !important;
+		font-family: 'NanumPen' !important;
+	}
+	
+	
+	.footercontainer {
+		padding: 0px 0px !important;
+	}
+	.footercontainer .rowwrapper {
+		margin: 0px 0px !important;
+		gap: 0px !important;
+	}
+	.rowwrapper {
+		flex-direction: column;
+	}
+	.rows {
+		gap:10px;
+		flex-direction: row !important;
+		padding: 10px 5px !important;
+	}
+	
+	.logoarea{
+	display: flex
+;
+    flex-direction: column;
+    justify-content: center;
+	}
+	
+	
+	.logoarea img{
+		display: inline-block;
+	}
+	
+	
+	.footertext{
+	font-size: 12px;
+	
+	}
+	
+}
+ /* 반응형 종료 */
+
+
+
+
+
+
 </style>
+
+
+
+<!-- 걍 이걸 로 나중에 뒤로/앞으로/새로가기 막자  -->
+<c:choose>
+    <c:when test="${empty sessionScope.visited}">
+        <!-- 첫 방문 -->
+        <c:set var="visitStatus" value="first" />
+        <c:set var="visited" value="true" scope="session" />
+    </c:when>
+    <c:otherwise>
+        <!-- 새로고침 또는 재방문 -->
+        <c:set var="visitStatus" value="return" />
+    </c:otherwise>
+</c:choose>
+
+
+
+
+
+
+
+
+
+
 
 <script>
 
 
 
-
-
-
 var check;
 var key;
-	window.onload = function() {		
+	window.onload = function() {			
 		
-	
+		$("#testBtn").on("click", function() {
+		    ajaxRequest({
+		        url: "${pageContext.request.contextPath}/api/guest/test",
+		        type: "POST",
+		        dataType: "json",
+		        success: function(res) {
+		            console.log("✅ 성공 응답:", res);
+		            alert("성공: " + res.message);
+		        }
+		    }, {
+		        client: function(res) {
+		            console.log("⚠️ 클라이언트 오류:", res);
+		            alert("클라이언트 오류: " + res.message + " (code: " + res.code + ")");
+		        },
+		        server: function(res) {
+		            console.log("🔥 서버 오류:", res);
+		            alert("서버 오류: " + res.message + " (code: " + res.code + ")");
+		        }
+		    });
+		});
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		
 		let qna = document.querySelectorAll('.qnatitle');
@@ -665,29 +726,7 @@ var key;
 			$(window).on('scroll', updatescroll);
  
 		}
-	/* 	//시큐리티 로그아웃 시작
-		$("#securitylogout").on("click",()=>{
-			 console.log("로그아웃 매핑 확인");
-			 window.localStorage.removeItem("key");			
-			 $.ajax({
-				 url:"securitylogout.do",
-				 type:"post",
-				 beforeSend: function (xhr) {
-			            xhr.setRequestHeader("Content-type","application/json");
-			            xhr.setRequestHeader("Authorization","logout");
-			            },
-			     success:(data,status,request)=>{
-			    	 console.log("로그아웃 성공");
-			    	  location.replace("/finall/mainhome.jsp");
-			     },
-			     error : function(xhr, ajaxSettings, thrownError) 
-			     {
-			         alert("수정하는데 오류가 발생하였습니다.");
-			     }			            
-				 
-			 })
-			 
-		}) */
+
 		
 	$(".managermode").on("click",()=>{		
 		key=localStorage.getItem("key");
@@ -788,7 +827,7 @@ const topTenOnedayclassComponentLoad = () => {
 <body style="height: 100vh;">
 	<div class="allwrapper">
 	
-	
+	<button id="testBtn" >서버 오류 테스트</button>
 <%-- 	 <img src="${pageContext.request.contextPath}/resources/cmd/dot.bmp">
 <script src="${pageContext.request.contextPath}/resources/cmd/dot.bmp"></script> --%>
 
@@ -950,149 +989,80 @@ const topTenOnedayclassComponentLoad = () => {
 
 
 			<div class="contents">
-
+			
 				<div class="contentsitems">
-					<a href="onedayclass.jsp">
+					<a href="${pageContext.request.contextPath}/guest/onedayclass-intro">
 						<div class="classcontent"></div>
-						<h4>원데이클래스</h4>
+						<h4>원데이클래스 소개</h4>
 					</a>
 				</div>
 
 				<div class="contentsitems">
-					<a href="productlist.do">
+					<a href="${pageContext.request.contextPath}/guest/productlist">
 						<div class="productcontent"></div>
 						<h4>상품구경</h4>
 					</a>
 				</div>
 
 				<div class="contentsitems">
-					<a href="getreserve.do?nextpage=0">
+					<a href="${pageContext.request.contextPath}/guest/get-onedayclass-detail-one-page">
 						<div class="workcontent"></div>
-						<h4>원데이클래스</h4>
+						<h4>원데이클래스 수업확인</h4>
 					</a>
 				</div>
 
 				<div class="contentsitems">
-					<a href="firstgetboad.do?startpage=0">
+					<a href="${pageContext.request.contextPath}/guest/communityPage">
 						<div class="boardcontent"></div>
-						<h4>참여자게시판</h4>
+						<h4>작업물자랑</h4>
 					</a>
 				</div>
 
 			</div>
 
 
-			<div id="introarea">
 
-				<label for="needlogin">
-					<div class="infotitel">
-						<h2 id="header1">모두의 화방 소개</h2>
-						<p>
-							학원 등록에 부담감을 덜어드리며 간단하게 평소 간직하고 싶었던 그림이나 취미그림반으로 자유롭게 와서 그려보는 모두의
-							화방입니다.<br>
-							<c:choose>
-								<c:when test="${userId eq null }">
-									<a href="login.jsp"> 원데이 클래스 등록은 회원가입이 필요합니다.<span
-										id="needlogin">회원가입하기</span>
-									</a>
-						</p>
-						</c:when>
-						<c:otherwise>
-							<a href="onedayclasssubmit.do?onedayclass_name=취미만화반">원데이클래스
-								확인 및 등록하기</a>
 
-						</c:otherwise>
+		<div class="centermenu">
+			<div class="centercontainder">
+				<div class="centermenutitlearea">
+					<h3>참여자들이 검증한</h3>
+					<p>인기 원데이 클래스</p>
+				</div>
+				<!-- 여기 안에 JSP fragment가 AJAX로 삽입됨 -->
+				<div class="toptenOnedayclass"></div>
 
-						</c:choose>
-					</div>
-				</label>
 			</div>
 
-			<div class="mainbanner">
-
-				<div class="bannerarea">
-					<img class="bannerimg" src='${pageContext.request.contextPath}/resources/img_onedayclass/onedaymain2.png'>
-				</div>
-
-				<div class="bannerinfoarea">
-
-					<div class="bannerinfo">
-						<h2 class="infotitle">어려운전공 수없이아닌</h2>
-						<p class="infocontent">자신이 원하는 그림을 선생님과 같이 이야기를나눈후 선생님과 함께 밑그림
-							작업과 채색 작업을 같이하면 어려운 그림이 아닌 쉬운 그림이 됩니다.</p>
-					</div>
-
-					<div class="bannerinfobtn">
-						<a href="onedayclasssubmit.do?onedayclass_name=취미만화반">원데이클래스
-							확인 및 등록하기</a>
-					</div>
+		</div>
 
 
-				</div>
+
+	<!-- 		<div class="mainbanner">
+
+			
 
 			</div>
 
 
 
 			<div class="mainbanner">
-				<div class="bannerinfoarea2">
-
-					<div class="bannerinfo">
-						<h2 class="infotitle">비용이 많이 드는 미술용품</h2>
-						<p class="infocontent">비용 부담없이 모두의화방에서 무료로 제공해드리고 있습니다. 비용부담
-							걱정을 덜어드립니다.</p>
-
-
-					</div>
-				</div>
-
-				<div class="bannerarea">
-					<img class="bannerimg"
-						src="${pageContext.request.contextPath}/resources/img_onedayclass/onedaymain3.jpg">
-				</div>
+				
 
 
 			</div>
 
 			<div class="cutlinearea">
-				<div class="cutline">
-					<h3>자유로운 주제의 그림</h3>
-					<p>참여자들이 선정하는 그림</p>
-				</div>
+				
 			</div>
 
 
 			<div class="studentarea">
-				<h3>참여자들의 작품을 소개 합니다.</h3>
-
-				<div class="studentbanner">
-					<div class="bannerarea">
-						<img class="studentimg" src='${pageContext.request.contextPath}/resources/img_onedayclass/onedaymain3.jpg'>
-					</div>
-
-					<div class="bannerarea">
-						<img class="studentimg" src='${pageContext.request.contextPath}/resources/img_onedayclass/onedaymain3.jpg'>
-					</div>
-
-					<div class="bannerarea">
-						<img class="studentimg" src='${pageContext.request.contextPath}/resources/img_onedayclass/onedaymain3.jpg'>
-					</div>
-
-					<div class="bannerarea">
-						<img class="studentimg" src='${pageContext.request.contextPath}/resources/img/work_img9.jpg'>
-					</div>
-
-					<div class="bannerarea">
-						<img class="studentimg" src='${pageContext.request.contextPath}/resources/img/work_img8.jpg'>
-					</div>
-
-					<div class="bannerarea">
-						<img class="studentimg" src='${pageContext.request.contextPath}/resources/img/work_img4.jpg'>
-					</div>
-
-				</div>
-			</div>
+			
+			</div> -->
 		</div>
+		
+		
 
 		<footer class="footer">
 			<div class="footercontainer">
@@ -1102,7 +1072,7 @@ const topTenOnedayclassComponentLoad = () => {
 						<div class="logoarea">
 							<img src="${pageContext.request.contextPath}/resources/img_mainhome/logo1.png">
 						</div>
-						<div class="infoarea">상호 : 아트토리 대표 : 이곤 주소 : 서울시 노원구 상계로 74
+						<div class="footertext infoarea">상호 : 아트토리 대표 : 이곤 주소 : 서울시 노원구 상계로 74
 							4F 사업자번호 : 105-17-78854</div>
 					</div>
 
@@ -1110,14 +1080,14 @@ const topTenOnedayclassComponentLoad = () => {
 						<div class="logoarea">
 							<img src="${pageContext.request.contextPath}/resources/img_mainhome/logo2.png">
 						</div>
-						<div class="infoarea">male : ###@naver.com</div>
+						<div class="footertext infoarea">male : ###@naver.com</div>
 					</div>
 
 					<div class="rows">
 						<div class="logoarea">
 							<img src="${pageContext.request.contextPath}/resources/img_mainhome/logo3.png">
 						</div>
-						<div class="infoarea">tell : 027-###-###</div>
+						<div class="footertext infoarea">tell : 027-###-###</div>
 					</div>
 				</div>
 
@@ -1125,5 +1095,6 @@ const topTenOnedayclassComponentLoad = () => {
 		</footer>
 		
 	</div>
+	<!-- 모바일디자인 종료 -->
 </body>
 </html>

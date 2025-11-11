@@ -28,7 +28,7 @@ public class ProductDAOMybatis {
 	// 일반 상품 최초 링크를 타거나 제품군 선택시 호출되는 메서드
 	public List<Map<String, Object>> productGroupLlist(ProductVO vo) {
 	    List<Map<String, Object>> list = mybatis.selectList("ProductVO.producGroupLlist", vo);
-	    System.out.println("왓더" + list);
+	
 	    return list;
 	}
 

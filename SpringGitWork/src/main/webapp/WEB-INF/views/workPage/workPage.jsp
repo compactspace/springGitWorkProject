@@ -50,6 +50,26 @@
       padding-top: 20px;
     padding-bottom: 20px;
   }  
+  
+  
+    #mobileNave{
+
+  display: none;
+}
+
+/*모바일 시작  */
+@media screen and (max-width: 760px) {
+
+
+    /* 네비게이션 전환 */
+    #pcNave {
+        display: none;
+    }
+    #mobileNave {
+        display: block;
+    }
+}
+/*모바일 종료  */
 </style>
 <script>
     const classMap = {
@@ -108,9 +128,15 @@
 </script>
 </head>
 
+
 <body>
   <div id="allwrapper">
-    <%@ include file="../pcNave.jsp"%>
+   	<div id="pcNave">
+ <%@ include file="../pcNave.jsp"%>
+</div>
+<div id="mobileNave">
+ <%@ include file="../mobileNave.jsp"%>
+</div>
 
     <div class="header-wrapper">
       <h2>학생 작업물 / 후기</h2>

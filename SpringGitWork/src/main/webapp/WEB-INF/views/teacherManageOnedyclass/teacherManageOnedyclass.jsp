@@ -19,14 +19,48 @@
 
 <style>
 html, body {
-	height: 100%;
-	margin: 0;
-	font-family: 'Roboto', sans-serif;
+    height: 100%;
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
 }
 
 #pageWrapper {
-	display: flex;
-	height: 100vh; /* 화면 전체 높이 */
+    display: flex;
+    height: 100vh;
+}
+
+#sidebar {
+    width: 240px;
+    border-right: 1px solid #e0e0e0;
+    overflow-y: auto;
+}
+
+#mainContent {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+}
+
+#contentHeader {
+    padding: 20px 24px;
+    background-color: #f5f7fa;
+    border-left: 6px solid #4a90e2;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+#contentHeader h1 {
+    margin: 0;
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #333;
+}
+
+#contentHeader .header-subtitle {
+    margin: 6px 0 0 0;
+    font-size: 0.95em;
+    color: #666;
 }
 
 /* 좌측 메뉴 */
@@ -334,6 +368,10 @@ let activeMonthOnedayClassList=null;
 var remainingDates 
 let changeMonth=null
 
+
+
+
+
 window.onload= async function(){	
 	
 	 const token = $("meta[name='_csrf']").attr("content");
@@ -363,12 +401,31 @@ window.onload= async function(){
 		        
 		    });	
 
-	
+		 
+		 
+		 
+		// 🔹 URL 파라미터 체크 후 자동 선택
+	      //현재 페이지 URL에서 쿼리 파라미터 가져오기
+const urlParams = new URLSearchParams(window.location.search);
+const date = urlParams.get("date");
+
+
+
+
+let alreadyOpenDate=date||null;
+
+	        if (alreadyOpenDate) {
+	            $(".active-month-select").val(alreadyOpenDate).trigger('change'); 
+	            // 🔹 URL의 ?부분 제거
+	            const cleanUrl = window.location.origin + window.location.pathname;
+	            window.history.replaceState({}, document.title, cleanUrl);
+	        }
 	});
 	
 	
 	  
 }
+
 
 
 
@@ -770,7 +827,8 @@ function todayYyyyMmFormatted(){
 		<!-- 우측 메인 콘텐츠 -->
 		<div id="mainContent">
 			<div id="contentHeader">
-				<h1>개설 수업 관리</h1>
+				<h1>개설된 월 단위 수업 관리</h1>
+				<p class="header-subtitle">개설된 월단위 수업을 관리 마감 수정합니다.</p>
 			</div>
 			<div id="contentBody">
 			

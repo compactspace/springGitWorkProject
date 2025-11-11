@@ -43,16 +43,27 @@ html, body {
 }
 
 #contentHeader {
+    padding: 20px 24px;
+    background-color: #f5f7fa;
+    border-left: 6px solid #4a90e2;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
     margin-bottom: 20px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 12px;
 }
 
 #contentHeader h1 {
     margin: 0;
-    font-size: 1.6em;
+    font-size: 1.8em;
+    font-weight: 700;
     color: #333;
 }
+
+#contentHeader .header-subtitle {
+    margin: 6px 0 0 0;
+    font-size: 0.95em;
+    color: #666;
+}
+
 
 #contentBody {
     background-color: #fff;
@@ -124,10 +135,12 @@ window.onload = function() {
         <%@ include file="../compoents/teacherVerticalBar/teacherVerticalBar.jsp"%>
     </div>
 
+
     <!-- 우측 메인 콘텐츠 -->
     <div id="mainContent">
         <div id="contentHeader">
             <h1>신청 현황</h1>
+            <p class="header-subtitle">회원 가입시 제출했던 회사정보에 대한 승인상태 확인</p>
         </div>
         <div id="contentBody">
             <table id="documentStatusTable">

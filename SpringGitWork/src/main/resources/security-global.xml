@@ -14,7 +14,8 @@
 			http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
 
 	<!-- 전역 시큐리티 무시-->
-	<http pattern="/err**" security="none" />
+	<http pattern="/callback/**" security="none" />
+	<http pattern="/error/**" security="none" />
 	<http pattern="/resources/img_mainhome/**" security="none" />
 	<http pattern="/resources/img_onedayclass/**" security="none" />
 	<http pattern="/resources/img/**" security="none" />
@@ -28,5 +29,5 @@
 	<http pattern="/resources/img_product/**" security="none" />
 	<http pattern="/resources/img_review/**" security="none" />
 	<http pattern="/resources/js/**" security="none" />
-	<http pattern="/api/guest/**" security="none" />
+
 </beans:beans>

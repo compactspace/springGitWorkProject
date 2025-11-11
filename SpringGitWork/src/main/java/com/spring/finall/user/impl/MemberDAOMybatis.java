@@ -64,11 +64,11 @@ public class MemberDAOMybatis {
 		System.out.println("아이확인값이 널?:"+check);
 		
 		if (check == null) {
-			System.out.println("네이버 정보로 가입한적없음");
+		
 			checkid = true;
 			return checkid;
 		} else {
-			System.out.println("네이버 정보로 가입한적있음");
+		
 			checkid = false;
 			return checkid;
 		}

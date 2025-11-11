@@ -125,13 +125,40 @@
     text-align: right;
     }
     
+    
+    
+    #mobileNave{
+
+  display: none;
+}
+
+/*모바일 시작  */
+@media screen and (max-width: 760px) {
+
+
+    /* 네비게이션 전환 */
+    #pcNave {
+        display: none;
+    }
+    #mobileNave {
+        display: block;
+    }
+}
+/*모바일 종료  */
+    
+    
 </style>    
     
 </head>
 <body>
 
+	<div id="pcNave">
+ <%@ include file="../pcNave.jsp"%>
+</div>
+<div id="mobileNave">
+ <%@ include file="../mobileNave.jsp"%>
+</div>
 
-<%@ include file="../pcNave.jsp"%>
 
 
 <div class="breadcrumb-wrapper">
@@ -289,9 +316,32 @@ const artWorkID="${artWorkDetail.artwork_id}"
     	                window.location.replace(contextPath + "/guest/get-artwork-detail?artWorkID=" + artWorkID);
     	                
     	            },
-    	            error: function (err) {
-    	                alert("오류가 발생했습니다. 다시 시도해주세요.");
-    	            }
+    	            // 공통 에러 처리
+    	            error: function(xhr, status, error) {
+    	                console.warn("❌ Ajax 오류:", status, error);
+						console.log(xhr);
+						
+						
+			
+    	                switch (xhr.status) {
+    	                    case 401: // 비로그인
+    	                        alert("로그인이 필요합니다.");
+    	                    	return;
+    	                     
+    	                    case 403: // 권한 없음
+    	                        alert("접근 권한이 없습니다.");
+    	                        return
+    	                    case 404:
+    	                        alert("요청하신 자원을 찾을 수 없습니다.");
+    	                        return
+    	                    case 500:
+    	                        alert("서버 내부 오류가 발생했습니다.");
+    	                        return
+    	                    default:
+    	                        alert("요청 실패: " + error);
+    	                        return
+    	                }
+    	            },
     	        }); 
     	    });
     }

@@ -155,7 +155,43 @@ public class UserController {
 		System.out.println("권하이 없다꼬요");
 		return "403";
 	}
+	
+	
+	
+	
+	
+	@PostMapping("/after-successpayment-complement")
+	@ResponseBody
+	public ApiResponse<Boolean> afterSuccesspaymentComplement(@RequestBody OrderPaymentRequestDTO OrderPaymentRequestDTO,
+			@AuthenticationPrincipal UserDetailsVO2 user) {
+		
+		int userCode = user.getUser_code();
 
+		OrderRequestDTO orderRequestDTO = OrderPaymentRequestDTO.getOrder();
+
+		orderRequestDTO.setUserCode(userCode);
+
+		orderRequestDTO.toStringLog();
+		PaymentDTO paymentDTO = OrderPaymentRequestDTO.getPayment();
+		paymentDTO.toStringLog();
+
+		//afterSuccesspaymentComplement
+		
+		try {
+			orderService.afterSuccesspaymentComplement(orderRequestDTO, paymentDTO); // 내부에서 트랜잭션 처리
+			return ApiResponse.<Boolean>builder().code(201).success(true).message("결제 성공").data(true).build();
+		} catch (Exception e) {
+			System.err.println("[ERROR] 주문 처리 중 예외 발생: " + e.getMessage());
+			return ApiResponse.<Boolean>builder().code(500).success(false).message("결제 실패").data(false).build();
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
 	@PostMapping("/payment")
 	@ResponseBody
 	public ApiResponse<Boolean> processPayment(@RequestBody OrderPaymentRequestDTO OrderPaymentRequestDTO,

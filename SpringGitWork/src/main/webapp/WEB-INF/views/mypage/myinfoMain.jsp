@@ -9,70 +9,122 @@
 <meta charset="UTF-8">
 <title>내 정보</title>
 <style>
-  /* 부모 컨테이너에 flex 적용: 2열 구조 만들기 */
-  #container {
+/* 전체 레이아웃 */
+#container {
     display: flex;
-    height: 100vh; /* 화면 전체 높이 */
-  }
-
-  #sidebar {
-    width: 230px;
-    background-color: #f8f8f8;
-    border-right: 1px solid #ddd;
-    padding-top: 20px;
-    box-sizing: border-box;
-    /* 높이는 부모 높이 상속 */
-    height: 100%;
-  }
-  #loginStatus {
-    padding: 10px 10px;
-    font-weight: bold;
-    border-bottom: 1px solid #ddd;
-    margin-bottom: 10px;
+    min-height: 100vh;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f5f5f5;
     color: #333;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  #loginStatus form {
-    margin: 0;
-  }
-  #loginStatus button {
-    font-size: 0.85em;
-    padding: 2px 6px;
-    cursor: pointer;
-    background-color: #f44336;
-    border: none;
-    color: white;
-    border-radius: 3px;
-  }
-  #loginStatus button:hover {
-    background-color: #d32f2f;
-  }
-  #sidebar ul {
+}
+
+/* 사이드바 */
+#sidebar {
+    width: 220px;
+    background-color: #ffffff;
+    border-right: 1px solid #e0e0e0;
+    padding: 20px;
+}
+
+/* 로그인 상태 영역 */
+#loginStatus {
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+/* 로그인 버튼 */
+#logoutForm button {
+    transition: 0.2s;
+}
+#logoutForm button:hover {
+    color: #007bff;
+}
+
+/* 메뉴 리스트 */
+#sidebar ul {
     list-style: none;
     padding: 0;
-    margin: 0;
-  }
-  #sidebar ul li {
-    padding: 15px 20px;
+}
+#sidebar ul li {
+    padding: 12px 15px;
+    margin-bottom: 6px;
+    border-radius: 4px;
     cursor: pointer;
-    border-bottom: 1px solid #ddd;
-  }
-  #sidebar ul li:hover {
-    background-color: #eee;
-  }
-  #sidebar ul li.active {
-    background-color: #4CAF50;
-    color: white;
-    font-weight: bold;
-  }
-  #content {
-    flex: 1; /* 나머지 공간 차지 */
-    padding: 20px;
-    overflow-y: auto; /* 내용 길면 스크롤 가능 */
-  }
+    transition: 0.2s;
+}
+#sidebar ul li:hover {
+    background-color: #f0f0f0;
+}
+#sidebar ul li.active {
+    background-color: #e0e0e0;
+    font-weight: 500;
+}
+
+/* 콘텐츠 영역 */
+#content {
+    flex: 1;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    margin: 20px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+}
+
+/* 주문 목록 버튼 */
+#load-more-btn {
+    display: inline-block;
+    padding: 10px 18px;
+    margin: 20px 0;
+    background-color: #ffffff;
+    color: #007bff;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s;
+}
+#load-more-btn:hover {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+
+
+	
+    
+    #sidebar {
+    	padding:0px 0px;
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+        flex-direction: column;
+        
+    }
+    
+    #loginStatus{
+	margin-bottom: 10px;
+	padding: 10px 10px;
+	}
+    #container {
+        flex-direction: column;
+    }
+    
+    #sidebar ul {
+    margin-top: 0px;
+    	padding: 10px 10px;
+        display: flex;
+    }
+    
+    #sidebar  li {
+        margin: 0 5px;
+    }
+}
 </style>
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!--전역 블록  -->
@@ -223,8 +275,8 @@ function loadOrders() {
       </ul>
     </div>
         
-    <div id="content">
       <!-- AJAX로 불러온 내용이 표시됩니다 -->
+    <div id="content">
     </div>
   </div>
 </body>

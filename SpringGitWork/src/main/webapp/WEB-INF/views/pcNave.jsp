@@ -363,11 +363,12 @@ if (request.getParameter("cmd") != null)
 
      
      
+     
        <!-- ✅ 로그인 상태일 때 -->
 <sec:authorize access="hasAuthority('user')">
     <a href="${pageContext.request.contextPath}/users/mypage">나의정보</a> &nbsp;|&nbsp;
 	<a href="${pageContext.request.contextPath}/users/generalcartlist">장바구니</a> &nbsp;|&nbsp;
-    <a href="${pageContext.request.contextPath}/users/payinfo">결제현황</a> &nbsp;|&nbsp;
+   <%--  <a href="${pageContext.request.contextPath}/users/payinfo">결제현황</a> &nbsp;|&nbsp; --%>
     <a href="${pageContext.request.contextPath}/users/get-my-reserve-page">예약현황</a> &nbsp;|&nbsp;
  <form id="logoutForm" action="${pageContext.request.contextPath}/users/logout" method="POST" style="display: inline;">
   <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
@@ -380,7 +381,8 @@ if (request.getParameter("cmd") != null)
 <sec:authorize access="hasRole('ROLE_TEACHER')">
 
 
-  <a href="${pageContext.request.contextPath}/teacher/teacher-my-info">나의정보</a> &nbsp;|&nbsp;	
+
+  <a href="${pageContext.request.contextPath}/teacher/teacher-my-info">수업관리</a> &nbsp;|&nbsp;	
  <form id="logoutForm" action="${pageContext.request.contextPath}/users/logout" method="POST" style="display: inline;">
   <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
   <button type="submit" style="background: none; border: none; color: #333; cursor: pointer;">로그아웃</button>

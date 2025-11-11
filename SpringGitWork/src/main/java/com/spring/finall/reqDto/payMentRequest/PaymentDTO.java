@@ -3,6 +3,8 @@ package com.spring.finall.reqDto.payMentRequest;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class PaymentDTO {
 	
 	//참조키용
@@ -16,14 +18,24 @@ public class PaymentDTO {
     private Integer amount;         // 결제 금액
     private String paymentMethod;   // 결제 방법
     private LocalDateTime createdAt; // 생성 일시
+    
+    @JsonProperty("impUid")
+    private String impUid;
+    
+    
+    
+    
+    
+    
+    public String getImpUid() {
+		return impUid;
+	}
 
-    
-    
-    
-    
-    
-    
-    public Long getProductId() {
+	public void setImpUid(String impUid) {
+		this.impUid = impUid;
+	}
+
+	public Long getProductId() {
 		return productId;
 	}
 

@@ -4,7 +4,163 @@
 
 <mapper namespace="OrderDAO">
 
+
+<!-- 1. 미완료 주문정보 가져오기 -->
+
+<select id="selectOneDraftOrder" parameterType="String" resultType="Map">
+
+SELECT
+  oi.order_info_id,
+  oi.user_id,
+  oi.merchant_uid,
+  
+  oit.order_item_id,
+  
+  doi.draft_total_amount,
+  doi.draft_total_quantity
+
+
+FROM
+	order_info AS oi
+iNNER JOIN draft_order_info AS doi 
+
+ON
+	oi.order_info_id = doi.order_info_id
+	
+INNER JOIN 	order_item AS oit 
+
+on oit.order_info_id=oi.order_info_id
+	
+WHERE
+	oi.user_id = #{user_id}
+	AND oi.status = 'PENDING'
+</select>
+
+
     <!-- 1. 주문 기본 정보 저장 -->
+<insert id="insertDraftOrderInfo" parameterType="map" useGeneratedKeys="true" keyProperty="orderInfoId">
+    INSERT INTO order_info (user_id, order_date,status, merchant_uid)
+    VALUES (#{user_id}, NOW(),'PENDING', #{merchant_uid})
+</insert>
+
+
+
+<insert id="insertDraftOrderItem" parameterType="map" useGeneratedKeys="true" keyProperty="draft_order_info_id">
+    INSERT INTO draft_order_info
+        (order_info_id, draft_total_amount, draft_total_quantity)
+    VALUES
+        (#{order_info_id}, #{draft_total_amount}, #{draft_total_quantity})
+</insert>
+
+<update id="updateDraftOrderItem" parameterType="map">
+    UPDATE draft_order_info
+    SET
+        draft_total_amount = #{draft_total_amount},
+        draft_total_quantity = #{draft_total_quantity}
+    WHERE order_info_id = #{order_info_id}
+</update>
+
+
+    <!-- 2. 주문 상품 리스트 저장 -->
+    <insert id="insertDraftOrderItemList">
+        INSERT INTO order_item (order_info_id, product_id, product_name, quantity, price_per_unit)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{orderInfoId}, #{item.productId}, #{item.productName}, #{item.quantity}, #{item.pricePerUnit})
+        </foreach>
+    </insert>
+
+
+
+<update id="updateOrderItemList" parameterType="map">
+    UPDATE order_item
+    SET
+      product_id = #{product_id},
+      product_name = #{product_name},
+      quantity = #{quantity},
+      price_per_unit = #{price_per_unit}
+    WHERE order_info_id = #{order_info_id}
+      AND order_item_id = #{order_item_id}
+</update>
+
+
+
+<select id="duplicateOrderCheck" parameterType="String" resultType="map">
+SELECT * FROM order_info WHERE merchant_uid =#{merchantUid} and status='SUCCESS'
+</select>
+
+
+
+<update id="OrderStatusToSuccess" parameterType="String">
+    UPDATE order_info
+    SET
+      status = 'SUCCESS'    
+    WHERE merchant_uid = #{merchantUid}
+</update>
+
+
+
+
+
+
+<select id="selectOneOrderInfoId" parameterType="String" resultType="map">
+
+SELECT * From order_info  WHERE merchant_uid=#{merchantUid}
+</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<select id="checkOneOrderAmount" parameterType="String"
+	resultType="map">
+
+	SELECT
+
+	doi.draft_total_amount,
+	doi.draft_total_quantity
+
+
+	FROM
+	order_info AS oi
+	iNNER JOIN draft_order_info AS doi
+
+	ON
+	oi.order_info_id = doi.order_info_id
+	WHERE
+	oi.merchant_uid = #{merchant_uid}
+	AND oi.status = 'PENDING'
+
+
+</select>
+
+
+    <!-- 1. 주문 상태 PENDING -> SUCCESS로 변경 -->
+<update id="updateOrderStatusToSuccess">
+    UPDATE order_info
+    SET order_status = 'SUCCESS',  -- 상태를 SUCCESS로 변경
+        updated_at = NOW()         -- 갱신일도 함께 업데이트
+    WHERE merchant_uid = #{merchant_uid}
+      AND order_status = 'PENDING'  -- 현재 PENDING 상태인 경우만
+</update>
+
+
+
+
+
+    <!-- updateOrderStatusToSuccess 완료후 지울것-->
  <insert id="insertOrderInfo" useGeneratedKeys="true" keyProperty="orderInfoId">
     INSERT INTO order_info (user_id, order_date)
     VALUES (#{userCode}, NOW())
@@ -24,6 +180,65 @@
         INSERT INTO order_person (order_info_id, name, email, phone)
         VALUES (#{orderInfoId}, #{name}, #{email}, #{phone})
     </insert>
+
+
+
+<select id="findOrderInfoIdListByDateWithPaging" parameterType="map" resultType="hashmap">
+  select
+    *
+  from
+    order_info as oi
+  where
+  user_id=#{user_id} and
+    oi.order_date BETWEEN #{startDate} AND #{endDate}
+  ORDER BY
+    oi.order_info_id DESC
+  LIMIT #{limit} OFFSET #{offset}
+</select>
+
+
+
+<select id="findOrderItemsList" parameterType="list" resultType="hashmap">
+  SELECT
+    op.name AS person_name,
+    op.email AS person_email,
+    op.phone AS person_phone,
+    oi2.product_id AS item_product_id,
+    oi2.product_name AS item_product_name,
+    oi2.quantity AS item_quantity,
+    oi2.price_per_unit AS item_price_per_unit,
+    p.payment_id,
+    p.order_info_id AS payment_order_info_id,
+    p.payment_number,
+    p.amount AS payment_amount,
+    p.payment_method,
+    p.created_at AS payment_created_at
+  FROM order_item oi2
+  JOIN order_person op ON oi2.order_info_id = op.order_info_id
+  JOIN payment p ON oi2.order_info_id = p.order_info_id
+  WHERE oi2.order_info_id IN
+  <foreach item="id" collection="list" open="(" separator="," close=")">
+    #{id}
+  </foreach>
+  ORDER BY
+    oi2.order_info_id DESC,
+    p.created_at DESC
+</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -50,14 +265,14 @@ JOIN order_item oi2 ON oi.order_info_id = oi2.order_info_id
 JOIN order_person op ON oi.order_info_id = op.order_info_id
 JOIN payment p ON oi.order_info_id = p.order_info_id
 WHERE
-  p.created_at BETWEEN #{startDate} AND #{endDate}
+  oi.order_date BETWEEN #{startDate} AND #{endDate}
 ORDER BY
-  p.created_at DESC,
-  oi.order_info_id DESC
-LIMIT ${limit} OFFSET ${offset}
-
-
+oi.order_info_id DESC,
+  p.created_at DESC
+  
+LIMIT #{limit} OFFSET #{offset}
 </select>
+
 
 <!-- OrderItemDTO 매핑 분리 -->
 <resultMap id="orderItemResultMap" type="OrderItemDTO">

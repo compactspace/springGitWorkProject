@@ -142,16 +142,11 @@ const currentSearChQuery="${query}";
 const itemsPerPage = 10;    // 한 페이지에 보여줄 아이템 수
 const pageBtnGroupSize = 5; // 한 번에 보여줄 페이지 버튼 개수
 
-
-
 //쿠키에서 totalCnt 읽기 함수
 function getTotalCntFromCookie() {
     const match = document.cookie.match(/cachyTotalCnt=(\d+)/);
-    console.log(match);
-    console.log(match?.[1]);
-    
-    
-    
+   /*  console.log(match);
+    console.log(match?.[1]); */    
     return Number(match?.[1] ?? 0);
 }
 

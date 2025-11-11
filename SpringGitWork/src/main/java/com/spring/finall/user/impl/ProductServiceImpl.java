@@ -30,7 +30,7 @@ public class ProductServiceImpl implements ProductService {
 
 		public  List<Map<String, Object>> productGroupLlist (ProductVO vo){
 			
-		System.out.println("트랜잭션테스트");
+
 			return productdao.productGroupLlist(vo);
 		}
 	

@@ -32,8 +32,8 @@
 
   .container {
     background: #fff;
-    width: 100%;
-    max-width: 400px;
+  min-width: 360px;
+    
     padding: 2.5rem 2rem 3rem;
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
@@ -131,7 +131,15 @@
 </head>
 <body>
 <div class="container">
-  <div class="title">Login</div>
+  <div class="title">선생님 Login</div>
+
+
+  <!-- 로그인 유형 선택 버튼 추가 -->
+  <div style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
+    <button type="button" class="membership-btn" id="studentLoginBtn" style="flex:1;">학생 로그인</button>
+    <button type="button" class="membership-btn" id="teacherLoginBtn" style="flex:1;">선생 로그인</button>
+  </div>
+
 
   <c:if test="${not empty param.error}">
     <div style="color:red; margin-bottom: 1rem;">
@@ -150,8 +158,17 @@
 
     <button type="submit" class="loginbtn">로그인</button>
   </form>
+   <div role="button" tabindex="0" class="membership-btn" onclick="location.href='${pageContext.request.contextPath}/teacher/signup-page'">모두의 화방 선생님되기</div>
 </div>
 
+
 </body>
+
+<script>  
+  document.getElementById('studentLoginBtn').addEventListener('click', function() {
+    // 선생님 로그인 페이지로 이동
+    location.href = '${pageContext.request.contextPath}/guest/login';
+  });
+  </script>
 
 </html>

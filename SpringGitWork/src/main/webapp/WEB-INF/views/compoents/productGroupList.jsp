@@ -1,11 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>상품 목록</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -166,17 +162,18 @@
         }
     </style> 
 
+
     <!-- 인증 여부를 JS로 안전하게 넘기기 -->
     <script>
-      var isAuthenticated = false;
+      var isAuthenticated = ${isAuthenticated};
+      console.log("isAuthenticated: "+isAuthenticated);
     </script>
+    
+    
 
-    <sec:authorize access="isAuthenticated()">
-      <script>
-        isAuthenticated = true;
-      </script>
-    </sec:authorize>
+  
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
     
     <script>
     $(document).ready(function() {
@@ -201,6 +198,10 @@
     }
 
     function handleAddToCart() {
+    	
+    console.log("isAuthenticated: "+isAuthenticated);
+    
+    	
         if (!isAuthenticated) {
             showLoginModal();
             return;
@@ -233,7 +234,7 @@
         localStorage.setItem('cart', JSON.stringify(cart));
         toggleCancelCartButton();
 
-        $.ajax({
+     /*    $.ajax({
             url: '/addToCart',
             method: 'POST',
             data: newProduct,
@@ -247,7 +248,7 @@
             error: function() {
                 alert("장바구니에 추가하는데 문제가 발생했습니다.");
             }
-        });
+        }); */
     }
 
 
@@ -277,7 +278,7 @@
         localStorage.setItem('cart', JSON.stringify(allProducts));
         toggleCancelCartButton();
 
-        $.ajax({
+ /*        $.ajax({
             url: '/addAllToCart',
             method: 'POST',
             contentType: 'application/json',
@@ -292,15 +293,16 @@
             error: function() {
                 alert("장바구니에 추가하는데 문제가 발생했습니다.");
             }
-        });
+        }); */
     }  
 
+    
     function handleCancelCart() {
         localStorage.removeItem('cart');
         toggleCancelCartButton();
         alert("장바구니가 비워졌습니다.");
 
-        $.ajax({
+      /*   $.ajax({
             url: '/cancelCart',
             method: 'POST',
             success: function(response) {
@@ -309,7 +311,8 @@
             error: function() {
                 alert("장바구니 취소에 문제가 발생했습니다.");
             }
-        });
+        }); */
+        
     }
     
     function showLoginModal() {
@@ -322,8 +325,7 @@
         $("#modal-backdrop").hide();
     }
     </script>
-</head>
-<body>
+
 
     <div class="content2">
         
@@ -374,5 +376,3 @@
         </div>
     </div>
     <div id="modal-backdrop"></div>
-</body>
-</html>
