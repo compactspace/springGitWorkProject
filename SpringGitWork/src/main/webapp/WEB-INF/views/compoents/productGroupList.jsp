@@ -222,12 +222,15 @@
             return;
         }
 
+        
+        
         var newProduct = {
             productCod: productCod,
             productId: productId,  // ← productId 추가
             productName: productName,
             productPrice: productPrice,
-            productImg: productImg
+            productImg: productImg,
+            quantity:1
         };
 
         cart.push(newProduct);
@@ -258,6 +261,7 @@
             return;
         }
         
+        
         var allProducts = [];
         $(".product-item").each(function() {
             var productCod = $(this).data("product-cod");
@@ -266,12 +270,14 @@
             var productPrice = $(this).find(".price").text().replace(' 원', '');
             var productImg = $(this).find(".product-image").css("background-image");
 
+            
             allProducts.push({
                 productCod: productCod,
                 productId: productId,  // ← productId 추가
                 productName: productName,
                 productPrice: productPrice,
-                productImg: productImg
+                productImg: productImg,
+                quantity:1
             });
         });
 

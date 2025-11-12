@@ -23,6 +23,7 @@ import com.spring.finall.impl.SmsServiceRedisDao;
 import com.spring.finall.reqDto.orderRequest.OrderItemDTO;
 import com.spring.finall.reqDto.orderRequest.OrderRequestDTO;
 import com.spring.finall.reqDto.payMentRequest.PaymentDTO;
+import com.spring.finall.reqDto.refundRequest.ProductRefundDTO;
 import com.spring.finall.reqDto.wrapperRequest.OrderPaymentRequestDTO;
 import com.spring.finall.security.UserDetailsVO2;
 import com.spring.finall.service.ArtworkService;
@@ -220,7 +221,9 @@ public class UserViewController {
 	    for (OrderPaymentRequestDTO dto : orderList) {
 	        OrderRequestDTO order = dto.getOrder();
 	        PaymentDTO payment = dto.getPayment();
-
+	        ProductRefundDTO refund = dto.getRefund();
+	        
+	        
 	        Map<String, Object> orderMap = orderMapById.get(order.getOrderInfoId());
 	        if (orderMap == null) {
 	            orderMap = new HashMap<>();
@@ -232,6 +235,7 @@ public class UserViewController {
 	            // items와 pay를 리스트로 초기화
 	            orderMap.put("items", new ArrayList<Map<String, Object>>());
 	            orderMap.put("pay", new ArrayList<Map<String, Object>>());
+	            orderMap.put("refund", new ArrayList<Map<String, Object>>());
 
 	            orderMapById.put(order.getOrderInfoId(), orderMap);
 	        }
@@ -253,6 +257,7 @@ public class UserViewController {
 	        if (payment != null) {
 	        
 	            Map<String, Object> payMap = new HashMap<>();
+	            payMap.put("paymentId", payment.getPaymentId());
 	            payMap.put("paymentMethod", payment.getPaymentMethod());
 	            payMap.put("paymentNumber", payment.getPaymentNumber());
 	            LocalDateTime createdAt = payment.getCreatedAt(); // 혹은 .toLocalDateTime() 필요할 수도 있음
@@ -264,6 +269,25 @@ public class UserViewController {
 	            payMap.put("amount", payment.getAmount());
 	            orderMap.put("pay", payMap);  // 리스트가 아니라 하나만
 	        }
+	        
+	        if (refund != null) {
+	            Map<String, Object> refundMap = new HashMap<>();
+	            refundMap.put("productRefundId", refund.getProductRefundId());
+	            refundMap.put("refundedAmount", refund.getRefundedAmount());
+	            refundMap.put("reason", refund.getReason());
+	            refundMap.put("status", refund.getStatus());
+	            refundMap.put("requestedAt", refund.getRequestedAt() != null
+	                ? refund.getRequestedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+	                : null);
+	            refundMap.put("refundedAt", refund.getRefundedAt() != null
+	                ? refund.getRefundedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+	                : null);
+	            refundMap.put("processedBy", refund.getProcessedBy());
+	            
+	            orderMap.put("refund", refundMap); // 리스트가 아니라 단일 Map
+	        }
+
+	        
 	    }
 
 	    // 최종 리스트 생성

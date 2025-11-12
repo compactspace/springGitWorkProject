@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.spring.finall.reqDto.orderRequest.OrderRequestDTO;
 import com.spring.finall.reqDto.payMentRequest.PaymentDTO;
+import com.spring.finall.reqDto.refundRequest.ProductRefundDTO;
 import com.spring.finall.reqDto.wrapperRequest.OrderPaymentRequestDTO;
 
 public interface OrderService {
@@ -26,6 +27,10 @@ public interface OrderService {
 	
 	   boolean afterSuccesspaymentComplement(OrderRequestDTO orderRequestDTO , PaymentDTO paymentDTO);
 	
+	 
+	   
+	   
+	   
 	   
 	   
 	 /**

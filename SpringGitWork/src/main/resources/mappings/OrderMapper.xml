@@ -249,21 +249,34 @@ SELECT
   op.name AS person_name,
   op.email AS person_email,
   op.phone AS person_phone,
+
   oi2.product_id AS item_product_id,
   oi2.product_name AS item_product_name,
   oi2.quantity AS item_quantity,
   oi2.price_per_unit AS item_price_per_unit,
+
   p.payment_id,
   p.order_info_id AS payment_order_info_id,
   p.payment_number,
   p.amount AS payment_amount,
   p.payment_method,
-  p.created_at AS payment_created_at
+  p.created_at AS payment_created_at,
+
+  -- 환불 정보 추가 (NULL 가능)
+  pr.product_refund_id,
+  pr.refunded_amount,
+  pr.reason AS refund_reason,
+  pr.status AS refund_status,
+  pr.requested_at AS refund_requested_at,
+  pr.refunded_at AS refund_completed_at,
+  pr.processed_by AS refund_processed_by
+
 FROM
   order_info oi
 JOIN order_item oi2 ON oi.order_info_id = oi2.order_info_id
 JOIN order_person op ON oi.order_info_id = op.order_info_id
 JOIN payment p ON oi.order_info_id = p.order_info_id
+LEFT JOIN product_refund pr ON p.payment_id = pr.payment_id
 WHERE
   oi.order_date BETWEEN #{startDate} AND #{endDate}
 ORDER BY
@@ -274,7 +287,6 @@ LIMIT #{limit} OFFSET #{offset}
 </select>
 
 
-<!-- OrderItemDTO 매핑 분리 -->
 <resultMap id="orderItemResultMap" type="OrderItemDTO">
   <id property="productId" column="item_product_id"/>
   <result property="productName" column="item_product_name"/>
@@ -282,34 +294,41 @@ LIMIT #{limit} OFFSET #{offset}
   <result property="pricePerUnit" column="item_price_per_unit"/>
 </resultMap>
 
-<!-- 최상위 resultMap -->
-<resultMap id="orderPaymentResultMap" type="OrderPaymentRequestDTO">
-
-  <association property="order" javaType="OrderRequestDTO">
-    <id property="orderInfoId" column="order_info_id"/>
-    <result property="userId" column="user_id"/>
-  
-
-    <association property="person" javaType="OrderPersonDTO">
-      <result property="name" column="person_name"/>
-      <result property="email" column="person_email"/>
-      <result property="phone" column="person_phone"/>
-    </association>
-
-    <!-- collection에서 별도의 resultMap 참조 -->
-    <collection property="items" ofType="OrderItemDTO" resultMap="orderItemResultMap"/>
-  </association>
-
-  <association property="payment" javaType="PaymentDTO">
-    <id property="paymentId" column="payment_id"/>
-    <result property="orderInfoId" column="payment_order_info_id"/>
-    <result property="paymentNumber" column="payment_number"/>
-    <result property="amount" column="payment_amount"/>
-    <result property="paymentMethod" column="payment_method"/>
-    <result property="createdAt" column="payment_created_at"/>
-  </association>
-
+<resultMap id="refundResultMap" type="ProductRefundDTO">
+  <id property="productRefundId" column="product_refund_id"/>
+  <result property="refundedAmount" column="refunded_amount"/>
+  <result property="reason" column="refund_reason"/>
+  <result property="status" column="refund_status"/>
+  <result property="requestedAt" column="refund_requested_at"/>
+  <result property="refundedAt" column="refund_completed_at"/>
+  <result property="processedBy" column="refund_processed_by"/>
 </resultMap>
+<resultMap id="paymentResultMap" type="PaymentDTO">
+  <id property="paymentId" column="payment_id"/>
+  <result property="orderInfoId" column="payment_order_info_id"/>
+  <result property="paymentNumber" column="payment_number"/>
+  <result property="amount" column="payment_amount"/>
+  <result property="paymentMethod" column="payment_method"/>
+  <result property="createdAt" column="payment_created_at"/>
+</resultMap>
+<resultMap id="orderResultMap" type="OrderRequestDTO">
+  <id property="orderInfoId" column="order_info_id"/>
+  <result property="userId" column="user_id"/>
+  
+  <association property="person" javaType="OrderPersonDTO">
+    <result property="name" column="person_name"/>
+    <result property="email" column="person_email"/>
+    <result property="phone" column="person_phone"/>
+  </association>
+
+  <collection property="items" ofType="OrderItemDTO" resultMap="orderItemResultMap"/>
+</resultMap>
+<resultMap id="orderPaymentResultMap" type="OrderPaymentRequestDTO">
+  <association property="order" resultMap="orderResultMap"/>
+  <association property="payment" resultMap="paymentResultMap"/>
+  <association property="refund" resultMap="refundResultMap"/>
+</resultMap>
+
 
 
 

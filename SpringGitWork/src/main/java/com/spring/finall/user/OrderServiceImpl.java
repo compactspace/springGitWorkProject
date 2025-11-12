@@ -18,6 +18,7 @@ import com.spring.finall.impl.PaymentServiceDAO;
 import com.spring.finall.reqDto.orderRequest.OrderItemDTO;
 import com.spring.finall.reqDto.orderRequest.OrderRequestDTO;
 import com.spring.finall.reqDto.payMentRequest.PaymentDTO;
+
 import com.spring.finall.reqDto.wrapperRequest.OrderPaymentRequestDTO;
 import com.spring.finall.service.OrderService;
 
@@ -143,10 +144,11 @@ public class OrderServiceImpl implements OrderService {
 		int totalAmount = 0;
 
 		List<OrderItemDTO> orderList = orderRequestDTO.getItems();
-
+		
 		for (int i = 0; i < orderList.size(); i++) {
-			totalAmount = +orderList.get(i).getQuantity();
+		    totalAmount += orderList.get(i).getPricePerUnit() * orderList.get(i).getQuantity();
 		}
+
 
 		paymentDTO.setAmount(totalAmount);
 
@@ -250,7 +252,7 @@ public class OrderServiceImpl implements OrderService {
 		return orderServiceDAO.duplicateOrderCheck(merchantUid);
 	}
 
-	
+
 
 	
 

@@ -46,11 +46,13 @@ import com.spring.finall.businessresult.ArtWorkImagesDeleteResult;
 import com.spring.finall.businessresult.CheckCurrentPwdResult;
 import com.spring.finall.businessresult.SmsSendResult;
 import com.spring.finall.exception.artworkexception.ArtWorkCompleteException;
+import com.spring.finall.exception.requestRefund.RequestRefundException;
 import com.spring.finall.impl.SmsServiceRedisDao;
 import com.spring.finall.impl.WorkServcieRedisDao;
 import com.spring.finall.redisutil.RedisUtil;
 import com.spring.finall.reqDto.orderRequest.OrderRequestDTO;
 import com.spring.finall.reqDto.payMentRequest.PaymentDTO;
+import com.spring.finall.reqDto.refundRequest.ProductRefundDTO;
 import com.spring.finall.reqDto.wrapperRequest.OrderPaymentRequestDTO;
 import com.spring.finall.reqDto.writeWorkComment.WorkCommentDTO;
 import com.spring.finall.security.SecurityUserVO;
@@ -60,6 +62,7 @@ import com.spring.finall.service.ArtworkService;
 import com.spring.finall.service.MemberService;
 import com.spring.finall.service.OneDayClassService;
 import com.spring.finall.service.OrderService;
+import com.spring.finall.service.ProductRefundService;
 import com.spring.finall.service.ReserveService;
 import com.spring.finall.service.SmsService;
 import com.spring.finall.service.WorkService;
@@ -150,21 +153,20 @@ public class UserController {
 	@Autowired
 	private ArtworkService artworkService;
 
+	@Autowired
+	private ProductRefundService productRefundService;
+
 	@RequestMapping(value = "/403", method = { RequestMethod.GET, RequestMethod.POST })
 	public String error403() {
 		System.out.println("권하이 없다꼬요");
 		return "403";
 	}
-	
-	
-	
-	
-	
+
 	@PostMapping("/after-successpayment-complement")
 	@ResponseBody
-	public ApiResponse<Boolean> afterSuccesspaymentComplement(@RequestBody OrderPaymentRequestDTO OrderPaymentRequestDTO,
-			@AuthenticationPrincipal UserDetailsVO2 user) {
-		
+	public ApiResponse<Boolean> afterSuccesspaymentComplement(
+			@RequestBody OrderPaymentRequestDTO OrderPaymentRequestDTO, @AuthenticationPrincipal UserDetailsVO2 user) {
+
 		int userCode = user.getUser_code();
 
 		OrderRequestDTO orderRequestDTO = OrderPaymentRequestDTO.getOrder();
@@ -175,8 +177,8 @@ public class UserController {
 		PaymentDTO paymentDTO = OrderPaymentRequestDTO.getPayment();
 		paymentDTO.toStringLog();
 
-		//afterSuccesspaymentComplement
-		
+		// afterSuccesspaymentComplement
+
 		try {
 			orderService.afterSuccesspaymentComplement(orderRequestDTO, paymentDTO); // 내부에서 트랜잭션 처리
 			return ApiResponse.<Boolean>builder().code(201).success(true).message("결제 성공").data(true).build();
@@ -185,13 +187,7 @@ public class UserController {
 			return ApiResponse.<Boolean>builder().code(500).success(false).message("결제 실패").data(false).build();
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
+
 	@PostMapping("/payment")
 	@ResponseBody
 	public ApiResponse<Boolean> processPayment(@RequestBody OrderPaymentRequestDTO OrderPaymentRequestDTO,
@@ -214,6 +210,37 @@ public class UserController {
 			System.err.println("[ERROR] 주문 처리 중 예외 발생: " + e.getMessage());
 			return ApiResponse.<Boolean>builder().code(500).success(false).message("결제 실패").data(false).build();
 		}
+	}
+
+	@PostMapping("/request-refund")
+	@ResponseBody
+	public ResponseEntity<ApiResponse<Boolean>> requestRefund(@AuthenticationPrincipal UserDetailsVO2 user,
+			@RequestBody ProductRefundDTO refundDto) {
+
+		ApiResponse<Boolean> response = null;
+
+		try {
+
+			boolean requestSuccess = productRefundService.reqeustRefund(refundDto);
+			if (requestSuccess) {
+				response = ApiResponse.<Boolean>builder().code(201).success(true).message("환불 요청이 정상적으로 접수되었습니다.")
+						.data(true).build();
+				return ResponseEntity.status(200).body(response);
+			} else {
+
+				response = ApiResponse.<Boolean>builder().code(50001).success(false).message("환불 신청시 에러").data(false)
+						.build();
+				return ResponseEntity.status(500).body(response);
+			}
+
+		} catch (RequestRefundException e) {
+
+			response = ApiResponse.<Boolean>builder().code(50001).success(false).message(e.getMessage()).data(false)
+					.build();
+			return ResponseEntity.status(500).body(response);
+
+		}
+
 	}
 
 	// 일반 상품을 카트에 추가 하는 매핑
@@ -893,7 +920,7 @@ public class UserController {
 
 		int userCode = userDetails.getUser_code();
 
-		if (folder == null || fileName == null || (!folder.equals("/userArtwork/") )) {
+		if (folder == null || fileName == null || (!folder.equals("/userArtwork/"))) {
 
 			return ApiResponse.<ArtWorkImagesDeleteResult>builder().code(403).success(false).message("폴더 접근권한 없음")
 					.data(null).build();
@@ -980,24 +1007,24 @@ public class UserController {
 	@ResponseBody
 	public ApiResponse<ArtWorkImagesDeleteResult> completeDraftArtWork(@RequestParam("content") String content,
 			@AuthenticationPrincipal UserDetailsVO2 userDetails) {
-		
-		int userCode=userDetails.getUser_code();		
+
+		int userCode = userDetails.getUser_code();
 
 		try {
 			Map<String, Object> executeQueryInfo = artworkService.completeDraftArtWork(content, userCode);
-			
-		return	ApiResponse.<ArtWorkImagesDeleteResult>builder().code(201).success(true)
-			.message("별탈없이 DB에 작업물이 저장됨").data(null).build();
-			
+
+			return ApiResponse.<ArtWorkImagesDeleteResult>builder().code(201).success(true).message("별탈없이 DB에 작업물이 저장됨")
+					.data(null).build();
+
 		} catch (ArtWorkCompleteException e) {
 
 			return ApiResponse.<ArtWorkImagesDeleteResult>builder().code(e.getBussinessCode()).success(false)
 					.message(e.getBussinessExceptionMessage()).data(null).build();
 
 		}
-	
+
 	}
-	
+
 	//
 	@PostMapping("/create-artwork-comment")
 	@ResponseBody
@@ -1023,7 +1050,7 @@ public class UserController {
 				success = true;
 				massage = "별탈없이 DB에 댓글이 창조됨 저장됨";
 			}
-			
+
 			if (affectedRow <= 0) {
 				code = 500;
 				success = false;
@@ -1041,14 +1068,11 @@ public class UserController {
 		}
 
 	}
-	
-	
+
 	@PostMapping("/applyTo-artwork-comment")
 	@ResponseBody
-	public ApiResponse<Object> applyToComment(
-			@RequestParam("commentText") String commentText,
-			@RequestParam("artWorkID") int artWorkID,
-			@RequestParam("parentCommentId") int parentCommentId,			
+	public ApiResponse<Object> applyToComment(@RequestParam("commentText") String commentText,
+			@RequestParam("artWorkID") int artWorkID, @RequestParam("parentCommentId") int parentCommentId,
 			@AuthenticationPrincipal UserDetailsVO2 userDetails) {
 
 		int userCode = userDetails.getUser_code();
@@ -1066,28 +1090,26 @@ public class UserController {
 			boolean success = false;
 			String massage = null;
 
-			Map<String,Object>	data	=new HashMap<>();
+			Map<String, Object> data = new HashMap<>();
 			if (generatedPk > 0) {
-			data.put("artwork_comment_id", generatedPk);
+				data.put("artwork_comment_id", generatedPk);
 				code = 201;
 				success = true;
 				massage = "별탈없이 DB에 댓글이 창조됨 저장됨";
 			}
-			
+
 			if (generatedPk <= 0) {
 				code = 500;
 				success = false;
 				massage = "잠시후 다시 시도해주세요";
-				data=null;
+				data = null;
 			}
-			return ApiResponse.<Object>builder().code(code).success(success).message(massage)
-					.data(data).build();
+			return ApiResponse.<Object>builder().code(code).success(success).message(massage).data(data).build();
 
 		} catch (Exception e) {
 
 			System.out.println(e);
-			return ApiResponse.<Object>builder().code(500).success(false).message("백엔드 코드 에러")
-					.data(null).build();
+			return ApiResponse.<Object>builder().code(500).success(false).message("백엔드 코드 에러").data(null).build();
 
 		}
 

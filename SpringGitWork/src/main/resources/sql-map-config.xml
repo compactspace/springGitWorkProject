@@ -58,6 +58,12 @@
 		<typeAlias
 			type="com.spring.finall.reqDto.orderRequest.OrderPersonDTO"
 			alias="OrderPersonDTO" />
+	<typeAlias
+			type="com.spring.finall.reqDto.refundRequest.ProductRefundDTO"
+			alias="ProductRefundDTO" />
+
+
+
 
 		<typeAlias
 			type="com.spring.finall.reqDto.wrapperRequest.OrderPaymentRequestDTO"
@@ -116,6 +122,7 @@
 <mapper resource="mappings/UserTeacherDetailMapper.xml" />
 
 <mapper resource="mappings/ManageOneDayClassMapper.xml" />
+<mapper resource="mappings/productRefundMapper.xml" />
 
 
 	</mappers>

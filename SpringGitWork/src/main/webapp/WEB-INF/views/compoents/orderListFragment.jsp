@@ -40,14 +40,11 @@ li {
 	margin-bottom: 4px;
 }
 
-
 .refund-controller {
-		
-		display: flex;
-		justify-content: space-between;
-		flex-direction: row;
-	}
-	
+	display: flex;
+	justify-content: space-between;
+	flex-direction: row;
+}
 
 /* 교환/환불 버튼 */
 .refund-btn {
@@ -76,10 +73,6 @@ li {
 	border-radius: 4px;
 }
 
-
-
-
-
 #load-more-btn {
 	display: block;
 	margin: 20px auto;
@@ -99,7 +92,6 @@ li {
 
 @media screen and (max-width: 600px) {
 	.refund-controller {
-		
 		display: flex;
 		/* justify-content: space-between; */
 		flex-direction: column;
@@ -117,7 +109,7 @@ li {
 		<h4>상품 목록:</h4>
 		<ul>
 			<c:forEach var="item" items="${orderWrapper.items}">
-				<li>${item.productName}(수량:${item.quantity}, 단가:
+				<li>${item.productName}(수량:${item.quantity},단가:
 					${item.pricePerUnit}원)</li>
 			</c:forEach>
 		</ul>
@@ -130,13 +122,38 @@ li {
 						${orderWrapper.pay.paymentNumber}, 결제일:
 						${orderWrapper.pay.paymentDate}, 금액: ${orderWrapper.pay.amount}원</div>
 					<div>
-						<c:if test="${orderWrapper.pay.refundable}">
-							<span class='refund-btn'>교환/환불</span>
+						<c:if test="${not empty orderWrapper.refund}">
+							<h4>
+								환불 상태:
+								<c:choose>
+									<c:when test="${orderWrapper.refund.status == 'REQUESTED'}">환불 요청이 접수되었어요</c:when>
+									<c:when test="${orderWrapper.refund.status == 'APPROVED'}">환불이 승인되었습니다</c:when>
+									<c:when test="${orderWrapper.refund.status == 'REJECTED'}">죄송합니다. 환불이 거부되었습니다</c:when>
+									<c:when test="${orderWrapper.refund.status == 'COMPLETED'}">환불이 완료되었습니다</c:when>
+									<c:when test="${orderWrapper.refund.status == 'CANCELLED'}">환불 요청이 취소되었습니다</c:when>
+									<c:otherwise>환불 상태를 확인해주세요</c:otherwise>
+								</c:choose>
+							</h4>
+							<ul>
+	 							<li>환불 요청일: ${orderWrapper.refund.requestedAt}</li>
+								<li>환불 금액: ${orderWrapper.refund.refundedAmount}원</li>
+								<li>환불 사유: ${orderWrapper.refund.reason}</li>
+							</ul>
 						</c:if>
-						<c:if test="${not orderWrapper.pay.refundable}">
-						<span class='refundunable'>교환/환불 불가</span>
-					
-				</c:if>
+
+
+
+						<c:if test="${empty orderWrapper.refund}">
+							<c:if test="${orderWrapper.pay.refundable}">
+								<span class='refund-btn' data-paymentid="${orderWrapper.pay.paymentId}"
+      data-amount="${orderWrapper.pay.amount}"
+      data-orderid="${orderWrapper.orderInfoId}">교환/환불</span>
+							</c:if>
+							<c:if test="${not orderWrapper.pay.refundable}">
+								<span class='refundunable'>교환/환불 불가</span>
+							</c:if>
+						</c:if>
+
 					</div>
 
 				</li>

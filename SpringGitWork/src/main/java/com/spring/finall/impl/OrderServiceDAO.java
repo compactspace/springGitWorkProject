@@ -187,25 +187,25 @@ public class OrderServiceDAO {
 		params.put("offset", offset);
 		params.put("limit", limit);
 		params.put("user_id", user_code);
-		// 1. 주문 ID 리스트 조회
-		List<Map<String, Object>> orderIdMaps = mybatis.selectList(
-		    "OrderDAO.findOrderInfoIdListByDateWithPaging", params
-		);
-
-		// order_info_id만 추출
-		List<Long> orderIds = orderIdMaps.stream()
-		    .map(m -> ((Number) m.get("order_info_id")).longValue())
-		    .collect(Collectors.toList());
-
-		// 2. 주문 아이템 + 결제 + 주문자 정보 조회
-		if (!orderIds.isEmpty()) {
-		    List<Map<String, Object>> orderItems = mybatis.selectList(
-		        "OrderDAO.findOrderItemsList", orderIds
-		    );
-
-		    // 로그 확인
-		    orderItems.forEach(System.out::println);
-		}
+//		// 1. 주문 ID 리스트 조회
+//		List<Map<String, Object>> orderIdMaps = mybatis.selectList(
+//		    "OrderDAO.findOrderInfoIdListByDateWithPaging", params
+//		);
+//
+//		// order_info_id만 추출
+//		List<Long> orderIds = orderIdMaps.stream()
+//		    .map(m -> ((Number) m.get("order_info_id")).longValue())
+//		    .collect(Collectors.toList());
+//
+//		// 2. 주문 아이템 + 결제 + 주문자 정보 조회
+//		if (!orderIds.isEmpty()) {
+//		    List<Map<String, Object>> orderItems = mybatis.selectList(
+//		        "OrderDAO.findOrderItemsList", orderIds
+//		    );
+//
+//		    // 로그 확인
+//		    orderItems.forEach(System.out::println);
+//		}
 		
 		
 		

@@ -88,6 +88,128 @@
     color: #ffffff;
 }
 
+
+
+
+
+/*환불 모달 시작 */
+.modal {
+    display: flex;
+    opacity: 0;
+    visibility: hidden;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+}
+
+.modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+
+
+.modal-content {
+    background-color: #fff;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+    padding: 20px 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+
+.close-btn {
+    position: absolute;
+    top: 10px; right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 20px;
+    text-align: center;
+}
+
+
+.readonly-info p {
+    margin: 8px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+/* 입력 영역 */
+.input-area {
+    margin-top: 15px;
+}
+
+.input-area label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.input-area textarea {
+    width: 100%;
+    height: 80px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: none;
+}
+
+
+.modal-buttons {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.modal-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-left: 10px;
+    transition: 0.2s;
+}
+
+#submitRefund {
+    background-color: #ff5757;
+    color: white;
+}
+
+#submitRefund:hover {
+    background-color: #e64545;
+}
+
+#closeModal {
+    background-color: #ccc;
+    color: #333;
+}
+
+#closeModal:hover {
+    background-color: #b3b3b3;
+}
+
+/*환불 모달 종료  */
+
+
+
+
+
+
 /* 반응형 */
 @media (max-width: 768px) {
 
@@ -246,8 +368,91 @@ function loadOrders() {
             console.log(e);
             alert('주문 목록을 불러오는 데 실패했습니다.');
         }
-    });
+    });   
+    
 }
+
+
+
+
+
+//동적 생성된 refund-btn 이벤트 처리
+$(document).on('click', '.refund-btn', function() {
+    const paymentId = $(this).data('paymentid');
+    const amount = $(this).data('amount');
+    const orderId = $(this).data('orderid');
+
+    $('#modalPaymentId').text(paymentId);
+    $('#modalAmount').text(amount);
+    $('#modalOrderId').text(orderId);
+
+    $('#refundModal').addClass('show'); // display: flex 유지, opacity로 보여줌
+});
+
+
+// 모달 닫기 (위임)
+$(document).on('click', '#refundModal .close-btn, #closeModal', function() {
+    $('#refundModal').removeClass('show');
+});
+
+
+$(document).on('click', '#submitRefund', function() {
+    const paymentId = $('#modalPaymentId').text().trim();
+    const refundedAmount = $('#modalAmount').text().replace(/[^0-9]/g, '').trim(); // "10,000원" → 10000
+    const reason = $('#refundReason').val().trim();
+
+    if (!reason) {
+        alert('환불 사유를 입력해주세요.');
+        return;
+    }
+
+    
+    
+    
+    const refundData = {
+        paymentId: paymentId,
+        refundedAmount: refundedAmount,
+        reason: reason
+    };
+    
+
+    $.ajax({
+        url: '${pageContext.request.contextPath}/api/users/request-refund',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(refundData),
+        success: function(res) {       	
+        		
+        	const {message}=res;        		
+        	   alert(message);
+               $('#refundModal').hide();
+               location.reload(); 
+        
+        
+        },   
+
+        
+        error: function(xhr) {
+        	
+        	const {status,responseJSON}=xhr        	
+        	
+        		if(500<=status && status<=599){        			
+        			const {message,code}=responseJSON
+        			alert(message) ;
+        		}
+        }
+    });
+});
+
+
+
+// 모달 바깥 클릭 시 닫기
+$(window).click(function(event) {
+    if (event.target.id === 'refundModal') {
+        $('#refundModal').removeClass('show');
+    }
+});
+
 
 </script>
 </head>
@@ -279,6 +484,40 @@ function loadOrders() {
     <div id="content">
     </div>
   </div>
+  
+  
+  <!-- 여기다가 모달 단, 이렇게 해보자,  -->
+  
+  <!-- 환불 모달 -->
+<div id="refundModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>환불 요청</h2>
+        
+        <div class="readonly-info">
+            <p><strong>주문번호:</strong> <span id="modalOrderId"></span></p>
+            <p><strong>결제 ID:</strong> <span id="modalPaymentId"></span></p>
+            <p><strong>총 결제 금액:</strong> <span id="modalAmount"></span>원</p>
+        </div>
+
+        <div class="input-area">
+            <label for="refundReason">환불 사유</label>
+            <textarea id="refundReason" placeholder="환불 사유를 입력해주세요"></textarea>
+        </div>
+
+        <div class="modal-buttons">
+            <button id="submitRefund">환불 요청</button>
+            <button id="closeModal">취소</button>
+        </div>
+    </div>
+</div>
+  
+  
+  
+  
+  
+  
+  
 </body>
 </html>
 
