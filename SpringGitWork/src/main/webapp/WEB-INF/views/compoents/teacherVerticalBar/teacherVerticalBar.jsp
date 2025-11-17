@@ -19,6 +19,9 @@ var isApproved = ${user.approved}; // true / false
 // ✅ 현재 URL 마지막 경로 추출 (prefix 비교용)
 var currentParam = window.location.pathname.split('/').pop();
 
+console.log("currentParam: "+currentParam);
+
+
 
 
 

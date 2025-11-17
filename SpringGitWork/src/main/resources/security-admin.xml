@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+        http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+
+
+
+<!-- =========================
+1.  (JSP 페이지) 관련 보안
+========================= -->
+<http pattern="/admin/**" use-expressions="true" entry-point-ref="adminAuthenticationEntryPoint">
+
+    <!-- 접근 제어 -->
+    <intercept-url pattern="/admin/login-page" access="permitAll"/>
+    <intercept-url pattern="/admin/logingo.do" access="permitAll"/>
+    <intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')"/>
+
+    <!-- 로그인 필터 -->
+    <custom-filter before="FORM_LOGIN_FILTER" ref="loginFormAdminFilter"/>
+
+    <!-- 로그아웃 -->
+    <logout logout-url="/admin/logout" logout-success-url="/guest/"/>
+
+    <!-- 권한 부족 처리 -->
+    <access-denied-handler ref="admin403" />
+
+</http>
+
+
+<!-- =========================
+2. API
+========================= -->
+<http pattern="/api/admin/**" 
+      use-expressions="true" entry-point-ref="adminAuthenticationEntryPoint">
+
+    
+    <intercept-url pattern="/api/admin/**" access="hasRole('ROLE_ADMIN')" />
+</http>
+
+<!--  원래 마지막에 두던건데
+<http pattern="/admin/**" use-expressions="true" entry-point-ref="adminAuthenticationEntryPoint">
+
+   
+    <intercept-url pattern="/admin/login-page" access="permitAll" />
+    <intercept-url pattern="/admin/logingo.do" access="permitAll" />
+  
+    teacher 로그인 필터
+    <custom-filter before="FORM_LOGIN_FILTER" ref="loginFormTeacherFilter" />
+
+ 
+</http> -->
+
+
+    <authentication-manager alias="authenticationManager">
+        <authentication-provider ref="adminAuthenticationProvider" />
+    </authentication-manager>
+
+    <beans:bean id="adminAuthenticationProvider"
+        class="com.spring.FormSecurity.admin.AdminAuthenticationProvider" />
+
+    <beans:bean id="adminLoginsuccessHandler"
+        class="com.spring.FormSecurity.admin.AdminLoginsuccessHandler" />
+          
+           
+           
+    <beans:bean id="adminLoginFailureHandler"
+        class="com.spring.FormSecurity.admin.AdminLoginFailureHandler" />
+
+    
+    <beans:bean id="loginFormAdminFilter"
+        class="com.spring.FormSecurity.admin.LoginFormAdminFilter"
+        p:authenticationManager-ref="authenticationManager"
+        p:authenticationSuccessHandler-ref="adminLoginsuccessHandler"
+        p:authenticationFailureHandler-ref="adminLoginFailureHandler"
+         />
+
+
+    <!-- 로그아웃 관련 -->
+    <beans:bean id="fomLogOutSuccessHandler"
+        class="com.spring.FormSecurity.FomLogOutSuccessHandler" />
+
+    <beans:bean id="formLogOutHandler"
+        class="com.spring.FormSecurity.FormLogOutHandler" />
+
+	<beans:bean id="adminAuthenticationEntryPoint"
+		class="com.spring.FormSecurity.admin.AdminAuthenticationEntryPoint" />
+
+    <!-- 권한 없는 접근 처리 -->
+    <beans:bean id="admin403"
+        class="com.spring.finall.security.MyAccessDeniedHandler">
+        <beans:property name="errorPage" value="403" />
+    </beans:bean>
+
+</beans:beans>

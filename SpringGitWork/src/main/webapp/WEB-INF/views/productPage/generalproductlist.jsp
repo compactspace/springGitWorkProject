@@ -1,280 +1,270 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbit&family=Sunflower:wght@300&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" />
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<link
+	href="https://fonts.googleapis.com/css2?family=Orbit&family=Sunflower:wght@300&display=swap"
+	rel="stylesheet">
+<link rel="stylesheet"
+	href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css"
+	type="text/css" />
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
 
 
 <style>
-  /* 폰트 통일 및 기본 세팅 */
-  body {
-    margin: 0;
-    background-color: #fff !important;
-    font-family: 'Sunflower', 'Orbit', sans-serif;
-    color: #333;
-    line-height: 1.5;
-  }
-
-  #wrapper {
-    max-width: 1020px;
-    margin: 0 auto;
-    padding: 0 15px;
-  }
-
-  header {
-    position: relative;
-    height: 70px;
-    background: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  }
-
-  #carousel {
-    height: 450px;
-    background-color: #BABABA;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    color: #fff;
-  }
-
-  #content1 .article1 {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 0 15px;
-  }
-
-  #content1 h2#header1 {
-    font-size: 2.8rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-    color: #1a1a1a;
-  }
-
-  #content1 p {
-    font-size: 1.15rem;
-    color: #666;
-  }
-
-  /* 모바일 헤더 */
-  #mobilecontent1 {
-    display: none;
-  }
-
-  .productgrouparea {
-    max-width: 1020px;
-    margin: 30px auto;
-    padding: 0 15px;
-  }
-
-  .productul {
-    display: flex;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    border-bottom: 2px solid #eee;
-  }
-
-  .group {
-    background-color: #f5f5f5;
-    flex: 1;
-    text-align: center;
-    padding: 15px 0;
-    font-weight: 600;
-    color: #444;
-    cursor: pointer;
-    border-right: 1px solid #ddd;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    user-select: none;
-  }
-
-  .group:last-child {
-    border-right: none;
-  }
-
-  .group:hover,
-  .group.active {
-    background-color: #4a90e2;
-    color: white;
-    font-weight: 700;
-  }
-
-  #productContainer {
-    max-width: 1020px;
-    margin: 20px auto 60px;
-    padding: 0 15px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-  }
-
-  /* 상품 아이템 스타일 (ajax 로드되는 구조에 맞게) */
-  .product-item {
-    background: #fff;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.07);
-    border-radius: 8px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: box-shadow 0.3s ease;
-  }
-
-  .product-item:hover {
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-  }
-
-  .product-item .imgarea {
-    background-size: cover !important;
-    background-position: center center !important;
-    height: 180px;
-  }
-
-  .titleinfo {
-    font-size: 1.3rem;
-    font-weight: 700;
-    padding: 10px 15px 5px;
-    color: #222;
-  }
-
-  .detailinof {
-    font-size: 1rem;
-    color: #666;
-    padding: 0 15px 10px;
-    flex-grow: 1;
-  }
-
-  .price {
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: #2c3e50;
-    padding: 0 15px 10px;
-  }
-
-  .addbtn {
-    cursor: pointer;
-    background-color: transparent;
-    border: 2px solid #4a90e2;
-    color: #4a90e2;
-    font-weight: 600;
-    font-size: 1rem;
-    border-radius: 4px;
-    margin: 0 15px 15px;
-    padding: 10px 0;
-    text-align: center;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  .addbtn:hover {
-    background-color: #4a90e2;
-    color: #fff;
-  }
-
-  .soldout {
-    color: #e74c3c;
-    font-weight: 900;
-    padding-left: 15px;
-  }
-
-  /* 반응형 */
-  @media screen and (max-width: 701px) {
-    #content1 .article1 {
-      padding: 0 10px;
-    }
-
-    #mobilecontent1 {
-      display: block;
-      max-width: 600px;
-      margin: 0 auto 20px;
-      padding: 0 15px;
-    }
-
-    .mobilecontent1header h3 {
-      font-size: 1.8rem;
-      margin-bottom: 5px;
-    }
-
-    .mobilecontent1header p {
-      font-size: 1rem;
-      color: #555;
-    }
-
-    .productul {
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      border-bottom: none;
-    }
-
-    .group {
-      flex: none;
-      min-width: 120px;
-      border-right: none;
-      border-radius: 4px;
-      padding: 12px 10px;
-      font-size: 1rem;
-      background-color: #f9f9f9;
-    }
-
-    .group.active,
-    .group:hover {
-      background-color: #4a90e2;
-      color: #fff;
-    }
-
-    #productContainer {
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      margin: 0 auto 40px;
-      width: 90%;
-      gap: 15px;
-    }
-
-    .product-item .imgarea {
-      height: 140px;
-    }
-
-    .titleinfo {
-      font-size: 1.1rem;
-      padding: 8px 10px 4px;
-    }
-
-    .detailinof {
-      font-size: 0.9rem;
-      padding: 0 10px 8px;
-    }
-
-    .price {
-      font-size: 1rem;
-      padding: 0 10px 8px;
-    }
-
-    .addbtn {
-      font-size: 0.95rem;
-      margin: 0 10px 10px;
-    }
-  }
-  
-  #mobileNave{
-  display: none;
+/* 폰트 통일 및 기본 세팅 */
+body {
+	margin: 0;
+	background-color: #fff !important;
+	font-family: 'Sunflower', 'Orbit', sans-serif;
+	color: #333;
+	line-height: 1.5;
 }
 
+#wrapper {
+	max-width: 1020px;
+	margin: 0 auto;
+	padding: 0 15px;
+}
 
- /*모바일 시작  */
+header {
+	position: relative;
+	height: 70px;
+	background: #fff;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+#carousel {
+	height: 450px;
+	background-color: #BABABA;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 2rem;
+	color: #fff;
+}
+
+#content1 .article1 {
+	max-width: 900px;
+	margin: 30px auto;
+	padding: 0 15px;
+}
+
+#content1 h2#header1 {
+	font-size: 2.8rem;
+	font-weight: 700;
+	margin-bottom: 10px;
+	color: #1a1a1a;
+}
+
+#content1 p {
+	font-size: 1.15rem;
+	color: #666;
+}
+
+/* 모바일 헤더 */
+#mobilecontent1 {
+	display: none;
+}
+
+.productgrouparea {
+	max-width: 1020px;
+	margin: 30px auto;
+	padding: 0 15px;
+}
+
+.productul {
+	display: flex;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	border-bottom: 2px solid #eee;
+}
+
+.group {
+	background-color: #f5f5f5;
+	flex: 1;
+	text-align: center;
+	padding: 15px 0;
+	font-weight: 600;
+	color: #444;
+	cursor: pointer;
+	border-right: 1px solid #ddd;
+	transition: background-color 0.3s ease, color 0.3s ease;
+	user-select: none;
+}
+
+.group:last-child {
+	border-right: none;
+}
+
+.group:hover, .group.active {
+	background-color: #4a90e2;
+	color: white;
+	font-weight: 700;
+}
+
+#productContainer {
+	max-width: 1020px;
+	margin: 20px auto 60px;
+	padding: 0 15px;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	gap: 20px;
+}
+
+/* 상품 아이템 스타일 (ajax 로드되는 구조에 맞게) */
+.product-item {
+	background: #fff;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+	border-radius: 8px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	transition: box-shadow 0.3s ease;
+}
+
+.product-item:hover {
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.product-item .imgarea {
+	background-size: cover !important;
+	background-position: center center !important;
+	height: 180px;
+}
+
+.titleinfo {
+	font-size: 1.3rem;
+	font-weight: 700;
+	padding: 10px 15px 5px;
+	color: #222;
+}
+
+.detailinof {
+	font-size: 1rem;
+	color: #666;
+	padding: 0 15px 10px;
+	flex-grow: 1;
+}
+
+.price {
+	font-size: 1.15rem;
+	font-weight: 600;
+	color: #2c3e50;
+	padding: 0 15px 10px;
+}
+
+.addbtn {
+	cursor: pointer;
+	background-color: transparent;
+	border: 2px solid #4a90e2;
+	color: #4a90e2;
+	font-weight: 600;
+	font-size: 1rem;
+	border-radius: 4px;
+	margin: 0 15px 15px;
+	padding: 10px 0;
+	text-align: center;
+	transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.addbtn:hover {
+	background-color: #4a90e2;
+	color: #fff;
+}
+
+.soldout {
+	color: #e74c3c;
+	font-weight: 900;
+	padding-left: 15px;
+}
+
+/* 반응형 */
+@media screen and (max-width: 701px) {
+	#content1 .article1 {
+		padding: 0 10px;
+	}
+	#mobilecontent1 {
+		display: block;
+		max-width: 600px;
+		margin: 0 auto 20px;
+		padding: 0 15px;
+	}
+	.mobilecontent1header h3 {
+		font-size: 1.8rem;
+		margin-bottom: 5px;
+	}
+	.mobilecontent1header p {
+		font-size: 1rem;
+		color: #555;
+	}
+	.productul {
+		justify-content: center;
+		gap: 10px;
+		flex-wrap: wrap;
+		border-bottom: none;
+	}
+	.group {
+		flex: none;
+		min-width: 120px;
+		border-right: none;
+		border-radius: 4px;
+		padding: 12px 10px;
+		font-size: 1rem;
+		background-color: #f9f9f9;
+	}
+	.group.active, .group:hover {
+		background-color: #4a90e2;
+		color: #fff;
+	}
+	#productContainer {
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		margin: 0 auto 40px;
+		width: 90%;
+		gap: 15px;
+	}
+	.product-item .imgarea {
+		height: 140px;
+	}
+	.titleinfo {
+		font-size: 1.1rem;
+		padding: 8px 10px 4px;
+	}
+	.detailinof {
+		font-size: 0.9rem;
+		padding: 0 10px 8px;
+	}
+	.price {
+		font-size: 1rem;
+		padding: 0 10px 8px;
+	}
+	.addbtn {
+		font-size: 0.95rem;
+		margin: 0 10px 10px;
+	}
+}
+
+#mobileNave {
+	display: none;
+}
+
+/*모바일 시작  */
 @media screen and (max-width: 760px) {
-
-
-    /* 네비게이션 전환 */
-    #pcNave {
-        display: none;
-    }
-    #mobileNave {
-        display: block;
-    }
+	/* 네비게이션 전환 */
+	#pcNave {
+		display: none;
+	}
+	#mobileNave {
+		display: block;
+	}
 }
-/*모바일 종료  */ 
+/*모바일 종료  */
 </style>
 
 
@@ -401,41 +391,44 @@ const groupDescriptions = {
 
 
 <body>
-    <div class="allwarpper">
-       		<div id="pcNave">
- <%@ include file="../pcNave.jsp"%>
-</div>
-<div id="mobileNave">
- <%@ include file="../mobileNave.jsp"%>
-</div>
+	<div class="allwarpper">
+		<div id="pcNave">
+			<%@ include file="../pcNave.jsp"%>
+		</div>
+		<div id="mobileNave">
+			<%@ include file="../mobileNave.jsp"%>
+		</div>
 
-     <div id="content1">
-  <div class="article1">
-    <h2 id="groupTitle">미술용품</h2>
-    <p id="groupDescription">합리적인 가격으로 미술용품을 판매하고 있습니다.</p>
-  </div>
-</div>
+		<div id="content1">
+			<div class="article1">
+				<h2 id="groupTitle">미술용품</h2>
+				<p id="groupDescription">합리적인 가격으로 미술용품을 판매하고 있습니다.</p>
+			</div>
+		</div>
 
 
-        <div id="mobilecontent1">
-            <div class="mobilecontent1header">
-                <h3>미술용품</h3>
-                <p>가장 기본적인 제품들로 구성하였습니다.</p>
-            </div>
-        </div>
-        
-        <div class="productgrouparea">
-            <ul class="productul">        
-                <li class="group" data-value="pencile">연필류</li>
-                <li class="group" data-value="colorpencile">색연필류</li>
-                <li class="group" data-value="groupdetermined">기타</li>
-            </ul>
-        </div>
+		<div id="mobilecontent1">
+			<div class="mobilecontent1header">
+				<h3>미술용품</h3>
+				<p>가장 기본적인 제품들로 구성하였습니다.</p>
+			</div>
+		</div>
+		
+		
 
-        <!-- 상품 목록이 삽입될 영역 -->
-        <div id="productContainer">
-            <!-- 여기에 Ajax로 받아온 상품 목록이 삽입됩니다. -->
-        </div>
-    </div>
+		<div class="productgrouparea">
+			<ul class="productul">
+				<c:forEach var="group" items="${groupInfolist}">
+					<li class="group" data-value="${group.groupName}">
+						${group.groupName}</li>
+				</c:forEach>
+			</ul>
+		</div>
+
+		<!-- 상품 목록이 삽입될 영역 -->
+		<div id="productContainer">
+			<!-- 여기에 Ajax로 받아온 상품 목록이 삽입됩니다. -->
+		</div>
+	</div>
 </body>
 </html>

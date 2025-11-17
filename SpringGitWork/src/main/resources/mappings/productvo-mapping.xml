@@ -19,6 +19,9 @@ SELECT
 	p.product_cod,
 	p.product_name,
 	p.product_group,
+	p.product_file_path,
+	p.file_category,
+	p.file_name,
 	h.old_price,
 	h.new_price,
 	h.changed_at
@@ -38,6 +41,8 @@ INNER JOIN (
 	h.product_id = latest.product_id
 	AND h.changed_at = latest.max_changed_at
 WHERE
+	p. product_status = '판매' 
+	AND
 	p.product_group = #{product_group}
 	AND h.old_price != h.new_price
 ORDER BY
@@ -45,6 +50,20 @@ ORDER BY
 
 
 </select>
+
+
+
+
+<select id="getProductGroupList" resultType="ProductGroupVO">
+SELECT
+	group_id AS GroupId ,
+	group_name AS GroupName
+FROM
+	product_group;
+
+</select>
+
+
 
 <!--  일반 상품 결제 이후 해당 제품 테이블의 주문 수량을 먼저 확인 -->
 <select id="checkOrderQuantity" parameterType="Integer" resultType="productVO">

@@ -201,4 +201,12 @@ From
  WHERE  a.content LIKE CONCAT('%', #{content}, '%')
 </select>
 
+
+<select id="getArtWorkCountByTodayAndWeek" parameterType="map" resultType="map">
+    SELECT created_at
+    FROM artworks
+    WHERE created_at BETWEEN #{startOfWeek} AND #{endOfWeek}
+</select>
+
+
 </mapper>

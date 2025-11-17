@@ -361,8 +361,8 @@ if (request.getParameter("cmd") != null)
     <!-- ✅ 1행: 로그인/로그아웃 -->
     <div class="header_top" >   
 
-     
-     
+ 
+ 
      
        <!-- ✅ 로그인 상태일 때 -->
 <sec:authorize access="hasAuthority('user')">

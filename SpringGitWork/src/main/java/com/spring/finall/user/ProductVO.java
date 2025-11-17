@@ -2,6 +2,10 @@ package com.spring.finall.user;
 
 public class ProductVO {
 
+	
+	private int product_id;
+	
+
 	private int product_cod;
 	private String product_name;
 	private int product_price;
@@ -10,23 +14,66 @@ public class ProductVO {
 	private String product_Registration_status;
 	private String product_status;
 	private String product_group;
+	private int group_id;
 	private int product_quantity;
 	private int product_order_quantity;
 	private int product_delivery_quantity;
+	private String product_file_path;
+
+
+	
+	
+	private String file_category;
+
+	private String 	file_name;
 	
 	
 	
 	
+
 	
-	
-	public int getProduct_quantity() {
-		return product_quantity;
+	public String getFile_category() {
+		return file_category;
 	}
 
-	public void setProduct_quantity(int product_quantity) {
-		this.product_quantity = product_quantity;
+	public void setFile_category(String file_category) {
+		this.file_category = file_category;
 	}
 
+	public String getFile_name() {
+		return file_name;
+	}
+
+	public void setFile_name(String file_name) {
+		this.file_name = file_name;
+	}
+
+	public int getProduct_id() {
+		return product_id;
+	}
+
+	public void setProduct_id(int product_id) {
+		this.product_id = product_id;
+	}
+	
+	
+	public String getProduct_file_path() {
+		return product_file_path;
+	}
+
+	public void setProduct_file_path(String product_file_path) {
+		this.product_file_path = product_file_path;
+	}
+
+	public int getGroup_id() {
+		return group_id;
+	}
+
+	public void setGroup_id(int group_id) {
+		this.group_id = group_id;
+	}
+
+	
 	public int getProduct_order_quantity() {
 		return product_order_quantity;
 	}
@@ -67,18 +114,21 @@ public class ProductVO {
 		this.product_status = product_status;
 	}
 
-	public int getproduct_quantity() {
+
+	
+	
+	public int getProduct_quantity() {
 		return product_quantity;
 	}
 
-	public void setproduct_quantity(int product_quantity) {
+	public void setProduct_quantity(int product_quantity) {
 		this.product_quantity = product_quantity;
 	}
+
 	
 	
 	
-	
-	
+
 	public String getProduct_info() {
 		return product_info;
 	}
@@ -119,18 +169,15 @@ public class ProductVO {
 		this.product_img = product_img;
 	}
 
-@Override
-public String toString() {
-	
-	return "[ product_cod = "+product_cod+", product_name =" +product_name+", product_price =" +product_price
-			+", product_img =" +product_img+", product_info =" +product_info+", product_quantity =" +product_quantity
-			
-+"]";
+	@Override
+	public String toString() {
 
+		return "[ product_cod = " + product_cod + ", product_name =" + product_name + ", product_price ="
+				+ product_price + ", product_img =" + product_img + ", product_info =" + product_info
+				+ ", product_quantity =" + product_quantity
 
+				+ "]";
 
+	}
 
-}
-	
-	
 }

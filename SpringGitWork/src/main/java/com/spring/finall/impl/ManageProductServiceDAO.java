@@ -1,0 +1,91 @@
+package com.spring.finall.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.spring.finall.user.ProductGroupVO;
+import com.spring.finall.user.ProductPriceHistoryVO;
+import com.spring.finall.user.ProductVO;
+
+@Repository
+public class ManageProductServiceDAO {
+
+	@Autowired
+	private SqlSessionTemplate mybaits;
+
+	public List<Map<String, Object>> getProductCode() {
+
+		List<Map<String, Object>> productCodeList = mybaits.selectList("ManageProductMapper.getProductCode");
+
+		return productCodeList;
+	}
+
+	public List<Map<String, Object>> getActiveProductList(int groupId) {
+		List<Map<String, Object>> productCodeList = mybaits.selectList("ManageProductMapper.getActiveProductList",
+				groupId);
+
+		return productCodeList;
+	}
+
+	public void updateProductStatus(int productId, String status) {
+		// productId와 status를 Map으로 전달
+		Map<String, Object> param = Map.of("productId", productId, "status", status);
+		mybaits.update("ManageProductMapper.updateProductStatus", param);
+	}
+
+	public void saveProduct(ProductVO productVO) {
+
+		int affectedRow = mybaits.insert("ManageProductMapper.saveProduct", productVO);
+
+	}
+
+	public void insertProductPriceHistory(ProductPriceHistoryVO productPriceHistoryVO) {
+
+		int affectedRow = mybaits.insert("ManageProductMapper.insertProductPriceHistory", productPriceHistoryVO);
+
+	}
+
+	// 내업보다.. 씨불
+	public String alreadyExsistProduct(String product_name) {
+		// 1. MyBatis에서 최대값 조회
+		String alreadyExsistProduct = mybaits.selectOne("ManageProductMapper.alreadyExsistProduct", product_name);
+
+		// 5. 다시 문자열로 변환하여 반환
+		return alreadyExsistProduct;
+	}
+
+	// 내업보다.. 씨불
+	public int getproductCod() {
+		// 1. MyBatis에서 최대값 조회
+		Integer maxProductCod = mybaits.selectOne("ManageProductMapper.getCurrentMaxproductCod");
+
+		// 2. null 처리 (제품이 하나도 없을 경우)
+		if (maxProductCod == null) {
+			return 1; // 첫 번째 코드로 1 반환
+		}
+
+		int nextProductCod = maxProductCod + 1;
+
+		// 5. 다시 문자열로 변환하여 반환
+		return nextProductCod;
+	}
+
+	public boolean alreadyProductGroupName(ProductGroupVO productGroupVO) {
+
+		ProductGroupVO groupName = mybaits.selectOne("ManageProductMapper.alreadyProductGroupName", productGroupVO);
+
+		return groupName != null ? true : false;
+	}
+
+	public boolean addProductGroup(ProductGroupVO productGroupVO) {
+
+		int affectedRow = mybaits.insert("ManageProductMapper.addProductGroup", productGroupVO);
+
+		return affectedRow >= 1 ? true : false;
+	}
+
+}

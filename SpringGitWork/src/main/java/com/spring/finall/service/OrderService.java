@@ -7,7 +7,6 @@ import java.util.Map;
 
 import com.spring.finall.reqDto.orderRequest.OrderRequestDTO;
 import com.spring.finall.reqDto.payMentRequest.PaymentDTO;
-import com.spring.finall.reqDto.refundRequest.ProductRefundDTO;
 import com.spring.finall.reqDto.wrapperRequest.OrderPaymentRequestDTO;
 
 public interface OrderService {
@@ -61,6 +60,11 @@ public interface OrderService {
      * @return 주문 목록(OrderRequestDTO 리스트)
      */
     List<OrderPaymentRequestDTO> getPagedOrders(LocalDate startDate, LocalDateTime endDate, int offset, int limit,int user_code);
+    
+    
+    
+    
+    Map<String,Object>	getOrdersCountByTodayAndWeek(LocalDate startOfWeek ,LocalDate endOfWeek );
     
     
     

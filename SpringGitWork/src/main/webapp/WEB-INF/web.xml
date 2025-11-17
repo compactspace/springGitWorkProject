@@ -14,6 +14,7 @@
     	classpath:security-global.xml
         classpath:security-context.xml
    		classpath:security-teacher.xml
+   		classpath:security-admin.xml
         classpath:applicationcontext.xml
     </param-value>
 </context-param>
@@ -134,7 +135,7 @@
 	<error-page>
 		<error-code>404</error-code>
 		<location>/WEB-INF/views/error/notFound.jsp</location>
-	</error-page>
+	</error-page> 
 
 	<error-page>
 		<error-code>500</error-code>

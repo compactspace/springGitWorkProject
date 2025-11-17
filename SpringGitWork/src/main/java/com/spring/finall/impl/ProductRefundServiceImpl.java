@@ -1,5 +1,8 @@
 package com.spring.finall.impl;
 
+import java.time.LocalDate;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -44,6 +47,12 @@ public class ProductRefundServiceImpl implements ProductRefundService {
 	        );
 	    }
 		return reqeustRefundSuccess;
+	}
+
+	@Override
+	public Map<String, Object> getProductRefundCountByTodayAndWeek(LocalDate startOfWeek, LocalDate endOfWeek) {
+		// TODO Auto-generated method stub
+ 	return productRefundServiceDAO.getProductRefundCountByTodayAndWeek(startOfWeek, endOfWeek);
 	}
 
 }

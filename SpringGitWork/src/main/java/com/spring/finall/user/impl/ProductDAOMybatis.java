@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.spring.finall.CustomException.PayRunTimeTranException;
+import com.spring.finall.user.ProductGroupVO;
 import com.spring.finall.user.ProductVO;
 
 @Repository
@@ -33,6 +34,15 @@ public class ProductDAOMybatis {
 	}
 
 
+	public List<ProductGroupVO> getProductGroupList() {
+		List<ProductGroupVO> list = mybatis.selectList("ProductVO.getProductGroupList");
+		return list;
+	}
+
+	
+	
+	
+	
 
 	
 	public int updateOrderQuantity(int cart_quantity, int product_cod) throws PayRunTimeTranException {
@@ -40,7 +50,7 @@ public class ProductDAOMybatis {
 		HashMap<String, Object> map = new HashMap();
 		ProductVO executequery = mybatis.selectOne("ProductVO.checkOrderQuantity", product_cod);
 		int product_order_quantity = executequery.getProduct_order_quantity();
-		int overquantity = executequery.getproduct_quantity();
+		int overquantity = executequery.getProduct_quantity();
 
 		// 상품코드 6 에대한 주문 수량 0
 		System.out.println("상품코드 " + product_cod + "카트에 담에담긴 주문수량 " + cart_quantity + "기존 테이블에 있던  주문 수량 "

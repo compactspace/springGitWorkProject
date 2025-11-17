@@ -1,23 +1,20 @@
 package com.spring.finall.config;
 
 import java.util.List;
-import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.commons.chain.web.WebContext;
 
+import org.apache.commons.chain.web.WebContext;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.transaction.ChainedTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
@@ -108,4 +105,12 @@ public class AdminConfig implements WebMvcConfigurer {
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
 	    resolvers.add(new AuthenticationPrincipalArgumentResolver());
 	}
+	
+	 @Override
+	    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	        // /images/** 요청을 C:/upload/product/ 경로와 매핑
+	        registry.addResourceHandler("/images/**")
+	                .addResourceLocations("file:///C:/upload/product/")
+	                .setCachePeriod(3600); // 캐시 설정 (선택)
+	    }
 }

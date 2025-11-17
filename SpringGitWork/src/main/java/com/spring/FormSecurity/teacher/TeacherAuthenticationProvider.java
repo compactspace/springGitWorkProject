@@ -34,7 +34,7 @@ public class TeacherAuthenticationProvider implements AuthenticationProvider {
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
-		 String userId = (String) authentication.getPrincipal();
+		 	String userId = (String) authentication.getPrincipal();
 	        String userPwd = (String) authentication.getCredentials();
 
 	        UserTeacherDetail user = (UserTeacherDetail) userTeacherDetailServiceImple.loadUserByUsername(userId);
@@ -49,9 +49,7 @@ public class TeacherAuthenticationProvider implements AuthenticationProvider {
 
 	        if (!user.isEnabled()) {
 	            throw new BadCredentialsException("계정이 비활성화 상태입니다.");
-	        }
-
-	        
+	        }        
 	        
 	       
 	        Long teacherId = user.getTeacher_id();

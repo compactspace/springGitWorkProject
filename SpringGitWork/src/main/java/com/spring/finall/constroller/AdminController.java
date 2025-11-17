@@ -1,0 +1,256 @@
+package com.spring.finall.constroller;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.spring.finall.apiResponseController.ApiResponse;
+import com.spring.finall.exception.applicantDocumentException.ApplicantDocumentException;
+import com.spring.finall.exception.common.CommonFileException;
+import com.spring.finall.service.ApplicantDocumentService;
+import com.spring.finall.service.ManageProductService;
+import com.spring.finall.user.ProductGroupVO;
+import com.spring.finall.user.ProductVO;
+
+@Controller
+@RequestMapping("/api/admin")
+public class AdminController {
+
+	@Autowired
+	private ApplicantDocumentService applicantDocumentService;
+
+	@Autowired
+	private ManageProductService manageProductService;
+
+	// unread-document-list
+	@GetMapping("/get-unread-document-list") // 실제 요청 경로: /users/login
+	@ResponseBody
+	public Map<String, Object> getUnreadDocumentList() {
+
+		List<Map<String, Object>> unReadDocumentList = applicantDocumentService.getUnreadDocumentList();
+
+		Map<String, Object> resData = new HashMap<>();
+
+		resData.put("unReadDocumentList", unReadDocumentList);
+
+		return resData;
+
+	}
+
+	@GetMapping("/get-readed-document-list")
+	@ResponseBody
+	public Map<String, Object> getReadedDocumentList() {
+
+		List<Map<String, Object>> unReadDocumentList = applicantDocumentService.getReadedDocumentList();
+
+		Map<String, Object> resData = new HashMap<>();
+
+		resData.put("readDocumentList", unReadDocumentList);
+
+		return resData;
+
+	}
+
+	@PostMapping("/get-document-file")
+	@ResponseBody
+	public ResponseEntity<Resource> getDocumentFile(@RequestParam Long teacherId) throws IOException {
+
+		// DB 조회로 파일 경로 가져오기
+		String filePath = applicantDocumentService.getFilePathByTeacherId(teacherId);
+		if (filePath == null || filePath.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+
+		Path path = Paths.get(filePath);
+		if (!Files.exists(path)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		Resource resource = new UrlResource(path.toUri());
+
+		// 파일 이름 추출
+		String fileName = path.getFileName().toString();
+
+		return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM)
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"").body(resource);
+	}
+
+	// update-document-status
+
+	// 상태 업데이트
+	@PostMapping("/update-document-status")
+	public ResponseEntity<ApiResponse<Map<String, Object>>> updateDocumentStatus(@RequestParam Long teacherId,
+			@RequestParam String status) {
+
+		ApiResponse<Map<String, Object>> apiRes = null;
+		Map<String, Object> resBodyData = new HashMap<>();
+
+		// 상태 값 검증
+		if (!"Approved".equals(status) && !"Rejected".equals(status) && !"Insufficient".equals(status)
+				&& !"Resubmit".equals(status)) {
+
+			resBodyData.put("error_code", 4003);
+
+			apiRes = ApiResponse.<Map<String, Object>>builder().code(4003).success(true).message(
+					"잘못된 요청입니다. @RequestParam String status 는 빈값이거나 Approved, Rejected, Insufficient, Resubmit 중 하나여야 합니다.")
+					.data(resBodyData).build();
+
+			return ResponseEntity.status(400).body(apiRes);
+		}
+
+		try {
+
+			boolean updated = applicantDocumentService.updateDocumentStatus(teacherId, status);
+
+			apiRes = ApiResponse.<Map<String, Object>>builder().code(201).success(true).message("서류 상태가 변경되었습니다.")
+					.data(resBodyData).build();
+
+			return ResponseEntity.status(200).body(apiRes);
+		} catch (ApplicantDocumentException ade) {
+			resBodyData.put("error_code", 4001);
+			apiRes = ApiResponse.<Map<String, Object>>builder().code(201).success(true).message("잠시후 다시 시도해주세요")
+					.data(resBodyData).build();
+
+			return ResponseEntity.status(4000).body(apiRes);
+
+		} catch (Exception e) {
+			resBodyData.put("error_code", 5001);
+			apiRes = ApiResponse.<Map<String, Object>>builder().code(201).success(true).message("서버상의 에러가 의심됨")
+					.data(resBodyData).build();
+
+			return ResponseEntity.status(5000).body(apiRes);
+
+		}
+
+	}
+
+	// 상품 그룹 선택 시 활성 상품 리스트 반환
+	@PostMapping("/get-active-product-list")
+	@ResponseBody
+	public Map<String, Object> getActiveProductList(@RequestParam("groupId") int groupId) {
+		Map<String, Object> result = new HashMap<>();
+
+		try {
+			// 서비스 호출
+			List<Map<String, Object>> productList = manageProductService.getActiveProductList(groupId);
+
+			result.put("success", true);
+			// 아오 빈배열이면 프론트에서 적절히 처리하자. 이거 때문에 캐쉬 로직이 꼬임
+			result.put("data", productList);
+
+		} catch (Exception e) {
+			result.put("success", false);
+			result.put("message", e.getMessage());
+		}
+
+		return result;
+	}
+
+	// 상품 상태 업데이트
+	@PostMapping("/update-product-status")
+	@ResponseBody
+	public Map<String, Object> updateProductStatus(@RequestParam("productId") int productId,
+			@RequestParam("status") String status) {
+		Map<String, Object> result = new HashMap<>();
+		try {
+			manageProductService.updateProductStatus(productId, status);
+			result.put("success", true);
+			result.put("message", "상태가 변경되었습니다.");
+		} catch (Exception e) {
+			result.put("success", false);
+			result.put("message", "상태 변경 실패: " + e.getMessage());
+		}
+		return result;
+	}
+
+	@PostMapping("/add-product")
+	@ResponseBody
+	public ResponseEntity<ApiResponse<Map<String, Object>>> addProduct(@RequestParam("group_id") int groupId,
+			@RequestParam("product_group") String product_group,
+			@RequestParam("product_name") String name, @RequestParam("product_price") int price,
+			@RequestParam(value = "product_quantity", required = false, defaultValue = "0") int qty,
+			@RequestParam(value = "product_info", required = false) String info,
+			@RequestParam(value = "product_img", required = false) MultipartFile img) {
+		Map<String, Object> resBodyData = new HashMap<>();
+
+		ApiResponse<Map<String, Object>> apiRes = null;
+
+		try {
+			ProductVO productVO = new ProductVO();
+			
+			productVO.setProduct_group(product_group);
+			productVO.setGroup_id(groupId);
+			productVO.setProduct_name(name);
+			productVO.setProduct_price(price);
+			productVO.setProduct_quantity(qty);
+			productVO.setProduct_info(info);
+
+			manageProductService.saveProduct(productVO, img);
+			resBodyData.put("success", true);
+
+			apiRes = ApiResponse.<Map<String, Object>>builder().code(201).success(true).message("상품을 등록하였습니다.")
+					.data(resBodyData).build();
+			return ResponseEntity.status(200).body(apiRes);
+
+		} catch (CommonFileException cfe) {
+			resBodyData.put("success", false);
+			resBodyData.put("message", cfe.getMessage());
+
+			apiRes = ApiResponse.<Map<String, Object>>builder().code(cfe.getBussinessCode()).success(false)
+					.message(cfe.getMessage()).data(resBodyData).build();
+			return ResponseEntity.status(400).body(apiRes);
+
+		}
+
+	}
+
+	@PostMapping("/add-product-group")
+	@ResponseBody
+	public ResponseEntity<ApiResponse<Map<String, Object>>> addProductGroup(
+			@RequestParam("group_name") String group_name) {
+
+		ProductGroupVO productGroupVO = new ProductGroupVO();
+		productGroupVO.setGroupName(group_name);
+
+		Map<String, Object> resBodyData = new HashMap<>();
+
+		ApiResponse<Map<String, Object>> apiRes = null;
+		try {
+			manageProductService.addProductGroup(productGroupVO);
+			resBodyData.put("success", true);
+			resBodyData.put("insertedPk", productGroupVO.getGroupId());
+			resBodyData.put("groupName", group_name);
+
+			apiRes = ApiResponse.<Map<String, Object>>builder().code(201).success(true).message("상품 그룹을 추가하였습니다.")
+					.data(resBodyData).build();
+			return ResponseEntity.status(200).body(apiRes);
+		} catch (CommonFileException cfe) {
+			resBodyData.put("success", false);
+			resBodyData.put("message", cfe.getMessage());
+
+			apiRes = ApiResponse.<Map<String, Object>>builder().code(cfe.getBussinessCode()).success(false)
+					.message("상품 그룹 추가 실패" + cfe.getMessage()).data(resBodyData).build();
+			return ResponseEntity.status(400).body(apiRes);
+
+		}
+
+	}
+}

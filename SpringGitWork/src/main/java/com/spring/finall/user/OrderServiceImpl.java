@@ -252,6 +252,13 @@ public class OrderServiceImpl implements OrderService {
 		return orderServiceDAO.duplicateOrderCheck(merchantUid);
 	}
 
+	@Override
+	public Map<String, Object> getOrdersCountByTodayAndWeek(LocalDate startOfWeek, LocalDate endOfWeek) {
+		
+		
+		return orderServiceDAO.getOrdersCountByTodayAndWeek(startOfWeek, endOfWeek);
+	}
+
 
 
 	

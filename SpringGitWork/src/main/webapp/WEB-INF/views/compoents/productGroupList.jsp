@@ -343,8 +343,17 @@
 
         <c:forEach var="p" items="${productService}">
             <c:if test="${p.product_Registration_status eq 'open'}">
-                <div class="product-item" data-product-cod="${p.product_cod}" data-product-id="${p.product_id}">
+                <div class="product-item" data-product-cod="${p.product_cod}" data-product-id="${p.product_id}">             
+                  <c:if test="${p.imagePath ne null}">
+                      <div class="product-image" style="background-image: url('${pageContext.request.contextPath}${p.imagePath}')"></div>
+                  </c:if>     
+                       
+                       
+                          
+                  
+                   <c:if test="${p.imagePath eq null}">
                     <div class="product-image" style="background-image: url('${pageContext.request.contextPath}/resources/img_product/${p.product_img}')"></div>
+                   </c:if>
 
                     <div class="product-details">
                         <div>

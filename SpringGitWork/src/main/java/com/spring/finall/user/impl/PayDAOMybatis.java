@@ -119,10 +119,10 @@ public class PayDAOMybatis {
 			
 				System.out.println("----------------------투스트링 pvos는---------------------------");
 				System.out.println(pvos);
-				System.out.println("창고재고 "+pvos.getproduct_quantity());
+				System.out.println("창고재고 "+pvos.getProduct_quantity());
 				System.out.println("취소하려는 수량 "+pvos.getProduct_delivery_quantity());
 			// product_quantity = product_delivery_quantity 일치하면 호출됨  창고재고와 일치하게 되면 0으로 만들어주자.
-			if(pvos.getproduct_quantity()==pvos.getProduct_delivery_quantity()) {
+			if(pvos.getProduct_quantity()==pvos.getProduct_delivery_quantity()) {
 				
 				mybatis.update("ProductVO.zeroDeliveryQuantity",map);	
 				

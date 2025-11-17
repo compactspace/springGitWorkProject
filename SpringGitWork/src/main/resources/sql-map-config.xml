@@ -25,6 +25,11 @@
 		<typeAlias type="com.spring.finall.user.ProductVO"
 			alias="productVO" />
 
+<typeAlias type="com.spring.finall.user.ProductPriceHistoryVO"
+			alias="ProductPriceHistoryVO" />
+
+
+
 
 		<typeAlias type="com.spring.finall.user.CartVO"
 			alias="cartVO" />
@@ -78,7 +83,8 @@
 			<typeAlias type="com.spring.finall.user.ArtWorkCommentVO"
 			alias="ArtWorkCommentVO" />
 
-
+<typeAlias type="com.spring.finall.user.ProductGroupVO"
+			alias="ProductGroupVO" />
 
 
 
@@ -86,13 +92,12 @@
 <typeAlias type="com.spring.FormSecurity.teacher.UserTeacherDetail"
 			alias="UserTeacherDetail" />
 
-
+<typeAlias type="com.spring.FormSecurity.admin.UserAdminDetail"
+			alias="UserAdminDetail" />
+			
+			<typeAlias type="com.spring.finall.user.TeacherDocumentVO"
+			alias="TeacherDocumentVO" />
 	</typeAliases>
-
-
-
-
-
 
 	<!-- SQL이 작성되는 mapper 파일 위치 등록! MyBatis에서 SQL 매퍼 파일을 등록하는 태그. mapper 태그를 
 		사용하여 등록할 매퍼 파일의 경로를 지정한다. src/main/resources 폴더 내에 위치해 있어야 한다. 그래서 mappings 
@@ -120,10 +125,11 @@
 		<mapper resource="mappings/OrderMapper.xml" />
 		<mapper resource="mappings/PaymentMapper.xml" />
 <mapper resource="mappings/UserTeacherDetailMapper.xml" />
-
+<mapper resource="mappings/UserAdminDetailMapper.xml" />
 <mapper resource="mappings/ManageOneDayClassMapper.xml" />
 <mapper resource="mappings/productRefundMapper.xml" />
-
+<mapper resource="mappings/ApplicantDocuments.xml" />
+<mapper resource="mappings/ManageProductMapper.xml" />
 
 	</mappers>
 

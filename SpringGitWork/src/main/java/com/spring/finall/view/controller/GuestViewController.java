@@ -32,6 +32,7 @@ import com.spring.finall.service.OneDayClassService;
 import com.spring.finall.service.WorkService;
 import com.spring.finall.user.ArtworkVO;
 import com.spring.finall.user.OneDayClassVO;
+import com.spring.finall.user.ProductGroupVO;
 import com.spring.finall.user.ProductService;
 import com.spring.finall.user.ProductVO;
 import com.spring.finall.user.ReserveRestVOService;
@@ -188,10 +189,11 @@ public class GuestViewController {
 
 		vo.setProduct_group(product_group);
 
-//	        System.out.println("vo.getProduct_group 매핑 확인: " + vo.getProduct_group());
-
 		List<Map<String, Object>> grouplist = protService.productGroupLlist(vo);
+
 		model.addAttribute("productService", grouplist);
+		List<ProductGroupVO> groupInfolist =protService.getProductGroupList();
+		model.addAttribute("groupInfolist", groupInfolist);
 
 		return "productPage/generalproductlist";
 	}

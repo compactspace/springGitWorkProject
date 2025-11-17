@@ -1,5 +1,6 @@
 package com.spring.finall.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -37,5 +38,6 @@ public	Map<String, Object> searchyArtWork(	ArtworkVO artWorkVO);
 
 public int searchyCntAll(	ArtworkVO artWorkVO);
 
+Map<String,Object>  getArtWorkCountByTodayAndWeek(LocalDate startOfWeek, LocalDate endOfWeek);
 	
 }

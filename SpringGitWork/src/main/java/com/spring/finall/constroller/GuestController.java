@@ -91,24 +91,39 @@ public class GuestController {
 
 	@RequestMapping(value = "/productGroupList")
 	public String ajaxProductGroupList(ProductVO vo,
-			@RequestParam(value = "product_group", required = false, defaultValue = "pencile") String product_group,
-			@AuthenticationPrincipal UserDetailsVO2 user,
-			Model model) {
+	        @RequestParam(value = "product_group", required = false, defaultValue = "pencile") String product_group,
+	        @AuthenticationPrincipal UserDetailsVO2 user,
+	        Model model) {
 
-		if ("groupdetermined".equals(product_group)) {
-			product_group = "제품군미정";
-		}
+	    // 제품군 미정 처리
+	    if ("groupdetermined".equals(product_group)) {
+	        product_group = "제품군미정";
+	    }
 
-		vo.setProduct_group(product_group);
-		List<Map<String, Object>> grouplist = protService.productGroupLlist(vo);
-		model.addAttribute("productService", grouplist);
+	    vo.setProduct_group(product_group);
+	    List<Map<String, Object>> grouplist = protService.productGroupLlist(vo);
 
-		Boolean isAuthenticated=user!=null ? true : false;
-		model.addAttribute("isAuthenticated", isAuthenticated);
-		
-		// ✅ 이 JSP는 #content2 부분만 포함한 "조각 페이지"여야 함
-		return "compoents/productGroupList";
+	    // 안전하게 새 컬럼만 별도 모델로 추가
+	    for (Map<String, Object> item : grouplist) {
+	        // file_category와 file_name이 존재하고 널이 아닐 때만
+	        if (item.containsKey("file_category") && item.get("file_category") != null &&
+	            item.containsKey("file_name") && item.get("file_name") != null) {
+
+	            // MVC리솔스 처리경로 /images/
+	            item.put("imagePath", "/images/" + item.get("file_category") + "/" + item.get("file_name"));
+	        }
+	    }
+
+	    model.addAttribute("productService", grouplist);
+
+	    // 로그인 여부
+	    Boolean isAuthenticated = user != null;
+	    model.addAttribute("isAuthenticated", isAuthenticated);
+
+	    // JSP는 #content2 부분만 포함한 조각 페이지
+	    return "compoents/productGroupList";
 	}
+
 
 	@RequestMapping(value = "/get-motre-reviews")
 	public String getdynamicworkimg(@RequestParam(defaultValue = "취미만화반") String onedayclass_name,

@@ -16,5 +16,10 @@ public interface ProductService {
 	public abstract int completequantity(HashMap<String, ArrayList<Object>> map);
 
 	public abstract int updateOrderQuantity(int cart_quantity, int product_cod);
+	
+	List<ProductGroupVO> getProductGroupList();
+	
+	
+	
 
 }

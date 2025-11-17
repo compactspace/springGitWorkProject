@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserAdminDetailMapper">
+
+  
+  <select id="selectByAdminUsername" parameterType="String" resultType="UserAdminDetail">
+    SELECT
+        admin_id AS adminId,
+        username,
+        password_hash AS passwordHash,
+        full_name AS fullName,
+        email,
+        phone,
+        role,
+        api_access_role AS apiAccessRole
+    FROM admin
+    WHERE username = #{username}
+</select>
+
+    
+
+
+
+
+
+
+
+
+
+
+</mapper>

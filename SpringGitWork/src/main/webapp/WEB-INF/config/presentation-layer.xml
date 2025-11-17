@@ -17,14 +17,16 @@
 	<mvc:annotation-driven />
 
 
-	<mvc:resources mapping="/resources/**" location="/resources/" />
+<!-- 	<mvc:resources mapping="/resources/**" location="/resources/" /> -->
+
+
 <mvc:default-servlet-handler />
 
 	<task:annotation-driven />
 
 
     <!-- 인터셉터 등록 -->
-    <mvc:interceptors>
+  <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**" />
             <bean class="com.spring.interceptor.SecurityLogInterceptor" />

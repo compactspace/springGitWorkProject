@@ -18,4 +18,15 @@
 </insert>
 
 
+
+
+
+<select id="getProductRefundCountByTodayAndWeek" parameterType="map" resultType="map">
+    SELECT requested_at
+    FROM product_refund
+    WHERE requested_at BETWEEN #{startOfWeek} AND #{endOfWeek}
+</select>
+
+
+
 </mapper>

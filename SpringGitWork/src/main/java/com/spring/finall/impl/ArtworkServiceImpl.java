@@ -3,6 +3,7 @@ package com.spring.finall.impl;
 import java.io.File;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -259,5 +260,11 @@ public class ArtworkServiceImpl implements ArtworkService {
 		
 		return  searchyAllCnt;
 		
+	}
+
+	@Override
+	public Map<String, Object> getArtWorkCountByTodayAndWeek(LocalDate startOfWeek, LocalDate endOfWeek) {
+		
+		return artworkServiceDAO.getArtWorkCountByTodayAndWeek(startOfWeek, endOfWeek);
 	}
 }

@@ -331,6 +331,12 @@ LIMIT #{limit} OFFSET #{offset}
 
 
 
+<select id="getOrdersCountByTodayAndWeek" resultType="map">
+    SELECT order_date
+    FROM order_info
+    WHERE order_date BETWEEN #{startOfWeek} AND #{endOfWeek}
+</select>
+
 
 
 

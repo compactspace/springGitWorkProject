@@ -70,7 +70,7 @@ public class AftterPayDAOMyBatis {
 		HashMap<String, Object> map = new HashMap();
 		ProductVO executequery = mybatis.selectOne("ProductVO.checkOrderQuantity", product_cod);
 		int product_order_quantity = executequery.getProduct_order_quantity();
-		int overquantity = executequery.getproduct_quantity();
+		int overquantity = executequery.getProduct_quantity();
 
 		// 상품코드 6 에대한 주문 수량 0
 		System.out.println("상품코드 " + product_cod + "카트에 담에담긴 주문수량 " + cart_quantity + "기존 테이블에 있던  주문 수량 "
