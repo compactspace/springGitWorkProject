@@ -6,7 +6,6 @@
 
 
 <!-- 1. 미완료 주문정보 가져오기 -->
-
 <select id="selectOneDraftOrder" parameterType="String" resultType="Map">
 
 SELECT
@@ -35,6 +34,21 @@ WHERE
 	oi.user_id = #{user_id}
 	AND oi.status = 'PENDING'
 </select>
+
+<update id="updateDraftStatusCancle" parameterType="String">
+UPDATE
+	order_info
+SET
+	status = 'ORDERCANCLE',	
+	order_status_id =6
+WHERE
+	user_id =
+	#{user_id} AND status='PENDING'
+
+
+</update>
+
+
 
 
     <!-- 1. 주문 기본 정보 저장 -->
@@ -158,6 +172,32 @@ SELECT * From order_info  WHERE merchant_uid=#{merchantUid}
 
 
 
+<select id="selectProductForUpdate" parameterType="Long" resultType="ProductVO">
+    SELECT *
+    FROM product
+    WHERE product_cod = #{productId}
+    FOR UPDATE
+</select>
+
+
+
+
+<update id="updateStockByOrderItemsQuantity">
+   UPDATE product
+    SET product_quantity = product_quantity - #{quantity}
+    WHERE product_cod = #{productId}
+</update>
+
+
+
+
+<update id="updateStockByOrderItemsQuantityCausePayCancel">
+   UPDATE product
+    SET product_quantity = product_quantity + #{quantity}
+    WHERE product_id = #{productId}
+</update>
+
+
 
 
     <!-- updateOrderStatusToSuccess 완료후 지울것-->
@@ -175,11 +215,12 @@ SELECT * From order_info  WHERE merchant_uid=#{merchantUid}
         </foreach>
     </insert>
 
-    <!-- 3. 주문자 정보 저장 -->
-    <insert id="insertOrderPerson">
-        INSERT INTO order_person (order_info_id, name, email, phone)
-        VALUES (#{orderInfoId}, #{name}, #{email}, #{phone})
-    </insert>
+ <!-- 3. 주문자 정보 저장 -->
+<insert id="insertOrderPerson">
+    INSERT INTO order_person (order_info_id, name, email, phone, zipcode, address, address_detail)
+    VALUES (#{orderInfoId}, #{name}, #{email}, #{phone}, #{zipcode}, #{address}, #{address_detail})
+</insert>
+
 
 
 
@@ -338,7 +379,16 @@ LIMIT #{limit} OFFSET #{offset}
 </select>
 
 
+<update id="approveForReqeustClientPayCancel" parameterType="String">
+	UPDATE
+	order_info
+set
+	status = 'APPROVEDPAYCANCEL',
+	order_status_id = 8,
+	order_status_comment = '환불완료'
+WHERE order_info_id=#{orderInfoId}
 
+</update>
 
 
 </mapper>

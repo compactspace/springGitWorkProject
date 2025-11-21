@@ -214,4 +214,10 @@ public class ManageProductServiceImpl implements ManageProductService {
 
 	}
 
+	@Override
+	public List<Map<String, Object>> stockCheck(List<Map<String, Object>> orderItems) {
+		// TODO Auto-generated method stub
+		return manageProductServiceDAO.stockCheck(orderItems);
+	}
+
 }

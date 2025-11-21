@@ -14,10 +14,11 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-
+import com.spring.interceptor.SecurityLogInterceptor;
 
 //@Configuration
 //→ 해당 클래스가 스프링 설정 클래스임을 나타냄.
@@ -47,11 +48,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class AdminConfig implements WebMvcConfigurer {
 
 	// aws 로 연결 할거면 jdbc:mysql://13.209.16.121:3306/octfair2?allowMultiQueries=true
-	// 아이디는 root 비번은  hwangkh704!
-	
-	//local로 연결할거면 jdbc:mariadb://localhost:3306/finall
+	// 아이디는 root 비번은 hwangkh704!
+
+	// local로 연결할거면 jdbc:mariadb://localhost:3306/finall
 	// 아이디는 root 비번은 1111
-	
+
 	@Bean
 	public BasicDataSource dataSource() {
 		BasicDataSource datasource = new BasicDataSource();
@@ -63,7 +64,7 @@ public class AdminConfig implements WebMvcConfigurer {
 	}
 
 	// jpa 설정
-	//META-INF에서 만들었던 persistence.xml 을 가지고 메니져를 만든다.
+	// META-INF에서 만들었던 persistence.xml 을 가지고 메니져를 만든다.
 	/*
 	 * @Bean public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 	 * LocalContainerEntityManagerFactoryBean entityManagerFactory = new
@@ -80,7 +81,7 @@ public class AdminConfig implements WebMvcConfigurer {
 	// 만들어진 메니져에게 트랜잭션을 세팅해준다는 정도로 이해
 	@Bean
 	public PlatformTransactionManager transactionManager() throws Exception {
-		//단 주의 하자. 지금 presentation.xml 에서 사용하고 있는 트랜잭션 메니져랑 동일해서 충돌이 있을 수도 있다.
+		// 단 주의 하자. 지금 presentation.xml 에서 사용하고 있는 트랜잭션 메니져랑 동일해서 충돌이 있을 수도 있다.
 		// mariadb transactional
 		DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
 		dataSourceTransactionManager.setDataSource(dataSource());
@@ -95,22 +96,28 @@ public class AdminConfig implements WebMvcConfigurer {
 		 * ChainedTransactionManager(jpaTransactionManager,
 		 * dataSourceTransactionManager);
 		 */
-		
-		ChainedTransactionManager transactionManager = new ChainedTransactionManager(
-				dataSourceTransactionManager);
+
+		ChainedTransactionManager transactionManager = new ChainedTransactionManager(dataSourceTransactionManager);
 		return transactionManager;
-	}	
+	}
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-	    resolvers.add(new AuthenticationPrincipalArgumentResolver());
+		resolvers.add(new AuthenticationPrincipalArgumentResolver());
 	}
-	
-	 @Override
-	    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-	        // /images/** 요청을 C:/upload/product/ 경로와 매핑
-	        registry.addResourceHandler("/images/**")
-	                .addResourceLocations("file:///C:/upload/product/")
-	                .setCachePeriod(3600); // 캐시 설정 (선택)
-	    }
+
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		// /images/** 요청을 C:/upload/product/ 경로와 매핑
+		registry.addResourceHandler("/images/**").addResourceLocations("file:///C:/upload/product/")
+				.setCachePeriod(3600); // 캐시 설정 (선택)
+	}
+
+//	@Override
+//	public void addInterceptors(InterceptorRegistry registry) {
+//		registry.addInterceptor(new SecurityLogInterceptor()).addPathPatterns("/**") // 모든 경로 적용
+//				.excludePathPatterns("/resources/**", "/static/**", "/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg",
+//						"/**/*.gif"); // 정적 리소스 제외
+//	}
+
 }

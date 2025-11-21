@@ -382,6 +382,10 @@ $(document).on('click', '.refund-btn', function() {
     const amount = $(this).data('amount');
     const orderId = $(this).data('orderid');
 
+    
+    
+    
+    
     $('#modalPaymentId').text(paymentId);
     $('#modalAmount').text(amount);
     $('#modalOrderId').text(orderId);
@@ -398,9 +402,17 @@ $(document).on('click', '#refundModal .close-btn, #closeModal', function() {
 
 $(document).on('click', '#submitRefund', function() {
     const paymentId = $('#modalPaymentId').text().trim();
+    const amount = $('#modalAmount').text().trim();
+    const orderId = $('#modalOrderId').text().trim();
     const refundedAmount = $('#modalAmount').text().replace(/[^0-9]/g, '').trim(); // "10,000원" → 10000
     const reason = $('#refundReason').val().trim();
 
+    console.log("orderId: "+orderId);
+    
+    
+    
+    
+    
     if (!reason) {
         alert('환불 사유를 입력해주세요.');
         return;
@@ -412,16 +424,17 @@ $(document).on('click', '#submitRefund', function() {
     const refundData = {
         paymentId: paymentId,
         refundedAmount: refundedAmount,
-        reason: reason
+        reason: reason,
+        orderInfoId:orderId
     };
     
-
-    $.ajax({
+    
+     $.ajax({
         url: '${pageContext.request.contextPath}/api/users/request-refund',
         method: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(refundData),
-        success: function(res) {       	
+        success: function(res) {      	
         		
         	const {message}=res;        		
         	   alert(message);

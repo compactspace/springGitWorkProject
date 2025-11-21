@@ -25,6 +25,13 @@ var currentParam = window.location.pathname.split('/').pop();
 var titleMenu = [
     { name: "Admin 대시보드", prefix: "main", url: "${pageContext.request.contextPath}/admin/main", children: [] },
     ,
+    
+    { name: "주문 관리", prefix: "admin-user", url: "${pageContext.request.contextPath}/admin/user", children: [
+        { name: "주문 목록", prefix: "order-list", url: "${pageContext.request.contextPath}/admin/order-list" },
+        { name: "권한 관리", prefix: "user-role", url: "${pageContext.request.contextPath}/admin/user/user-role" },
+        { name: "활동 로그", prefix: "user-log", url: "${pageContext.request.contextPath}/admin/user/user-log" }
+    ] }
+    ,
     { name: "Admin 기업 사용자 관리", prefix: "admin-user", url: "${pageContext.request.contextPath}/admin/user", children: [
         { name: "기업-사용자 목록", prefix: "user-list", url: "${pageContext.request.contextPath}/admin/user/user-list" },
         { name: "권한 관리", prefix: "user-role", url: "${pageContext.request.contextPath}/admin/user/user-role" },

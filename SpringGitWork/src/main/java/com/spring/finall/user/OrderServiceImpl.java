@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,42 +33,45 @@ public class OrderServiceImpl implements OrderService {
 	private PaymentServiceDAO paymentServiceDAO;
 
 	@Override
-	public String checkoutDraftOrder(Map<String, Object> params,OrderRequestDTO orderRequestDTO ) {
+	public String checkoutDraftOrder(Map<String, Object> params, OrderRequestDTO orderRequestDTO) {
 
 		String merchant_uid = null;
 		String user_id = (String) params.get("user_id");
-		
-		List<Map<String, Object>> 	list=orderServiceDAO.selectOneDraftOrder(user_id);
-		Map<String, Object> myDraftOrderInfo = null;
-		boolean 장바구니가변했니=false;
 
-		if(list!=null&& !list.isEmpty()) {
+		List<Map<String, Object>> list = orderServiceDAO.selectOneDraftOrder(user_id);
+		Map<String, Object> myDraftOrderInfo = null;
+		boolean 장바구니가변했니 = false;
+
+		if (list != null && !list.isEmpty()) {
 			myDraftOrderInfo = list.get(0);
-			 장바구니가변했니=findUpdateDraftValues(params, myDraftOrderInfo);
-		}		
-		
-		
-		if(list!=null&& !list.isEmpty() &&!장바구니가변했니) {
+			장바구니가변했니 = findUpdateDraftValues(params, myDraftOrderInfo);
+		}
+
+		if (list != null && !list.isEmpty() && !장바구니가변했니) {
 			myDraftOrderInfo = list.get(0);
-			List<Long> orderItemIdList= new ArrayList<Long>();
-			
-			for(int k=0; k<list.size(); k++) {
-				Long order_item_id=	(Long)list.get(k).get("order_item_id");
+			List<Long> orderItemIdList = new ArrayList<Long>();
+
+			for (int k = 0; k < list.size(); k++) {
+				Long order_item_id = (Long) list.get(k).get("order_item_id");
 				orderItemIdList.add(k, order_item_id);
 				orderRequestDTO.getItems().get(k).setOrderItemId(order_item_id);
 			}
-			orderRequestDTO.setOrderItemId(orderItemIdList);	
-			
-		}				
-				
+			orderRequestDTO.setOrderItemId(orderItemIdList);
+
+		}
+
 		if (myDraftOrderInfo != null && !장바구니가변했니) {
 			// DB UPDATE문 실행
-			Long order_info_id=(Long)myDraftOrderInfo.get("order_info_id");
+			Long order_info_id = (Long) myDraftOrderInfo.get("order_info_id");
 			params.put("order_info_id", order_info_id);
+
+			// 여기서부턴 좀 위험하니 생각하자.
+			//
+
 			orderServiceDAO.updateDraftOrderItem(params);
-			//여기서 항목도 찾아서 업데이트해주는 DAO메서드 추가하자.
-			orderServiceDAO.updateOrderItemList(order_info_id,orderRequestDTO.getItems());		
-			
+			// 여기서 항목도 찾아서 업데이트해주는 DAO메서드 추가하자.
+			orderServiceDAO.updateOrderItemList(order_info_id, orderRequestDTO.getItems());
+
 		}
 
 		if (myDraftOrderInfo != null && 장바구니가변했니) {
@@ -88,7 +92,7 @@ public class OrderServiceImpl implements OrderService {
 
 			params.put("order_info_id", orderInfoId);
 			Long draft_order_info_id = orderServiceDAO.insertDraftOrderItem(params);
-			
+
 			int affectedRow = orderServiceDAO.insertDraftOrderItemList(orderInfoId, orderRequestDTO.getItems());
 			merchant_uid = merchantUid;
 		}
@@ -119,62 +123,52 @@ public class OrderServiceImpl implements OrderService {
 		return isAmountEqual && isQuantityEqual;
 	}
 
-	
-	
 	@Override
 	public boolean updateOrderStatusToSuccess(String merchantUid) {
-		
+
 		return orderServiceDAO.updateOrderStatusToSuccess(merchantUid);
 	}
-	
+
 	@Transactional
 	@Override
 	public boolean afterSuccesspaymentComplement(OrderRequestDTO orderRequestDTO, PaymentDTO paymentDTO) {
 		try {
-		String merchantUid=orderRequestDTO.getMerchantUid();
-		Long orderInfoId =orderServiceDAO.selectOneOrderInfoId(merchantUid);
-		if (orderInfoId == null || orderInfoId <= 0) {
-			throw new OrderException("해당 주문번호로, 주문번호 고유키를 찾을 수 없음");
-		}		
-	
-		int personInserted = orderServiceDAO.insertOrderPerson(orderInfoId, orderRequestDTO.getPerson());
-		if (personInserted <= 0) {
-			throw new OrderException("주문자 정보 삽입 실패");
+			String merchantUid = orderRequestDTO.getMerchantUid();
+			Long orderInfoId = orderServiceDAO.selectOneOrderInfoId(merchantUid);
+			if (orderInfoId == null || orderInfoId <= 0) {
+				throw new OrderException("해당 주문번호로, 주문번호 고유키를 찾을 수 없음");
+			}
+
+			int personInserted = orderServiceDAO.insertOrderPerson(orderInfoId, orderRequestDTO.getPerson());
+			if (personInserted <= 0) {
+				throw new OrderException("주문자 정보 삽입 실패");
+			}
+			int totalAmount = 0;
+
+			List<OrderItemDTO> orderList = orderRequestDTO.getItems();
+
+			for (int i = 0; i < orderList.size(); i++) {
+				totalAmount += orderList.get(i).getPricePerUnit() * orderList.get(i).getQuantity();
+			}
+
+			paymentDTO.setAmount(totalAmount);
+
+			paymentDTO.setOrderInfoId(orderInfoId);
+
+			paymentDTO.setPaymentNumber(merchantUid);
+			orderServiceDAO.updateStockByOrderItemsQuantity(orderList);
+			int paymentInserted = paymentServiceDAO.insertPayment(paymentDTO);
+			if (paymentInserted <= 0) {
+				throw new OrderException("결제정보 삽입 실패");
+			}
+
+			return true;
+		} catch (Exception e) {
+
+			throw e; // 런타임 예외는 트랜잭션 롤백 발생
 		}
-		int totalAmount = 0;
-
-		List<OrderItemDTO> orderList = orderRequestDTO.getItems();
-		
-		for (int i = 0; i < orderList.size(); i++) {
-		    totalAmount += orderList.get(i).getPricePerUnit() * orderList.get(i).getQuantity();
-		}
-
-
-		paymentDTO.setAmount(totalAmount);
-
-		paymentDTO.setOrderInfoId(orderInfoId);
-		
-		paymentDTO.setPaymentNumber(merchantUid);
-
-		int paymentInserted = paymentServiceDAO.insertPayment(paymentDTO);
-		if (paymentInserted <= 0) {
-			throw new OrderException("결제정보 삽입 실패");
-		}
-		return true;
-	} catch (Exception e) {
-
-		throw e; // 런타임 예외는 트랜잭션 롤백 발생
 	}
-}
-	
 
-	
-	
-	
-	
-	
-	
-	
 	@Transactional
 	@Override
 	public boolean placeOrder(OrderRequestDTO orderRequestDTO, PaymentDTO paymentDTO) {
@@ -182,8 +176,8 @@ public class OrderServiceImpl implements OrderService {
 			Long orderInfoId = orderServiceDAO.insertOrderInfo(orderRequestDTO);
 			if (orderInfoId == null || orderInfoId <= 0) {
 				throw new OrderException("주문 정보 생성 실패");
-			}			
-			
+			}
+
 			int itemsInserted = orderServiceDAO.insertOrderItems(orderInfoId, orderRequestDTO.getItems());
 			if (itemsInserted <= 0) {
 				throw new OrderException("주문 항목 삽입 실패");
@@ -217,31 +211,30 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public List<OrderPaymentRequestDTO> getPagedOrders(LocalDate startDate, LocalDateTime endDate, int offset, int limit,int user_code) {
+	public List<OrderPaymentRequestDTO> getPagedOrders(LocalDate startDate, LocalDateTime endDate, int offset,
+			int limit, int user_code) {
 		// DAO 호출
-		return orderServiceDAO.selectOrdersByDateWithPaging(startDate, endDate, offset, limit,user_code);
+		return orderServiceDAO.selectOrdersByDateWithPaging(startDate, endDate, offset, limit, user_code);
 	}
 
 	@Override
-	public Boolean checkOneOrderAmount(Map<String, Object> params,Integer amount) {
-		String 	주문장에있는가격	=orderServiceDAO.checkOneOrderAmount(params);
-		Integer pg사로부터통보받은실물결제가격=amount;		
-		return 가굑조작이니함수(주문장에있는가격,pg사로부터통보받은실물결제가격);
+	public Boolean checkOneOrderAmount(Map<String, Object> params, Integer amount) {
+		String 주문장에있는가격 = orderServiceDAO.checkOneOrderAmount(params);
+		Integer pg사로부터통보받은실물결제가격 = amount;
+		return 가굑조작이니함수(주문장에있는가격, pg사로부터통보받은실물결제가격);
 	}
 
 	// 1000.00
 	// 1000
 	public boolean 가굑조작이니함수(String 주문장에있는가격, Integer pg사로부터통보받은실물결제가격) {
-		
-		// null 방지 및 BigDecimal 변환
-		BigDecimal 주문장에있는가격BigDecimal = new BigDecimal(주문장에있는가격) ;
 
+		// null 방지 및 BigDecimal 변환
+		BigDecimal 주문장에있는가격BigDecimal = new BigDecimal(주문장에있는가격);
 
 		BigDecimal pg사로부터통보받은실물결제가격BigDecimal = new BigDecimal(pg사로부터통보받은실물결제가격.toString());
 
 		// 값(value) 비교 → compareTo() == 0이면 값이 같음
 		boolean isAmountEqual = 주문장에있는가격BigDecimal.compareTo(pg사로부터통보받은실물결제가격BigDecimal) == 0;
-	
 
 		return isAmountEqual;
 	}
@@ -254,22 +247,59 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Map<String, Object> getOrdersCountByTodayAndWeek(LocalDate startOfWeek, LocalDate endOfWeek) {
-		
-		
+
 		return orderServiceDAO.getOrdersCountByTodayAndWeek(startOfWeek, endOfWeek);
 	}
 
+	@Override
+	public List<OrderStatusVO> getOrderStatusList() {
+		// TODO Auto-generated method stub
+		return orderServiceDAO.getOrderStatusList();
+	}
 
+	@Override
+	public Map<String, Object> findOrdersByFilter(LocalDate startOfWeek, LocalDate endOfWeek, String statusCode) {
+		// TODO Auto-generated method stub
+		return orderServiceDAO.findOrdersByFilter(startOfWeek, endOfWeek, statusCode);
+	}
 
-	
+	@Override
+	public Map<String, Object> findOrdersDetailByOrderInfoId(String orderInfoId) {
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
+		//이건 추구 고민해보고 지워라	
+		List<Map<String, Object>> orderItemListte = orderServiceDAO.findOrdersItemByOrderInfoId(orderInfoId);
+
+		Map<String, Object> obj = orderServiceDAO.findPayInfoByOrderInfoId(orderInfoId);
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("orderItemListte", orderItemListte);
+		map.put("paymentInfo", obj.get("paymentInfo"));
+		map.put("orderItemList", obj.get("orderItemList"));
+
+		return map;
+	}
+
+	@Override
+	public boolean updateDraftStatusCancle(String user_id) {
+
+		return orderServiceDAO.updateDraftStatusCancle(user_id);
+	}
+
+	@Override
+	@Transactional
+	public boolean updateOrderStatusToRefunded(String impUid, String merchantUid, String orderInfoId, String paymentId,
+			List<OrderItemDTO> orderList) {
+
+		try {
+			orderServiceDAO.approveForReqeustClientPayCancel(orderInfoId);
+			paymentServiceDAO.updateProductRefund(orderInfoId, paymentId);
+			orderServiceDAO.updateStockByOrderItemsQuantityCausePayCancel(orderList);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
+
 }

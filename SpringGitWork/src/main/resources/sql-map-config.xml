@@ -97,6 +97,12 @@
 			
 			<typeAlias type="com.spring.finall.user.TeacherDocumentVO"
 			alias="TeacherDocumentVO" />
+			
+				<typeAlias type="com.spring.finall.user.OrderStatusVO"
+			alias="OrderStatusVO" />
+			
+			
+			
 	</typeAliases>
 
 	<!-- SQL이 작성되는 mapper 파일 위치 등록! MyBatis에서 SQL 매퍼 파일을 등록하는 태그. mapper 태그를 
@@ -130,6 +136,7 @@
 <mapper resource="mappings/productRefundMapper.xml" />
 <mapper resource="mappings/ApplicantDocuments.xml" />
 <mapper resource="mappings/ManageProductMapper.xml" />
+<mapper resource="mappings/ManageOrderMapper.xml" />
 
 	</mappers>
 

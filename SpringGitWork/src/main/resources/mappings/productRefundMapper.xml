@@ -13,9 +13,10 @@
 
 
 <insert id="productReqeustRefund" parameterType="ProductRefundDTO">
-    INSERT INTO product_refund (payment_id, refunded_amount, reason)
-    VALUES (#{paymentId}, #{refundedAmount}, #{reason})
+    INSERT INTO product_refund (payment_id, refunded_amount, reason, order_info_id)
+    VALUES (#{paymentId}, #{refundedAmount}, #{reason}, #{orderInfoId})
 </insert>
+
 
 
 

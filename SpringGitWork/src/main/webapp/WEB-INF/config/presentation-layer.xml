@@ -25,13 +25,13 @@
 	<task:annotation-driven />
 
 
-    <!-- 인터셉터 등록 -->
-  <mvc:interceptors>
+    <!-- 인터셉터 등록: 지금 디스패쳐 경로 때문이지 여기 서 안먹혀서 AdminConfig 자바 파일에 등록함 -->
+<!--   <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**" />
             <bean class="com.spring.interceptor.SecurityLogInterceptor" />
         </mvc:interceptor>
-    </mvc:interceptors>
+    </mvc:interceptors> -->
 
 
  <!-- ViewResolver 추가 (중요) -->

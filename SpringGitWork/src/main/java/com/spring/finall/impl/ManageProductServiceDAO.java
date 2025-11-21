@@ -1,7 +1,11 @@
 package com.spring.finall.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +90,54 @@ public class ManageProductServiceDAO {
 		int affectedRow = mybaits.insert("ManageProductMapper.addProductGroup", productGroupVO);
 
 		return affectedRow >= 1 ? true : false;
+	}
+
+	public List<Map<String, Object>> stockCheck(List<Map<String, Object>> orderItems) {
+
+		List<Map<String, Object>> nowStock = mybaits.selectList("ManageProductMapper.stockCheck", orderItems);
+
+		return possibleStock(nowStock, orderItems);
+	}
+
+	public List<Map<String, Object>> possibleStock(List<Map<String, Object>> nowStock,
+			List<Map<String, Object>> orderItems) {
+
+		List<Map<String, Object>> result = new ArrayList<>();
+
+		// orderItems 기준으로 반복
+		for (Map<String, Object> orderItem : orderItems) {
+			Long productId = Long.valueOf(orderItem.get("productId").toString());
+			Integer orderQty = Integer.valueOf(orderItem.get("quantity").toString());
+
+			// DB 재고 찾기
+			Map<String, Object> stockItem = nowStock.stream()
+					.filter(s -> Long.valueOf(s.get("product_id").toString()).equals(productId)).findFirst()
+					.orElse(null);
+
+			Map<String, Object> itemResult = new HashMap<>(orderItem);
+
+			if (stockItem != null) {
+				Integer stockQty = Integer.valueOf(stockItem.get("product_quantity").toString());
+
+				 if (stockQty >= orderQty) {
+				        itemResult.put("status", "AVAILABLE");
+				    } else if (stockQty > 0 && stockQty < orderQty) {
+				        itemResult.put("status", "UNAVAILABLE");
+				        itemResult.put("availableQuantity", stockQty);
+				    } else { // stockQty == 0
+				        itemResult.put("status", "SOLDOUT");
+				        itemResult.put("unAvailableQuantity", 0);
+				    }
+			} else {
+				// DB에 상품이 없는 경우
+				itemResult.put("status", "SOLDOUT");
+				itemResult.put("unAvailableQuantity", 0);
+			}
+
+			result.add(itemResult);
+		}
+
+		return result;
 	}
 
 }

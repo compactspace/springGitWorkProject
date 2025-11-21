@@ -46,28 +46,7 @@ public class OrderInfoServiceDAOMybatis {
 //		List<OrderInfoVO> lists = new List<OrderInfoVO>();
 
 		List<OrderInfoVO> lists = mybatis.selectList("OrderInfoVO.mypayinfo", ovo);
-//	System.out.println("받은 유저 코드->>"+ovo.getUser_code());	
-//	System.out.println(lists.size());
 
-//	System.out.println("조인당항 카트테이블의 상품명 "+lists.get(0).getCartvo().getProduct_name());		
-//	System.out.println("조인당항 카트테이블의 수량 "+lists.get(0).getCartvo().getCart_quantity());
-//	
-//	System.out.println("조인당항 카트테이블의 상품명 "+lists.get(1).getCartvo().getProduct_name());		
-//	System.out.println("조인당항 카트테이블의 수량 "+lists.get(1).getCartvo().getCart_quantity());
-//	
-//	
-//	System.out.println("조인당항 카트테이블의 상품명 "+lists.get(3).getCartvo().getProduct_name());		
-//	System.out.println("조인당항 카트테이블의 수량 "+lists.get(3).getCartvo().getCart_quantity());
-
-//	System.out.println("------------------구분선-----------------------");
-//	
-//	for(OrderInfoVO vo: lists) {
-//		
-//		System.out.println("조인당항 카트테이블 "+vo.getCartvo());		
-//		
-//		
-//	}
-//		
 
 		return lists;
 
@@ -84,5 +63,20 @@ public class OrderInfoServiceDAOMybatis {
 	public void payupdate(int cart_id) {
 		mybatis.update("OrderInfoVO.payupdate", cart_id);
 	};
+	
+	
+	public boolean updateOrderStatusToRefundRequested(Long orderInfoId) {
+		
+		int affectedRow=mybatis.update("OrderInfoVO.updateOrderStatusToRefundRequested",orderInfoId);
+		
+		return  affectedRow>0? true : false;
+		
+		
+	}
+	
+
+	
+	
+	
 
 }

@@ -50,6 +50,7 @@ import com.spring.finall.exception.requestRefund.RequestRefundException;
 import com.spring.finall.impl.SmsServiceRedisDao;
 import com.spring.finall.impl.WorkServcieRedisDao;
 import com.spring.finall.redisutil.RedisUtil;
+import com.spring.finall.reqDto.orderRequest.OrderItemDTO;
 import com.spring.finall.reqDto.orderRequest.OrderRequestDTO;
 import com.spring.finall.reqDto.payMentRequest.PaymentDTO;
 import com.spring.finall.reqDto.refundRequest.ProductRefundDTO;
@@ -59,6 +60,7 @@ import com.spring.finall.security.SecurityUserVO;
 import com.spring.finall.security.SecurityUserVOService;
 import com.spring.finall.security.UserDetailsVO2;
 import com.spring.finall.service.ArtworkService;
+import com.spring.finall.service.ManageProductService;
 import com.spring.finall.service.MemberService;
 import com.spring.finall.service.OneDayClassService;
 import com.spring.finall.service.OrderService;
@@ -112,6 +114,9 @@ public class UserController {
 
 	@Autowired
 	private WorkServcieRedisDao workServiceRedisDao;
+
+	@Autowired
+	private ManageProductService manageProductService;
 
 	boolean PASSWORDCHANGE;
 
@@ -180,12 +185,107 @@ public class UserController {
 		// afterSuccesspaymentComplement
 
 		try {
-			orderService.afterSuccesspaymentComplement(orderRequestDTO, paymentDTO); // 내부에서 트랜잭션 처리
+			orderService.afterSuccesspaymentComplement(orderRequestDTO, paymentDTO);
 			return ApiResponse.<Boolean>builder().code(201).success(true).message("결제 성공").data(true).build();
 		} catch (Exception e) {
 			System.err.println("[ERROR] 주문 처리 중 예외 발생: " + e.getMessage());
 			return ApiResponse.<Boolean>builder().code(500).success(false).message("결제 실패").data(false).build();
 		}
+	}
+
+	@PostMapping("/stock-check")
+	public ResponseEntity<?> stockCheck(@RequestBody List<Map<String, Object>> items) {
+
+		for (Map<String, Object> item : items) {
+			Long productId = Long.valueOf(item.get("productId").toString());
+			Integer quantity = Integer.valueOf(item.get("quantity").toString());
+
+		}
+
+		List<Map<String, Object>> possibleStock = manageProductService.stockCheck(items);
+
+		return ResponseEntity.ok(possibleStock);
+	}
+
+	@RequestMapping(value = "/update-draft-order", method = RequestMethod.POST)
+	@ResponseBody
+	public String updateDraftOrder(@AuthenticationPrincipal UserDetailsVO2 userDetails,
+			@RequestParam("product_id") List<String> productIds,
+			@RequestParam("cart_quantity") List<Integer> quantities,
+			@RequestParam("pricePerUnit") List<Integer> pricePerUnit, // 새로 추가된 단가
+			@RequestParam("product_name") List<String> productNames, @RequestParam("finallsum") String finallsum,
+			Model model) {
+		System.out.println("업데이트전 최종 합계: " + finallsum);
+		// 데이터 출력 (디버깅용)
+		for (int i = 0; i < productIds.size(); i++) {
+			System.out.println("상품 ID: " + productIds.get(i));
+			System.out.println("상품 이름: " + productNames.get(i));
+			System.out.println("수량: " + quantities.get(i));
+			System.out.println("단가: " + pricePerUnit.get(i));
+		}
+
+		System.out.println("업데이트후 최종 합계: " + finallsum);
+
+		int userCode = userDetails.getUser_code();
+		OrderRequestDTO orderRequestDTO = new OrderRequestDTO();
+
+		List<OrderItemDTO> orderItemDTOlist = new ArrayList<OrderItemDTO>();
+		// orderRequestDTO.getItems() -> OrderItemDTO
+
+		int totalPrice = Integer.parseInt(finallsum.replace(",", ""));
+		System.out.println(totalPrice); // 20400
+
+		int totalQuantities = 0;
+		for (int i = 0; i < productIds.size(); i++) {
+			OrderItemDTO orderItem = new OrderItemDTO();
+
+			orderItem.setProductId(Long.valueOf(productIds.get(i)));
+			orderItem.setProductName(productNames.get(i));
+			orderItem.setQuantity(quantities.get(i));
+			orderItem.setPricePerUnit(pricePerUnit.get(i));
+
+			orderItemDTOlist.add(orderItem); // 세팅 후 리스트에 추가
+			orderItem = null;
+			totalQuantities += quantities.get(i);
+
+		}
+		orderRequestDTO.setItems(orderItemDTOlist);
+		orderRequestDTO.setUserCode(userCode);
+
+		String user_id = String.valueOf(userDetails.getUser_code());
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("user_id", user_id);
+		params.put("draft_total_quantity", totalQuantities);
+		params.put("draft_total_amount", totalPrice);
+
+		String merchant_uid = orderService.checkoutDraftOrder(params, orderRequestDTO);
+		return "orderSuccess"; // 성공적인 응답 후 이동할 페이지명
+	}
+
+	@RequestMapping(value = "/update-draft-status-cancle", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<?> updateDraftStatusCancle(@AuthenticationPrincipal UserDetailsVO2 userDetails) {
+
+		String user_id = String.valueOf(userDetails.getUser_code());
+		boolean statusCancle = orderService.updateDraftStatusCancle(user_id);
+
+		Map<String, Object> bodyData = new HashMap<>();
+
+		try {
+
+			bodyData.put("statusCancle", statusCancle);
+
+			return ResponseEntity.status(200).body(bodyData);
+
+		} catch (Exception e) {
+
+			bodyData.put("statusCancle", statusCancle);
+
+			return ResponseEntity.status(500).body(bodyData);
+
+		}
+
 	}
 
 	@PostMapping("/payment")

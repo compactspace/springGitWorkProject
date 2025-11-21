@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- resultType 는 반드시 정확하게 입력해야함 클래스급으로 오류남 -->
+<mapper namespace="ManageOrderMapper">
+
+<select id="getOrderStatusList" resultMap="orderStatusMap">
+    SELECT * FROM order_status
+</select>
+
+<resultMap id="orderStatusMap" type="OrderStatusVO">
+    <id property="statusId" column="status_id"/>
+    <result property="statusCode" column="status_code"/>
+    <result property="statusName" column="status_name"/>
+    <result property="description" column="description"/>
+    <result property="isFinal" column="is_final"/>
+</resultMap>
+
+
+
+
+
+<select id="findOrdersByFilter" resultType="map">
+    SELECT 
+	oi.order_info_id,
+	oi.order_date,
+	oi.merchant_uid,
+	oi.order_status_id,
+	oi.order_status_comment,
+	op.order_person_id,
+	op.order_info_id,
+	op.name,
+	op.email,
+	op.phone,
+	op.zipcode,
+    op.address,
+    op.address_detail,
+	doi.draft_order_info_id,
+	doi.order_info_id,
+	doi.draft_total_amount,
+	doi.draft_total_quantity,
+	os.status_id,
+	os.status_code,
+	os.status_name,
+	os.description,
+	os.is_final
+    FROM order_info AS oi
+    LEFT JOIN order_person AS op
+        ON oi.order_info_id = op.order_info_id
+    LEFT JOIN draft_order_info AS doi
+        ON oi.order_info_id = doi.order_info_id
+    LEFT JOIN order_status AS os
+        ON oi.order_status_id = os.status_id
+    WHERE oi.order_date BETWEEN #{startOfWeek} AND #{endOfWeek}
+    <if test="statusCode != null and statusCode != ''">
+        AND os.status_code = #{statusCode}
+    </if>
+    ORDER BY oi.order_info_id DESC
+</select>
+
+
+<select id="findOrdersItemByOrderInfoId"  parameterType="String" resultType="Map">
+SELECT * FROM order_item where order_info_id=#{orderInfoId}
+</select>
+
+
+
+
+</mapper>

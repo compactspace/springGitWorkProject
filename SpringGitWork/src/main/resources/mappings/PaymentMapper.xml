@@ -10,4 +10,52 @@
 </insert>
 
 
+
+<select id="findPayInfoByOrderInfoId"   parameterType="String" resultType="Map">
+
+SELECT
+
+-- 주문 항목
+oi.product_name,
+oi.price_per_unit,
+oi.quantity,
+oi.order_item_id,
+oi.order_info_id,
+-- 상품 정보
+p.product_id,
+p.product_info,
+p.file_category,
+p.file_name,
+
+-- 결제 정보 
+pay.payment_id,
+pay.payment_method,
+pay.created_at AS paycreated_at,
+pay.amount AS payamount,
+pay.payment_number,
+pay.imp_uid
+
+FROM
+	order_item AS oi
+INNER JOIN product AS p 
+on
+	oi.product_id = p.product_id
+	
+	
+LEFT JOIN payment AS pay	
+	on oi.order_info_id = pay.order_info_id
+	
+where
+	oi.order_info_id =#{orderInfoId}
+
+</select>
+
+
+<update id="updateProductRefund" parameterType="Map">
+	UPDATE product_refund set status='APPROVED' , refunded_at=now() 
+
+WHERE  order_info_id=#{orderInfoId} and payment_id=#{paymentId}
+</update>
+
+
 </mapper>

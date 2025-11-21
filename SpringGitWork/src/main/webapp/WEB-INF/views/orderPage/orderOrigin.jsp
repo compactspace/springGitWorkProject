@@ -369,75 +369,6 @@ button.back-btn {
 }
 
 
-
-/*재고 경고창 모달 시작  */
-.stock-modal {
-  display:flex;
-  position: fixed; /* 화면 고정 */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* 배경 어두운 색 */
-  z-index: 9999; /* 최상위 */
-  align-items: center;
-  justify-content: center;
-}
-
-.stock-modal-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 5px;
-  width: 60%;
-  max-width: 500px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
-  position: relative;
-}
-
-.stock-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.stock-modal-body {
-  padding: 10px 0;
-}
-
-.stock-modal-footer {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.stock-close-btn {
-  font-size: 24px;
-  cursor: pointer;
-  border: none;
-  background: none;
-}
-
-.stock-btn-primary,
-.stock-btn-secondary {
-  padding: 6px 12px;
-  margin-left: 5px;
-  cursor: pointer;
-  border-radius: 4px;
-  border: none;
-}
-
-.stock-btn-primary {
-  background-color: #007bff;
-  color: #fff;
-}
-
-.stock-btn-secondary {
-  background-color: #6c757d;
-  color: #fff;
-}
-
-/*재고 경고창 모달 종료  */
-
-
 </style>
 
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
@@ -708,32 +639,6 @@ $.ajaxSetup({
 
 
 
-
-<!-- 재고 문제 확인 모달 -->
-<!-- 재고 문제 확인 모달 -->
-<div id="stock-modal" class="stock-modal" style="display: none;">
-  <div class="stock-modal-content">
-    <div class="stock-modal-header">
-      <h5 class="stock-modal-title">재고 알림</h5>
-      <button type="button" class="stock-close-btn" id="stock-modalCloseBtn">&times;</button>
-    </div>
-    <div class="stock-modal-body" id="stock-modalBody">
-      <!-- JS에서 내용 채움 -->
-    </div>
-    <div class="stock-modal-footer">
-      <button type="button" class="stock-btn-secondary" id="stock-modalCancelBtn">아니요</button>
-      <button type="button" class="stock-btn-primary" id="stock-modalConfirmBtn">예</button>
-    </div>
-  </div>
-</div>
-
-
-
-
-
-
-
-
 	<script >
 	
 	
@@ -759,224 +664,70 @@ $.ajaxSetup({
 	    
 	    
 	    
-	    var needsRender = false; // 플래그 초기화
-
+	    
 	    $.ajax({
 	        url: "${pageContext.request.contextPath}/api/users/stock-check",
 	        type: "POST",
 	        contentType: "application/json",
-	        data: JSON.stringify(productQuantityList), // [{productId:1, quantity:3}, ...]
+	        data: JSON.stringify(productQuantityList),   // [{productId:1, quantity:3}, ...]
 	        success: function(res) {
+	     
+	        
+	            console.log("재고 체크 결과:", res);
 
-	            //  console.log("재고 체크 결과:", res);
+		        // cart 업데이트
+		        cart = cart.map(item => {
+		            const stockInfo = res.find(r => r.productId == item.productId);
 
-	            cart = cart.map(item => {
-	                const stockInfo = res.find(r => r.productId == item.productId);
+		            if (!stockInfo) {
+		                return { ...item, status: "SOLDOUT", quantity: 0 };
+		            }
 
-	                if (!stockInfo) {
-	                    // stockInfo가 없다면 상품이 DB에 없는 것, 즉 SOLDOUT 처리
-	                    needsRender = true;
-	                    return { ...item, status: "SOLDOUT", quantity: 0 };
-	                }
+		            if (stockInfo.status === "AVAILABLE") {
+		                return { ...item, status: "AVAILABLE" };
+		            } else if (stockInfo.status === "UNAVAILABLE") {
+		                return { 
+		                    ...item, 
+		                    status: "UNAVAILABLE", 
+		                    quantity: stockInfo.availableQuantity 
+		                };
+		            } else {
+		                return { ...item, status: stockInfo.status };
+		            }
+		        });
+		        // 로컬스토리지에 저장
+		      //  localStorage.setItem("cart", JSON.stringify(cart));
 
-	                if (stockInfo.status === "AVAILABLE") {
-	                    return { ...item, status: "AVAILABLE" };
-	                } else if (stockInfo.status === "UNAVAILABLE") {
-	                    needsRender = true;
-	                    return { 
-	                        ...item, 
-	                        status: "UNAVAILABLE", 
-	                        quantity: stockInfo.availableQuantity 
-	                    };
-	                } else if (stockInfo.status === "SOLDOUT") {
-	                    // SOLDOUT 상태에서도 needsRender를 true로 설정해야 함
-	                    needsRender = true;
-	                    return { ...item, status: "SOLDOUT", quantity: 0 };
-	                } else {
-	                    return { ...item, status: stockInfo.status };
-	                }
-	            });
+		        console.log("업데이트된 cart:", cart);
+		        
 
-	            
-	            
-	            console.log('계산된 카트,', cart);   
-	            
-	            
-	            // 재랜더링 필요 여부 체크
-	            if (needsRender) {
-	            	 // 모달 호출: 재랜더링 함수는 renderCart() 예시
-	                showStockModal(cart, function() {
-	                	totalAmount = 0;
-	                    cart_idarray = [];
-	                    cart_quantityArray = [];
-	                    product_codArray = [];
-	                    renderOrderItem(); // 실제 재랜더링 함수 호출
-	                });
-	                console.log("재고 문제 있음, 재랜더링 필요 함");
-	                
-	                
-	                
-	            } else {
-	                console.log("재고 문제 없음, 재랜더링 필요 없음.");
-	            }
+		        // UI 렌더링 함수 호출 가능
+		        // renderCart(cart);
+	        
+	        	
+	        	
+	        	
+	        /* 	itemResult.put("status", "AVAILABLE");
+	        	itemResult.put("status", "UNAVAILABLE");
+				itemResult.put("availableQuantity", stockQty); /
+				itemResult.put("status", "SOLDOUT");
+				itemResult.put("unAvailableQuantity", 0);
+	        	 */
+	       
+	        	
+	        	
+	        	
+	            console.log("결과:", res);
 	        }
 	    });
+
+	    
+	    
+	    
+	    
+	    
 	}
 
-	/**
-	 * 재고 문제 모달 표시
-	 * @param {Array} cart - 선택된 카트 항목
-	 * @param {Function} onConfirm - "예" 클릭 시 호출되는 함수 (재랜더링)
-	 */
-	function showStockModal(cart, onConfirm) {
-	    var problemItems = [];
-   	 selectedCart = cart.filter(item => !!item && item.selected === true && item.quantity>0);
-   	 
-	    for (var i = 0; i < cart.length; i++) {
-	        var item = selectedCart[i];
-	        
-	        console.log("item,",item);
-	        if (item.status === "UNAVAILABLE" || item.status === "SOLDOUT") {
-	            problemItems.push(item);
-	        }
-	    }
-
-	  //  console.log("problemItems,",problemItems);
-	    
-	    if (problemItems.length === 0) {
-	        console.log("재고 문제 없음, 재랜더링 필요 없음.");
-	        return;
-	    }
-
-	    // 모달 내용 구성
-	    var modalHtml = '<ul>';
-	    for (var j = 0; j < problemItems.length; j++) {
-	        var item = problemItems[j];
-	        if (item.status === "UNAVAILABLE") {
-	            modalHtml += '<li>' + item.productName + ': 요청 수량 초과, 현재 가능 수량 ' + item.quantity + '만 주문 가능</li>';
-	        } else if (item.status === "SOLDOUT") {
-	            modalHtml += '<li>' + item.productName + ': 품절</li>';
-	        }
-	    }
-	    modalHtml += '</ul>';
-	 // 기존 모달 내용 구성 끝난 후
-	    modalHtml += '<p>재고 문제를 확인했습니다.<br>계속 진행하시겠습니까, 아니면 장바구니를 비우시겠습니까?</p>';
-
-
-	    $('#stock-modalBody').html(modalHtml);
-
-	    // 모달 표시
-	    $('#stock-modal').show();
-
-	    // 이벤트 바인딩
-	    $('#stock-modalConfirmBtn').off('click').on('click', function() {
-	        $('#stock-modal').hide();
-	        
-	        
-	        // 선택된 카트 상태 그대로 cart와 로컬스토리지 덮어쓰기
-	        cart = cart.map(function(item) { return { ...item }; });
-	        localStorage.setItem("cart", JSON.stringify(cart));
-	        alert("선택한 재고를 반영합니다."); // 메시지
-	        $('#product-list').empty(); // 기존 항목 삭제        
-	        
-	        
-	       if (typeof onConfirm === 'function') {	    	   
-	    	 updateDraftOrder(cart);
-
-	            onConfirm();    
-	            
-	            
-	            
-	            
-	            
-	        } 
-	        
-	        
-	    });
-
-	    $('#stock-modalCancelBtn, #stock-modalCloseBtn').off('click').on('click', function() {
-	    
-	    	// 먼저 로컬 스토리지를 지운다.	    	
-	    	$.ajax({
-	    		url:"${pageContext.request.contextPath}/api/users/update-draft-status-cancle",
-	    		type:"POST",
-	    		success:function(res){    			
-	    			console.log("-----응답결과----")
-	    			console.log(res)
-	    			console.log("-----응답결과----")
-	    			localStorage.removeItem("cart"); 
-	    			location.replace("${pageContext.request.contextPath}/guest/productlist");	    			
-	    		
-	    		},
-	    		error:function(err){	    			
-	    			
-	    		}
-	    		
-	    		
-	    	})
-	    	
-	    	
-	        $('#stock-modal').hide();
-	    });
-	}
-
-
-	 
-//장후	 
-
-async function updateDraftOrder(cart) {
-    let finallsum = cart.reduce((sum, item) => {
-        let qty = Number(item.quantity) || 0;
-        let price = Number(item.productPrice) || 0;
-        return sum + (qty * price);
-    }, 0);
-
-   /*  console.log("finallsum 계산 결과:", finallsum); */
-
-    let productIds = [];
-    let quantities = [];
-    let pricePerUnit = [];
-    let productNames = [];
-
-    cart.forEach(item => {
-        productIds.push(item.productId);
-        quantities.push(Number(item.quantity) || 0);
-        pricePerUnit.push(Number(item.productPrice) || 0);
-        productNames.push(item.productName);
-    });
-
-  /*   console.log("productIds:", productIds);
-    console.log("quantities:", quantities);
-    console.log("pricePerUnit:", pricePerUnit);
-    console.log("productNames:", productNames); */
-
-    try {
-        const response = await $.ajax({
-            url: "${pageContext.request.contextPath}/api/users/update-draft-order",
-            type: "POST",
-            data: {
-                product_id: productIds,
-                cart_quantity: quantities,
-                pricePerUnit: pricePerUnit,
-                product_name: productNames,
-                finallsum: finallsum
-            },
-            traditional: true
-        });
-        console.log("주문 임시 저장 완료", response);
-    } catch (err) {
-        console.error("저장 실패:", err);
-    }
-}
-
-
-
-
-	
-	
-	
-	
-	
 	
 	
 	
@@ -1206,10 +957,10 @@ async function updateDraftOrder(cart) {
 var cart = JSON.parse(localStorage.getItem("cart") || "[]");
 const $list = $("#product-list");
 let totalAmount = 0;
-var selectedCart = cart.filter(item => !!item && item.selected === true && item.quantity>0);
-var cart_idarray = [];
-var cart_quantityArray = [];
-var product_codArray = [];
+const selectedCart = cart.filter(item => !!item && item.selected === true);
+const cart_idarray = [];
+const cart_quantityArray = [];
+const product_codArray = [];
 renderOrderItem();
 
 /* if (cart.length === 0) {
@@ -1251,13 +1002,8 @@ function renderOrderItem(){
 		    const img = item.productImg.match(/url\(["']?(.*?)["']?\)/);
 		    const imgSrc = img ? img[1] : item.productImg;
 		    const quantity = item.quantity || 1;
-		   console.log("quantity, ",quantity);
-		   
-		    
 		    const price = Number(item.productPrice);
 		    const sum = quantity * price;
-		    console.log("sum: ",sum);
-		    
 		    totalAmount += sum;
 
 		    cart_idarray.push(item.cartId);

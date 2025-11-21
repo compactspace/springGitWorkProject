@@ -12,8 +12,12 @@ public class ProductRefundDTO {
     private LocalDateTime requestedAt; // 환불 요청 시각
     private LocalDateTime refundedAt;  // 실제 환불 완료 시각
     private String processedBy;       // 처리 관리자 ID
+    private Long orderInfoId;
+    
 
-    // Getter / Setter
+    // Getter / Setter   
+    
+    
     public Long getProductRefundId() {
         return productRefundId;
     }
@@ -69,4 +73,12 @@ public class ProductRefundDTO {
     public void setProcessedBy(String processedBy) {
         this.processedBy = processedBy;
     }
+	public Long getOrderInfoId() {
+		return orderInfoId;
+	}
+	public void setOrderInfoId(Long orderInfoId) {
+		this.orderInfoId = orderInfoId;
+	}
+    
+    
 }

@@ -24,5 +24,7 @@ public interface ManageProductService {
     void  saveProduct(ProductVO productVO, MultipartFile img);
 	
     void addProductGroup(ProductGroupVO productGroupVO);
+    
+    List<Map<String, Object>> stockCheck(List<Map<String, Object>> orderItems);
 
 }

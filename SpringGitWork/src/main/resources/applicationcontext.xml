@@ -6,7 +6,9 @@
 	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:aop="http://www.springframework.org/schema/aop"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
@@ -17,6 +19,11 @@
 			expression="com\.spring\.finall\.admin(\..*)?" />
 	</context:component-scan>
 
+
+
+<!--task:annotation-driven 와  helloBatch 둘이 쌍으로 배치 스케쥴러 같은건데 지금 주석처리함 -->
+<!--    <task:annotation-driven/>
+ <bean id="helloBatch" class="com.spring.finall.apiResponseController.HelloBatch"/> -->
 
 	<context:property-placeholder
 		location="classpath:mappings/database.properties" />
