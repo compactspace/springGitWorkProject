@@ -12,6 +12,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.spring.finall.reqDto.deliverRequest.RequestDeliverDTO;
 import com.spring.finall.reqDto.orderRequest.OrderItemDTO;
 import com.spring.finall.reqDto.orderRequest.OrderPersonDTO;
 import com.spring.finall.reqDto.orderRequest.OrderRequestDTO;
@@ -442,4 +443,68 @@ public class OrderServiceDAO {
 		return affectedRow > 0 ? true : false;
 
 	}
+	
+	
+	public void updateStatusToShippingByShipping(List<RequestDeliverDTO> requestList) {
+		
+		Long  orderInfoId =	requestList.get(0).getOrderInfoId();
+		
+		
+		mybatis.update("OrderDAO.updateStatusToShippingByShipping",orderInfoId);
+		
+	}
+	
+	
+	public String getCurrentOrderStatusByOrderInfoId(String orderInfoId){
+	    // selectOne로 단일 결과 조회
+	    String status = mybatis.selectOne("OrderDAO.getCurrentOrderStatusByOrderInfoId", orderInfoId);
+	    return status;
+	}
+
+	
+	public  List<Map<String,Object>>  getInventoryListFindByOrderInfoId(String orderInfoId){
+	    // selectOne로 단일 결과 조회
+	    List<Map<String,Object>> ivList = mybatis.selectList("OrderDAO.getInventoryListFindByOrderInfoId", orderInfoId);
+	    return ivList;
+	}
+
+	
+	public boolean updateInventoryPlusQuantiryByInventoryId(List<Map<String, Object>> ivList) {
+	    boolean allUpdated = true;
+	    
+	    for (Map<String, Object> iv : ivList) {
+	        int updated = mybatis.update(
+	            "ManageinventoryMapper.updateInventoryPlusQuantiryByInventoryId", 
+	            iv
+	        );
+	        
+	        // 업데이트가 1건이 아닌 경우 실패로 처리
+	        if (updated != 1) {
+	            allUpdated = false;
+	        }
+	    }
+	    
+	    return allUpdated;
+	}
+
+	
+	public boolean recodeInventoryLogByRefund(List<Map<String, Object>> ivList) {
+
+	    int inserted = mybatis.insert(
+	        "ManageinventoryMapper.recodeInventoryLogByRefund",
+	        ivList
+	    );
+
+	    return inserted > 0;
+	}
+	public boolean updateShipmentByRefund(List<Map<String, Object>> ivList) {
+	    int totalUpdated = 0;
+	    for (Map<String, Object> item : ivList) {
+	        totalUpdated += mybatis.update("ManageinventoryMapper.updateShipmentByRefund", item);
+	    }
+	    return totalUpdated > 0;
+	}
+
+
+	
 }

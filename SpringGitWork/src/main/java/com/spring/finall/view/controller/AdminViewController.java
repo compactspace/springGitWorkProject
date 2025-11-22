@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,9 +17,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.finall.service.ApplicantDocumentService;
 import com.spring.finall.service.ArtworkService;
+import com.spring.finall.service.ManageInventoryService;
 import com.spring.finall.service.ManageProductService;
 import com.spring.finall.service.OrderService;
 import com.spring.finall.service.ProductRefundService;
+import com.spring.finall.user.InventoryVO;
 import com.spring.finall.user.OrderStatusVO;
 
 @Controller
@@ -39,6 +42,9 @@ public class AdminViewController {
 
 	@Autowired
 	private ManageProductService manageProductService;
+	
+	@Autowired
+	private ManageInventoryService manageInventoryService;
 
 	@GetMapping("/main")
 	public String showMainHome(Model model) {
@@ -81,6 +87,30 @@ public class AdminViewController {
 		return "adminManageOrderListPage/adminManageOrderListPage";
 	}
 
+	
+	//delivery-list
+	
+	@GetMapping("/delivery-list")
+	public String showDeliveryListPage(Model model) throws JsonProcessingException {
+
+		List<OrderStatusVO>	 orderStatusList=orderService.getOrderStatusList();
+		
+		  // 0번과 statusId가 5,6,7인 항목 제거
+	    List<OrderStatusVO> filteredStatusList = orderStatusList.stream()
+	            .skip(1) // 첫 번째 항목 제거
+	            .filter(status -> !(status.getStatusId() == 5 || status.getStatusId() == 6 || status.getStatusId() == 7))
+	            .collect(Collectors.toList());
+
+	    
+	    Map<Long, List<InventoryVO>>  fullInventoryList=	manageInventoryService.getFullInventoryList();
+	    model.addAttribute("fullInventoryList", fullInventoryList);
+	    model.addAttribute("fullInventoryListJson", new ObjectMapper().writeValueAsString(fullInventoryList));
+	    model.addAttribute("orderStatusListJson", new ObjectMapper().writeValueAsString(filteredStatusList));
+	    model.addAttribute("orderStatusList", filteredStatusList);
+		return "adminManageDelivery/adminManageDelivery";
+	}
+	
+	
 	@GetMapping("/login-page") // 실제 요청 경로: /users/login
 	public String showAdminLoginPage(Model model) {		
 		

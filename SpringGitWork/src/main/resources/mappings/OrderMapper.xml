@@ -391,5 +391,56 @@ WHERE order_info_id=#{orderInfoId}
 </update>
 
 
+<update id="updateStatusToShippingByShipping" parameterType="Long">
+	UPDATE
+	order_info
+set
+	status = 'SHIPPING',
+	order_status_id = 4,
+	order_status_comment = '배송중'
+WHERE order_info_id=#{orderInfoId}
+</update>
+
+<select id="getCurrentOrderStatusByOrderInfoId" parameterType="String" resultType="String">
+select status from  order_info where order_info_id=#{orderInfoId};
+</select>
+
+<select id="getInventoryListFindByOrderInfoId" parameterType="String" resultType="Map" >
+
+SELECT 
+
+-- 창고
+wh.name AS name,
+wh.location AS location,
+
+-- 각 창고에 대한 각 보관함의 실제 출고 정보
+shi.Shipment_Item_id  AS  shipmentItemId,
+shi.inventory_id AS inventoryId,
+shi.lot_no AS lotNo,
+shi.product_id AS productId,
+shi.quantity AS quantity,
+
+-- 항목별 정보
+oi.order_item_id AS orderItemId
+
+FROM order_info AS oif
+
+INNER JOIN (SELECT * FROM order_item WHERE order_info_id =#{orderInfoId}) AS oi
+    ON oif.order_info_id = oi.order_info_id
+
+INNER JOIN shipment_item AS shi
+    ON shi.order_item_id = oi.order_item_id
+
+INNER JOIN inventory AS iv
+    ON shi.inventory_id = iv.inventory_id
+
+INNER JOIN warehouse AS wh
+    ON wh.warehouse_id = iv.warehouse_id;
+
+
+</select>
+
+
+
 </mapper>
 

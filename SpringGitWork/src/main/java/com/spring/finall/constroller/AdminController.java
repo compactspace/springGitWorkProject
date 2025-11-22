@@ -40,9 +40,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.spring.finall.apiResponseController.ApiResponse;
 import com.spring.finall.exception.applicantDocumentException.ApplicantDocumentException;
 import com.spring.finall.exception.common.CommonFileException;
+import com.spring.finall.reqDto.deliverRequest.RequestDeliverDTO;
 import com.spring.finall.reqDto.orderRequest.OrderItemDTO;
 import com.spring.finall.reqDto.refundRequest.AfterSuccesPgRefundDTO;
 import com.spring.finall.service.ApplicantDocumentService;
+import com.spring.finall.service.DeliverService;
 import com.spring.finall.service.ManageProductService;
 import com.spring.finall.service.OrderService;
 import com.spring.finall.service.ProductRefundService;
@@ -67,6 +69,9 @@ public class AdminController {
 
 	@Autowired
 	private ManageProductService manageProductService;
+
+	@Autowired
+	private DeliverService deliverService;
 
 	// unread-document-list
 	@GetMapping("/get-unread-document-list") // 실제 요청 경로: /users/login
@@ -282,8 +287,6 @@ public class AdminController {
 
 	}
 
-	
-
 	// order-list
 	@GetMapping("/search-order-list-with-date")
 	@ResponseBody
@@ -437,4 +440,22 @@ public class AdminController {
 		return ResponseEntity.status(200).body(resBodyData);
 	}
 
+	@PostMapping("/delegate-to-deliver")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> requestDeliver(@RequestBody List<RequestDeliverDTO> requestList) {
+
+		Map<String, Object> resBodyData = new HashMap<>();
+		resBodyData.put("success", true);
+		try {
+			deliverService.ShipmentItem(requestList);
+			resBodyData.put("message", "실물 배송이 이루어 졌으며 실물 재고가 창고별로 업데이트 되었습니다.");
+			return ResponseEntity.status(200).body(resBodyData);
+		} catch (Exception e) {
+			resBodyData.put("success", false);
+			resBodyData.put("message", "실물 배송이 이루어 졌으며 실물 재고가 창고별로 업데이트 되었습니다.");
+			return ResponseEntity.status(500).body(resBodyData);
+
+		}
+
+	}
 }

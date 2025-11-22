@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- resultType 는 반드시 정확하게 입력해야함 클래스급으로 오류남 -->
+<mapper namespace="ManageinventoryMapper">
+
+ <resultMap id="inventoryResultMap" type="com.spring.finall.user.InventoryVO">
+    <!-- Inventory 기본 필드 -->
+    <id property="inventoryId" column="inventory_id"/>
+    <result property="productId" column="product_id"/>
+    <result property="warehouseId" column="warehouse_id"/>
+    <result property="lotNo" column="lot_no"/>
+    <result property="quantity" column="quantity"/>
+    <result property="reservedQuantity" column="reserved_quantity"/>
+    <result property="expireDate" column="expire_date"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+
+    <!-- 🔥 조인된 WarehouseVO 객체 매핑 -->
+    <association property="warehouse" javaType="com.spring.finall.user.WarehouseVO">
+        <id property="warehouseId" column="w_warehouse_id"/>
+        <result property="name" column="w_name"/>
+        <result property="location" column="w_location"/>
+        <result property="createdAt" column="w_created_at"/>
+        <result property="updatedAt" column="w_updated_at"/>
+    </association>
+</resultMap>
+
+
+<select id="getFullinventory" resultMap="inventoryResultMap">
+    SELECT
+        -- Inventory
+        i.inventory_id,
+        i.product_id,
+        i.warehouse_id,
+        i.lot_no,
+        i.quantity,
+        i.reserved_quantity,
+        i.expire_date,
+        i.created_at,
+        i.updated_at,
+
+        -- Warehouse (alias 붙이기!)
+        w.warehouse_id AS w_warehouse_id,
+        w.name         AS w_name,
+        w.location     AS w_location,
+        w.created_at   AS w_created_at,
+        w.updated_at   AS w_updated_at
+
+    FROM inventory i
+    INNER JOIN warehouse w
+        ON i.warehouse_id = w.warehouse_id
+</select>
+
+
+
+<update id="updateInventoryQuantiryByInventoryId">
+update inventory set quantity=quantity-#{warehouseByQuantity} where inventory_id= #{inventoryId}
+
+</update>
+
+<insert id="recodeInventoryLogByShipmentItem" parameterType="java.util.List">
+    insert into inventory_log (inventory_id, change_qty, type, order_item_id)
+    values
+    <foreach collection="list" item="item" separator=",">
+        (#{item.inventoryId}, #{item.warehouseByQuantity}, 'OUT', #{item.orderItemId})
+    </foreach>
+</insert>
+
+<insert id="insertShipmentByShipmentItem" parameterType="java.util.List">
+   insert into Shipment_Item (order_item_id, inventory_id, product_id, quantity, lot_no, status) values
+    <foreach collection="list" item="item" separator=",">
+       (#{item.orderItemId}, #{item.inventoryId}, #{item.productId}, #{item.warehouseByQuantity}, #{item.lotNo}, 'Shipping')
+    </foreach>
+</insert>
+
+
+<update id="updateInventoryPlusQuantiryByInventoryId">
+update inventory set quantity=quantity+#{quantity} where inventory_id= #{inventoryId}
+
+</update>
+
+
+<insert id="recodeInventoryLogByRefund" parameterType="java.util.List">
+    INSERT INTO inventory_log (inventory_id, change_qty, type, order_item_id)
+    VALUES
+    <foreach collection="list" item="item" separator=",">
+        (#{item.inventoryId}, #{item.quantity}, 'REFUND', #{item.orderItemId})
+    </foreach>
+</insert>
+
+
+<update id="updateShipmentByRefund" parameterType="map">
+    UPDATE shipment_item
+    SET status = 'Refunded'
+    WHERE shipment_item_id = #{shipmentItemId}
+</update>
+
+
+
+
+
+</mapper>

@@ -266,7 +266,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public Map<String, Object> findOrdersDetailByOrderInfoId(String orderInfoId) {
 
-		//이건 추구 고민해보고 지워라	
+		// 이건 추구 고민해보고 지워라
 		List<Map<String, Object>> orderItemListte = orderServiceDAO.findOrdersItemByOrderInfoId(orderInfoId);
 
 		Map<String, Object> obj = orderServiceDAO.findPayInfoByOrderInfoId(orderInfoId);
@@ -291,9 +291,27 @@ public class OrderServiceImpl implements OrderService {
 			List<OrderItemDTO> orderList) {
 
 		try {
+			
+
+			String currentOrderStatus = orderServiceDAO.getCurrentOrderStatusByOrderInfoId(orderInfoId);
+			if (currentOrderStatus.equals("SHIPPING")) {
+				List<Map<String, Object>> ivList = orderServiceDAO.getInventoryListFindByOrderInfoId(orderInfoId);
+				
+				
+				orderServiceDAO.updateInventoryPlusQuantiryByInventoryId(ivList);
+				
+				orderServiceDAO.recodeInventoryLogByRefund(ivList);
+				
+				orderServiceDAO.updateShipmentByRefund(ivList);	
+				
+				
+			}
 			orderServiceDAO.approveForReqeustClientPayCancel(orderInfoId);
 			paymentServiceDAO.updateProductRefund(orderInfoId, paymentId);
 			orderServiceDAO.updateStockByOrderItemsQuantityCausePayCancel(orderList);
+			
+			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

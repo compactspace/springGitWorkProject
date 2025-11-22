@@ -28,6 +28,10 @@
 <typeAlias type="com.spring.finall.user.ProductPriceHistoryVO"
 			alias="ProductPriceHistoryVO" />
 
+<typeAlias type="com.spring.finall.user.InventoryVO" alias="InventoryVO" />
+<typeAlias type="com.spring.finall.user.InventoryLogVO" alias="InventoryLogVO" />
+<typeAlias type="com.spring.finall.user.ShipmentItemVO" alias="ShipmentItemVO" />
+<typeAlias type="com.spring.finall.user.WarehouseVO" alias="WarehouseVO" />
 
 
 
@@ -67,6 +71,9 @@
 			type="com.spring.finall.reqDto.refundRequest.ProductRefundDTO"
 			alias="ProductRefundDTO" />
 
+	<typeAlias
+			type="com.spring.finall.reqDto.deliverRequest.RequestDeliverDTO"
+			alias="RequestDeliverDTO" />
 
 
 
@@ -137,6 +144,7 @@
 <mapper resource="mappings/ApplicantDocuments.xml" />
 <mapper resource="mappings/ManageProductMapper.xml" />
 <mapper resource="mappings/ManageOrderMapper.xml" />
+<mapper resource="mappings/ManageinventoryMapper.xml" />
 
 	</mappers>
 

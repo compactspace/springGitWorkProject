@@ -28,7 +28,7 @@ var titleMenu = [
     
     { name: "주문 관리", prefix: "admin-user", url: "${pageContext.request.contextPath}/admin/user", children: [
         { name: "주문 목록", prefix: "order-list", url: "${pageContext.request.contextPath}/admin/order-list" },
-        { name: "권한 관리", prefix: "user-role", url: "${pageContext.request.contextPath}/admin/user/user-role" },
+        { name: "배송 관리", prefix: "delivery-list", url: "${pageContext.request.contextPath}/admin/delivery-list" },
         { name: "활동 로그", prefix: "user-log", url: "${pageContext.request.contextPath}/admin/user/user-log" }
     ] }
     ,
