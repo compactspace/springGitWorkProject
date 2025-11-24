@@ -2,8 +2,11 @@ package com.spring.finall.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,9 @@ public class ManageProductServiceImpl implements ManageProductService {
 
 	@Autowired
 	private ManageProductServiceDAO manageProductServiceDAO;
+
+	@Autowired
+	private ManageInventoryServiceDAO manageInventoryServiceDAO;
 
 	@Override
 	public List<Map<String, Object>> getProductCode() {
@@ -45,9 +51,10 @@ public class ManageProductServiceImpl implements ManageProductService {
 
 	@Override
 	@Transactional
-	public void saveProduct(ProductVO productVO, MultipartFile img) {
+	public void saveProduct(ProductVO productVO, MultipartFile img, List<Long> warehouseIds,
+			Map<String, Integer> quantityMap) {
 		String savedFilePath = null;
-		try {			
+		try {
 
 			String alreadyExsistProduct = manageProductServiceDAO.alreadyExsistProduct(productVO.getProduct_name());
 			if (alreadyExsistProduct != null) {
@@ -64,10 +71,9 @@ public class ManageProductServiceImpl implements ManageProductService {
 			savedFilePath = uploadProductImage(img, productVO);
 			productVO.setProduct_file_path(savedFilePath);
 
-			
 			ProductPriceHistoryVO productPriceHistoryVO = new ProductPriceHistoryVO();
-		
-			int newPrice=productVO.getProduct_price();
+
+			int newPrice = productVO.getProduct_price();
 			// 첫 삽입은 0 으로한다. 조회 조건이 스냅샷이기 때문에 상품의 등록시 첫 가격은 0 으로
 			productVO.setProduct_price(0);
 			// DB 저장
@@ -77,10 +83,22 @@ public class ManageProductServiceImpl implements ManageProductService {
 			productPriceHistoryVO.setNewPrice(newPrice);
 			// 스냅샷으로 저장한다. 조회 조건이니깐
 			manageProductServiceDAO.insertProductPriceHistory(productPriceHistoryVO);
-			
-			
-			
 
+			// 이제 인벤토리 와, 인벤토리_로그 테이블 인설트를 진행
+			// 주의사항
+			// 지금근 새로운 제품의 최초 입고이기에 인설트한 프로덕트_id를 가져온다.
+			// lotNo 는 창고별로 유일해야하기에, 어음 DAO에서 반복문에서 돌리면서 걍 당해로 가봐라
+			int generatedgetProductId = productVO.getProduct_id();
+
+			List<Long> generatedInventoryIdList = manageInventoryServiceDAO.createInventory(generatedgetProductId,warehouseIds, quantityMap);
+			
+			
+			
+			
+			List<Long> generatedInventoryLogIdList =manageInventoryServiceDAO.recordInventoryLogByCreateInventory(generatedInventoryIdList, warehouseIds, quantityMap);
+		
+			
+			
 		} catch (CommonFileException cfe) {
 			ManageProductException manageProductException = new ManageProductException(
 					cfe.getBussinessExceptionMessage(), cfe.getBussinessCode());
@@ -96,12 +114,11 @@ public class ManageProductServiceImpl implements ManageProductService {
 		}
 	}
 
-	public String uploadProductImage( MultipartFile img, ProductVO productVO) {
+	public String uploadProductImage(MultipartFile img, ProductVO productVO) {
 		String savedFilePath = null;
-	
+
 		try {
-		
-			
+
 			String uploadPath = "C:/upload/product/" + productVO.getProduct_group() + "/";
 
 			// 2️⃣ 폴더 없으면 생성
@@ -193,22 +210,19 @@ public class ManageProductServiceImpl implements ManageProductService {
 				ManageProductException manageProductException = new ManageProductException("이미 존재하는 상품 그룹입니다.", 4001);
 				throw manageProductException;
 			}
-			
-			
+
 			boolean insertStatus = manageProductServiceDAO.addProductGroup(productGroupVO);
-			if(!insertStatus) {
-				
+			if (!insertStatus) {
+
 				ManageProductException manageProductException = new ManageProductException("DB에 인설트하다가 실패", 4001);
 				throw manageProductException;
 			}
-			
-			
 
 		} catch (Exception e) {
-			
-			ManageProductException manageProductException = new ManageProductException("서버상의 코드문제 혹은 DB접근시 문제가 예상됩니다.", 5001);
+
+			ManageProductException manageProductException = new ManageProductException("서버상의 코드문제 혹은 DB접근시 문제가 예상됩니다.",
+					5001);
 			throw manageProductException;
-			
 
 		}
 

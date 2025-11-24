@@ -23,6 +23,7 @@ import com.spring.finall.service.OrderService;
 import com.spring.finall.service.ProductRefundService;
 import com.spring.finall.user.InventoryVO;
 import com.spring.finall.user.OrderStatusVO;
+import com.spring.finall.user.WarehouseVO;
 
 @Controller
 @RequestMapping("/admin")
@@ -46,6 +47,9 @@ public class AdminViewController {
 	@Autowired
 	private ManageInventoryService manageInventoryService;
 
+	
+	
+	
 	@GetMapping("/main")
 	public String showMainHome(Model model) {
 
@@ -153,9 +157,9 @@ public class AdminViewController {
 	public String showgAdProductPage(Model model) {
 
 		List<Map<String, Object>> productCodeList = manageProductService.getProductCode();
-
+		List<WarehouseVO> wareHouseList = manageInventoryService.getWarehouseList();
 		model.addAttribute("productCodeList", productCodeList);
-
+		model.addAttribute("wareHouseList", wareHouseList);
 		return "adminManageAdProductPage/adminManageAdProductPage"; // 뷰리졸버에 의해
 																	// /WEB-INF/views/login.jsp로 매핑됨
 

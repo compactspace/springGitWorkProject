@@ -134,24 +134,6 @@ $(document).ready(function () {
         $("#groupAddModal").fadeOut(200);
     });
 
-    
-    $("input[name='warehouse_id']").on("change", function() {
-        const warehouseId = $(this).val();
-        const qtyDiv = $("#warehouseQty_" + warehouseId);
-
-        if ($(this).is(":checked")) {
-            qtyDiv.show();
-        } else {
-            qtyDiv.hide();
-            qtyDiv.find("input").val(""); // 입력값 초기화
-        }
-    });
-
-    
-    
-    
-    
-    
     // ----------------------
     // 그룹 추가 AJAX
     // ----------------------
@@ -248,29 +230,25 @@ $(document).ready(function () {
    
 
    const formData = new FormData();
+
    // 상품 데이터 수집
    formData.append("group_id", $("#productGroupSelect").val());
    formData.append("product_group",product_group);
    formData.append("product_name", $("#productName").val());
    formData.append("product_price", $("#productPrice").val());
-   formData.append("online_product_quantity", $("#productQuantity").val());
+   formData.append("product_quantity", $("#productQuantity").val());
    formData.append("product_info", $("#productInfo").val());
-   
-   
-// 체크된 창고와 재고 수량
-checkedWarehouses.forEach(function(warehouseId) {
-    var qty = $("input[name='product_quantity_" + warehouseId + "']").val() || 0;
-
-    formData.append("warehouse_id[]", warehouseId);
-    formData.append("product_quantity[" + warehouseId + "]", qty);
-
-    console.log("창고 " + warehouseId + " 재고 = " + qty);
-});
 
    
    
    
-
+   
+   
+// 선택된 창고 추가
+   checkedWarehouses.forEach((warehouseId, index) => {
+       formData.append("warehouse_id[" + index + "]", warehouseId);
+       console.log(`창고 ${index + 1}: id=${warehouseId}`);
+   });
 
    // FormData 전체 내용 확인
    console.log("FormData 전체 확인:");
@@ -285,7 +263,7 @@ checkedWarehouses.forEach(function(warehouseId) {
        formData.append("product_img", fileInput);
    }
    
-     $.ajax({
+/*       $.ajax({
        url: contextPath + "/api/admin/add-product",
        type: "POST",
        data: formData,
@@ -313,8 +291,7 @@ checkedWarehouses.forEach(function(warehouseId) {
        error: function () {
            alert("서버 오류 발생");
        }
-   });  
-     
+   });  */
    
    
    
@@ -378,26 +355,16 @@ checkedWarehouses.forEach(function(warehouseId) {
 <div class="select-box-wrapper">
     <label class="select-label">창고 선택</label>
     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    
         <c:forEach var="warehouse" items="${wareHouseList}">
-            <!-- 체크박스 -->
             <label>
                 <input type="checkbox" name="warehouse_id" value="${warehouse.warehouseId}" />
                 ${warehouse.name}-${warehouse.warehouseId}
             </label>
-
-            <!-- 재고 입력 필드, 처음에는 숨김 -->
-            <div class="select-box-wrapper warehouse-qty-wrapper" 
-                 id="warehouseQty_${warehouse.warehouseId}" 
-                 style="display:none; margin-bottom:10px;">
-                <label class="select-label">${warehouse.name} 재고 수량</label>
-                <input type="number" 
-                       name="product_quantity_${warehouse.warehouseId}" 
-                       class="styled-select" 
-                       placeholder="${warehouse.name} 재고 수량 입력" />
-            </div>
         </c:forEach>
     </div>
 </div>
+
 
 
 

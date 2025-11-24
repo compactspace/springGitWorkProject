@@ -21,7 +21,7 @@ public interface ManageProductService {
     void updateProductStatus(int productId, String status);
     
     
-    void  saveProduct(ProductVO productVO, MultipartFile img);
+    void  saveProduct(ProductVO productVO, MultipartFile img,	List<Long> warehouseIds,Map<String, Integer> quantityMap);
 	
     void addProductGroup(ProductGroupVO productGroupVO);
     

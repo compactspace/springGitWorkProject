@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.spring.finall.service.ManageInventoryService;
 import com.spring.finall.user.InventoryVO;
+import com.spring.finall.user.WarehouseVO;
 
 @Service
 public class ManageInventoryServiceImpl implements ManageInventoryService{
@@ -20,6 +21,13 @@ public class ManageInventoryServiceImpl implements ManageInventoryService{
 	public Map<Long, List<InventoryVO>> getFullInventoryList() {
 		// TODO Auto-generated method stub
 		return manageInventoryServiceDAO.getFullInventoryList();
+	}
+
+
+	@Override
+	public List<WarehouseVO> getWarehouseList() {
+		// TODO Auto-generated method stub
+		return manageInventoryServiceDAO.getWarehouseList();
 	}
 
 }

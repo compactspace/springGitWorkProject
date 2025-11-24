@@ -308,7 +308,7 @@ html, body {
 	        htmlTag += '<div class="product-table-row" data-idx="' + i + '" data-product_id="' + item.product_id + '">';
 	        htmlTag += '<div class="product-col col-id">' + item.product_id + '</div>';
 	        htmlTag += '<div class="product-col col-name">' + item.product_name + '</div>';
-	        htmlTag += '<div class="product-col col-price">' + item.product_price + '</div>';
+	        htmlTag += '<div class="product-col col-price">' + item.new_price + '</div>';
 	        htmlTag += '<div class="product-col col-status">' + item.product_status + '</div>';
 	        htmlTag += '</div>';
 	    }

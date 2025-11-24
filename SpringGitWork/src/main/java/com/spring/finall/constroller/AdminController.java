@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +46,7 @@ import com.spring.finall.reqDto.orderRequest.OrderItemDTO;
 import com.spring.finall.reqDto.refundRequest.AfterSuccesPgRefundDTO;
 import com.spring.finall.service.ApplicantDocumentService;
 import com.spring.finall.service.DeliverService;
+import com.spring.finall.service.ManageInventoryService;
 import com.spring.finall.service.ManageProductService;
 import com.spring.finall.service.OrderService;
 import com.spring.finall.service.ProductRefundService;
@@ -69,6 +71,10 @@ public class AdminController {
 
 	@Autowired
 	private ManageProductService manageProductService;
+	
+	@Autowired
+	private ManageInventoryService manageInventoryService;
+	
 
 	@Autowired
 	private DeliverService deliverService;
@@ -219,9 +225,14 @@ public class AdminController {
 	public ResponseEntity<ApiResponse<Map<String, Object>>> addProduct(@RequestParam("group_id") int groupId,
 			@RequestParam("product_group") String product_group, @RequestParam("product_name") String name,
 			@RequestParam("product_price") int price,
-			@RequestParam(value = "product_quantity", required = false, defaultValue = "0") int qty,
+			@RequestParam(value = "online_product_quantity", required = false, defaultValue = "0") int online_product_quantity,
 			@RequestParam(value = "product_info", required = false) String info,
-			@RequestParam(value = "product_img", required = false) MultipartFile img) {
+			@RequestParam(value = "product_img", required = false) MultipartFile img,
+			// 🔹 추가된 부분 (창고 ID 리스트)
+	        @RequestParam(value = "warehouse_id[]", required = false) List<Long> warehouseIds,
+
+	        // 🔹 창고별 수량 Map (product_quantity[창고ID] 형태로 들어옴)
+	        @RequestParam Map<String, String> allParams  ) {
 		Map<String, Object> resBodyData = new HashMap<>();
 
 		ApiResponse<Map<String, Object>> apiRes = null;
@@ -233,10 +244,48 @@ public class AdminController {
 			productVO.setGroup_id(groupId);
 			productVO.setProduct_name(name);
 			productVO.setProduct_price(price);
-			productVO.setProduct_quantity(qty);
+			productVO.setProduct_quantity(online_product_quantity);
 			productVO.setProduct_info(info);
+			
+			
+		
+			
 
-			manageProductService.saveProduct(productVO, img);
+			  // 🔹 창고별 수량만 추출
+			  // 🔹 창고별 수량 Map 생성
+		    Map<String, Integer> quantityMap = new HashMap<>();
+
+		    Iterator<Map.Entry<String, String>> it = allParams.entrySet().iterator();
+		    while (it.hasNext()) {
+		        Map.Entry<String, String> entry = it.next();
+		        String key = entry.getKey();
+
+		        if (key.startsWith("product_quantity[")) {
+		            // [] 안의 값이 창고ID
+		            String warehouseId = key.substring("product_quantity[".length(), key.length() - 1);
+		            String valueStr = entry.getValue();
+
+		            // 안전하게 Integer 변환
+		            int quantity = 0;
+		            if (valueStr != null && !valueStr.isEmpty()) {
+		                try {
+		                    quantity = Integer.parseInt(valueStr);
+		                } catch (NumberFormatException e) {
+		                    System.out.println("Invalid quantity for warehouse " + warehouseId + ": " + valueStr);
+		                }
+		            }
+
+		            quantityMap.put(warehouseId, quantity);
+		        } else {
+		            // 🔹 나머지 키는 제거
+		            it.remove();
+		        }
+		    }
+		
+			
+			
+			
+		 manageProductService.saveProduct(productVO, img,	 warehouseIds, quantityMap); 
 			resBodyData.put("success", true);
 
 			apiRes = ApiResponse.<Map<String, Object>>builder().code(201).success(true).message("상품을 등록하였습니다.")

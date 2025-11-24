@@ -97,7 +97,40 @@ update inventory set quantity=quantity+#{quantity} where inventory_id= #{invento
 </update>
 
 
+<select id="getWarehouseList" resultType="com.spring.finall.user.WarehouseVO">
 
+
+SELECT 
+    warehouse_id     AS warehouseId,
+    name             AS name,
+    location         AS location,
+    created_at       AS createdAt,
+    updated_at       AS updatedAt
+FROM warehouse;
+
+</select>
+
+
+<insert id="createInventory"
+        useGeneratedKeys="true"
+        keyProperty="inventoryId"
+        keyColumn="inventory_id">
+
+    INSERT INTO inventory
+    (product_id, warehouse_id, lot_no,quantity)
+    VALUES
+    (#{productId}, #{warehouseId},#{lotNo} ,#{quantity})
+
+</insert>
+
+<insert id="recordInventoryLogByCreateInventory"
+useGeneratedKeys="true"
+        keyProperty="inventoryLogId"
+        keyColumn="inventory_log_id"
+>
+insert into inventory_log (inventory_id,change_qty,type,note) values(#{inventoryId},#{quantity},'IN','당해 창고 첫상품 자체가등록됨')
+
+</insert>
 
 
 </mapper>
