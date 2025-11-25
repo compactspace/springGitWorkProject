@@ -28,21 +28,21 @@ var titleMenu = [
     
     { name: "주문 관리", prefix: "admin-user", url: "${pageContext.request.contextPath}/admin/user", children: [
         { name: "주문 목록", prefix: "order-list", url: "${pageContext.request.contextPath}/admin/order-list" },
-        { name: "배송 관리", prefix: "delivery-list", url: "${pageContext.request.contextPath}/admin/delivery-list" },
-        { name: "활동 로그", prefix: "user-log", url: "${pageContext.request.contextPath}/admin/user/user-log" }
+        { name: "배송 관리", prefix: "delivery-list", url: "${pageContext.request.contextPath}/admin/delivery-list" }
+       /*  ,{ name: "활동 로그", prefix: "user-log", url: "${pageContext.request.contextPath}/admin/user/user-log" } */
     ] }
     ,
-    { name: "Admin 기업 사용자 관리", prefix: "admin-user", url: "${pageContext.request.contextPath}/admin/user", children: [
+    /* { name: "Admin 기업 사용자 관리", prefix: "admin-user", url: "${pageContext.request.contextPath}/admin/user", children: [
         { name: "기업-사용자 목록", prefix: "user-list", url: "${pageContext.request.contextPath}/admin/user/user-list" },
         { name: "권한 관리", prefix: "user-role", url: "${pageContext.request.contextPath}/admin/user/user-role" },
         { name: "활동 로그", prefix: "user-log", url: "${pageContext.request.contextPath}/admin/user/user-log" }
     ] }
-    ,
+    , */
     
     { name: "사용자 관리", prefix: "admin-user", url: "${pageContext.request.contextPath}/admin/user", children: [
         { name: "사용자 목록", prefix: "user-list", url: "${pageContext.request.contextPath}/admin/user-list" },
-        { name: "권한 관리", prefix: "user-role", url: "${pageContext.request.contextPath}/admin/user/user-role" },
-        { name: "활동 로그", prefix: "user-log", url: "${pageContext.request.contextPath}/admin/user/user-log" }
+      /*   { name: "권한 관리", prefix: "user-role", url: "${pageContext.request.contextPath}/admin/user/user-role" },
+        { name: "활동 로그", prefix: "user-log", url: "${pageContext.request.contextPath}/admin/user/user-log" } */
     ] }
     
     
@@ -50,8 +50,9 @@ var titleMenu = [
     { name: "신청서류 관리", prefix: "admin-user", url: "${pageContext.request.contextPath}/admin/user", children: [
         { name: "미처리 서류", prefix: "unread-document-list", url: "${pageContext.request.contextPath}/admin/unread-document-list" },
         { name: "처리된 서류 관리", prefix: "readed-document-list", url: "${pageContext.request.contextPath}/admin/readed-document-list" }
-    ] },
-    { name: "Admin 시스템 설정", prefix: "admin-settings", url: "${pageContext.request.contextPath}/admin/settings", children: [
+    ] }
+    ,
+/*     { name: "Admin 시스템 설정", prefix: "admin-settings", url: "${pageContext.request.contextPath}/admin/settings", children: [
         { name: "일반 설정", prefix: "settings-general", url: "${pageContext.request.contextPath}/admin/settings/settings-general" },
         { name: "보안 설정", prefix: "settings-security", url: "${pageContext.request.contextPath}/admin/settings/settings-security" }
     ] },
@@ -59,14 +60,15 @@ var titleMenu = [
         { name: "사용자 통계", prefix: "stats-user", url: "${pageContext.request.contextPath}/admin/stats/stats-user" },
         { name: "시스템 통계", prefix: "stats-system", url: "${pageContext.request.contextPath}/admin/stats/stats-system" }
     ] }
-    ,
+    , */
     { name: "상품관리", prefix: "admin-stats", url: "${pageContext.request.contextPath}/admin/stats", children: [
     	{ name: "상품 등록", prefix: "add-product", url: "${pageContext.request.contextPath}/admin/add-product" },
-        { name: "상품 홈페이지 노출 관리", prefix: "active-product-list", url: "${pageContext.request.contextPath}/admin/active-product-list" },
-        { name: "시스템 통계", prefix: "stats-system", url: "${pageContext.request.contextPath}/admin/stats/stats-system" }
+        { name: "상품 홈페이지 노출 관리", prefix: "active-product-list", url: "${pageContext.request.contextPath}/admin/active-product-list" }
+    	//,{ name: "시스템 통계", prefix: "stats-system", url: "${pageContext.request.contextPath}/admin/stats/stats-system" }
     ] }
   
 ];
+
 
 // ✅ 메뉴 HTML 생성 함수
 function createMenuHTML(menuArray, currentParam) {

@@ -11,7 +11,8 @@
 <link rel="stylesheet"
 	href="https://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css"
 	type="text/css" />
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
 
 <meta charset="UTF-8">
@@ -196,9 +197,25 @@ window.onload = function(){
 						<span>이번주 주문:</span> <span class="summary-number">${ordersSummary.weekOrders}</span>
 					</div>
 				</div>
+
+
+
+				<!-- 추가 카드 예시: 반품 신청 -->
+				<div class="summary-card">
+					<h2>환불신청 요약</h2>
+					<div class="summary-row" onclick="goTodayRefunds()">
+						<span>오늘 환불신청:</span> <span class="summary-number">${productSummary.todayProductRefund}</span>
+					</div>
+					<div class="summary-row" onclick="goWeekRefunds()">
+						<span>이번주 환불신청:</span> <span class="summary-number">${productSummary.weekProductRefund}</span>
+					</div>
+				</div>
+
+
+
 				<script>
 
-var url = contextPath + "/admin/order-list-by-postmapping";
+const url = contextPath + "/admin/order-list-by-postmapping";
 
 // 오늘 00:00:00
 function getTodayDate() {
@@ -222,6 +239,10 @@ function getTomorrowDate() {
 
 
 function goTodayOrders() {
+	
+	alert(url);
+	
+	
     var start = getTodayDate();
     var end = getTomorrowDate();
 
@@ -256,22 +277,95 @@ function goWeekOrders() {
     document.body.appendChild(form);
     form.submit();
 }
+
+
+
+
+function goTodayRefunds() {
+    var form = document.createElement("form");
+    form.method = "POST";
+    form.action = url;
+
+    var start = getTodayDate();
+    var end = getTomorrowDate();
+    var token = $("meta[name='_csrf']").attr("content");
+
+    // 안전하게 input 추가
+    var fields = [
+        {name: "startDate", value: start},
+        {name: "endDate", value: end},
+        {name: "status", value: "RefundRequested"},
+        {name: "_csrf", value: token}
+    ];
+    
+    fields.forEach(function(f){
+        var input = document.createElement("input");
+        input.type = "hidden";
+        input.name = f.name;
+        input.value = f.value;
+        form.appendChild(input);    
+       
+    });
+
+  
+    document.body.appendChild(form);
+
+  
+
+    form.submit();
+}
+
+
+// 이번주 주문 (startDate, endDate = null → 전체 검색)
+function goWeekRefunds() {
+    var form = document.createElement("form");
+    form.method = "POST";
+    form.action = url;
+
+    var token = $("meta[name='_csrf']").attr("content");
+
+    // 안전하게 input 추가
+    var fields = [
+        {name: "status", value: "RefundRequested"},
+        {name: "_csrf", value: token}
+    ];
+
+    fields.forEach(function(f){
+        var input = document.createElement("input");
+        input.type = "hidden";
+        input.name = f.name;
+        input.value = f.value;
+        form.appendChild(input);
+      
+    });
+
+    document.body.appendChild(form);
+
+  
+
+    form.submit();
+}
+
+
 </script>
 
 
-				<!-- 추가 카드 예시: 반품 신청 -->
+
+
+
 				<div class="summary-card">
-					<h2>환불 요약</h2>
-					<div class="summary-row" onclick="goTodayRefunds()">
-						<span>오늘 환불:</span> <span class="summary-number">${productSummary.todayProductRefund}</span>
+					<h2>미처리 신청서류 요약</h2>
+					<div class="summary-row" onclick="goTodayUnread()">
+						<span>오늘 미처리 신청건:</span> <span class="summary-number">${applicantSummary.todayApplicantDocuments}</span>
 					</div>
-					<div class="summary-row" onclick="goWeekRefunds()">
-						<span>이번주 환불:</span> <span class="summary-number">${productSummary.weekProductRefund}</span>
+					<div class="summary-row" onclick="goWeekUnread()">
+						<span>이번주 미처리 신청건:</span> <span class="summary-number">${applicantSummary.weekApplicantDocuments}</span>
 					</div>
 				</div>
-<script>
 
-var url = contextPath + "/admin/unread-document-list-by-postmapping";
+				<script>
+
+const unreadUrl = contextPath + "/admin/unread-document-list-by-postmapping";
 
 // 오늘 00:00:00
 function getTodayDate() {
@@ -293,13 +387,13 @@ function getTomorrowDate() {
 
 
 
-function goTodayRefunds() {
+ function goTodayUnread() {
     var start = getTodayDate();
     var end = getTomorrowDate();
 
     var form = document.createElement("form");
     form.method = "POST";
-    form.action = url;
+    form.action = unreadUrl;
 
     var token = $("meta[name='_csrf']").attr("content");
 
@@ -314,10 +408,10 @@ function goTodayRefunds() {
 }
 
 // 이번주 주문 (startDate, endDate = null → 전체 검색)
-function goWeekRefunds() {
+function goWeekUnread() {
     var form = document.createElement("form");
     form.method = "POST";
-    form.action = url;
+    form.action = unreadUrl;
 
     var token = $("meta[name='_csrf']").attr("content");
 
@@ -326,23 +420,25 @@ function goWeekRefunds() {
 
     document.body.appendChild(form);
     form.submit();
-}
+} 
 </script>
 
 
-				<div class="summary-card"
-					onclick="location.href='${contextPath}/admin/returns'">
-					<h2>신청서류 요약</h2>
-					<div class="summary-row">
-						<span>오늘 신청건:</span> <span class="summary-number">${applicantSummary.todayApplicantDocuments}</span>
-					</div>
-					<div class="summary-row">
-						<span>이번주 신청건:</span> <span class="summary-number">${applicantSummary.weekApplicantDocuments}</span>
-					</div>
-				</div>
 
 
-				<div class="summary-card"
+
+
+
+
+
+
+
+
+
+
+
+
+				<%--	<div class="summary-card"
 					onclick="location.href='${contextPath}/admin/returns'">
 					<h2>게시물 등록 요약</h2>
 					<div class="summary-row">
@@ -351,7 +447,7 @@ function goWeekRefunds() {
 					<div class="summary-row">
 						<span>이번주 등록건:</span> <span class="summary-number">${artWorkSummary.weekArtWork}</span>
 					</div>
-				</div>
+				</div> --%>
 
 				<!-- 추가 카드 예시: 에러 로그 -->
 				<%--  <div class="summary-card" onclick="location.href='${contextPath}/admin/errorLogs'">

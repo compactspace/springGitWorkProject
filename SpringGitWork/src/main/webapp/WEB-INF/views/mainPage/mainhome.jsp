@@ -827,7 +827,7 @@ const topTenOnedayclassComponentLoad = () => {
 <body style="height: 100vh;">
 	<div class="allwrapper">
 	
-	<button id="testBtn" >서버 오류 테스트</button>
+	<!-- <button id="testBtn" >서버 오류 테스트</button> -->
 <%-- 	 <img src="${pageContext.request.contextPath}/resources/cmd/dot.bmp">
 <script src="${pageContext.request.contextPath}/resources/cmd/dot.bmp"></script> --%>
 
