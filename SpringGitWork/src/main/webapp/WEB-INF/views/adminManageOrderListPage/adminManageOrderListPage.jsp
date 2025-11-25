@@ -380,6 +380,9 @@ html, body {
 <script>
 var selectedOrderItemList=null;
 const contextPath = "${pageContext.request.contextPath}";
+
+
+
 var    orderStatusList=[];
 const statusTransitions = {
 	    1: [2, 6],   // Pending → Paid, Cancelled
@@ -749,6 +752,10 @@ html += '</div>'; // modal-status-row 끝
 	let selectedStatus = '';
 
 	function searchOrders(start, end, status) {
+		
+		console.log(start, end, status);	
+		
+		
 		$.ajax({
 			url : contextPath + "/api/admin/search-order-list-with-date",
 			type : "GET",
@@ -849,7 +856,7 @@ html += '</div>'; // modal-status-row 끝
 		searchOrders($.datepicker.formatDate('yy-mm-dd', firstDay), $.datepicker.formatDate('yy-mm-dd', lastDay), selectedStatus);
 	});
 
-	// 상태 버튼 이벤트
+	// 상태 버튼 이벤트 및 트리거 대상
 	$("#statusFilters button").click(function() {
 		selectedStatus = $(this).data("status");
 		const start = $("#startDate").val();
@@ -887,19 +894,6 @@ html += '</div>'; // modal-status-row 끝
        const converted = keysToCamel(selectedOrderItemList);
 	   console.log("업보 청산 변환 결과:", converted);        
         
-        
-        
-  
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
       if(statusId===7){
         	 $.ajax({
                  url: contextPath + '/api/admin/delegate-to-pg-refund',
@@ -931,11 +925,45 @@ html += '</div>'; // modal-status-row 끝
                      console.log("errorThrown:", errorThrown);
                  }
              });
-        } 
-
-     
+        }     
     });	
-});
+	
+	
+	
+	// JSP 값 문자열로 받기
+	var fromOuterStatus = "${status}";
+	var fromOuterStart  = "${startDate}";
+	var fromOuterEnd    = "${endDate}";
+
+	// "" 또는 null을 undefined로 바꾸는 함수
+	function normalize(value) {
+	    if (!value || value.trim() === "") {
+	        return undefined;
+	    }
+	    return value;
+	}
+
+	// 정리된 값
+	fromOuterStatus = normalize(fromOuterStatus);
+	fromOuterStart  = normalize(fromOuterStart);
+	fromOuterEnd    = normalize(fromOuterEnd);
+
+	
+	
+	
+	// 최종 실행 로직
+	if (fromOuterStatus || fromOuterStart || fromOuterEnd) {
+
+	    // 필요한 값만 그대로 전달됨 (없으면 undefined)
+	    searchOrders(fromOuterStart, fromOuterEnd, fromOuterStatus);
+	}
+
+
+
+
+	
+	
+});//윈도우 온로드=레디함수 종료
 
 
 

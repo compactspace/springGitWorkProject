@@ -13,7 +13,7 @@
 
 
 
-	<select id="getUnreadDocumentList" resultType="Map">
+	<select id="getUnreadDocumentList" parameterType="Map" resultType="Map">
 		SELECT
 		-- 당해 회사 정보
 
@@ -46,7 +46,7 @@
 		ON
 		td.reviewer_id = a.admin_id
 
-		where td.status='pending'
+		WHERE td.status='pending' AND td.uploaded_at BETWEEN #{stDate} AND #{edDat}
 
 	</select>
 	

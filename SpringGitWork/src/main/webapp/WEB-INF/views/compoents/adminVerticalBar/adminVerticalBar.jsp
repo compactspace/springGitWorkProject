@@ -39,8 +39,8 @@ var titleMenu = [
     ] }
     ,
     
-    { name: "Admin 사용자 관리", prefix: "admin-user", url: "${pageContext.request.contextPath}/admin/user", children: [
-        { name: "사용자 목록", prefix: "user-list", url: "${pageContext.request.contextPath}/admin/user/user-list" },
+    { name: "사용자 관리", prefix: "admin-user", url: "${pageContext.request.contextPath}/admin/user", children: [
+        { name: "사용자 목록", prefix: "user-list", url: "${pageContext.request.contextPath}/admin/user-list" },
         { name: "권한 관리", prefix: "user-role", url: "${pageContext.request.contextPath}/admin/user/user-role" },
         { name: "활동 로그", prefix: "user-log", url: "${pageContext.request.contextPath}/admin/user/user-log" }
     ] }

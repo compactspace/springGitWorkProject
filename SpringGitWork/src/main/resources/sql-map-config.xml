@@ -108,6 +108,9 @@
 				<typeAlias type="com.spring.finall.user.OrderStatusVO"
 			alias="OrderStatusVO" />
 			
+				<typeAlias type="com.spring.finall.resDto.mannageUserListResPonse.ManageUserListResponseDTO"
+			alias="ManageUserListResponseDTO" />
+			
 			
 			
 	</typeAliases>
@@ -145,6 +148,7 @@
 <mapper resource="mappings/ManageProductMapper.xml" />
 <mapper resource="mappings/ManageOrderMapper.xml" />
 <mapper resource="mappings/ManageinventoryMapper.xml" />
+<mapper resource="mappings/ManageUserMapper.xml" />
 
 	</mappers>
 

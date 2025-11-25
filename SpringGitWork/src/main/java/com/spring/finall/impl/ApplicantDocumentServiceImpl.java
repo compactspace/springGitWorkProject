@@ -24,9 +24,9 @@ public class ApplicantDocumentServiceImpl implements ApplicantDocumentService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getUnreadDocumentList() {
+	public List<Map<String, Object>> getUnreadDocumentList(String stDate, String edDate) {
 		// TODO Auto-generated method stub
-		return applicantDocumentServiceDAO.getUnreadDocumentList();
+		return applicantDocumentServiceDAO.getUnreadDocumentList(stDate,edDate);
 	}
 
 	@Override

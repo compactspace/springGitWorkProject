@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ManageUserMapper">
+
+
+
+
+	<resultMap id="manageUserListResultMap"
+		type="ManageUserListResponseDTO">
+		<result property="userCode" column="user_code" />
+		<result property="id" column="id" />
+		<result property="createSignup" column="create_signup" />
+		<result property="userTell" column="user_tell" />
+		<result property="agreed" column="agreed" />
+		<result property="termsContent" column="content" />
+		<result property="payCnt" column="paycnt" />
+		<result property="writingCnt" column="writingcnt" />
+	</resultMap>
+
+
+	<select id="getUserList" resultMap="manageUserListResultMap">
+		SELECT
+		-- 기본 유저 정보
+		u.user_code,
+		u.id,
+		u.create_signup,
+		u.user_tell,
+		-- 유저의 약관 동의 여부 불린값
+		utar.agreed,
+		-- 약관 내용
+		tv.content,
+		-- 결제 건 요약
+		paysummary.paycnt,
+		-- 게시글 작성 요약
+		artworkWritingsummary.writingcnt
+		FROM
+		user AS u
+		LEFT JOIN (
+		select
+		*
+		From
+		user_terms_agree_record as s
+		where
+		s.terms_code = 1
+		and s.version_id = 1) as utar
+		ON
+		u.user_code = utar.user_code
+		LEFT JOIN terms_version as tv
+
+		ON
+		tv.terms_code = utar.terms_code
+		LEFT JOIN (
+		SELECT
+		COUNT(*) AS paycnt,
+		oi.user_id
+		FROM
+		order_info AS oi
+		WHERE
+		oi.order_status_id = 3
+		GROUP BY
+		oi.user_id) AS paysummary
+
+		ON
+		paysummary.user_id = u.user_code
+
+		LEFT JOIN (
+		SELECT
+		COUNT(*) AS writingcnt,
+		a.user_code
+		FROM
+		artworks AS a
+
+		GROUP BY
+		a.user_code) AS artworkWritingsummary
+
+		ON
+		artworkWritingsummary.user_code = u.user_code
+		WHERE u.enabled=1;
+
+	</select>
+
+
+
+</mapper>

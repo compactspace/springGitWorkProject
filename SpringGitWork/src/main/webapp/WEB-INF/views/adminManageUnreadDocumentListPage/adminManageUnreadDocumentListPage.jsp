@@ -70,6 +70,61 @@ html, body {
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
+/* 조회 버튼 시작 */
+#searchFilters {
+	margin-bottom: 20px;
+}
+
+#searchFilters input {
+	padding: 5px 8px;
+	margin-right: 10px;
+	width: 120px;
+}
+
+#searchFilters button {
+	padding: 6px 12px;
+	margin-right: 5px;
+	background-color: #4a90e2;
+	border: none;
+	color: #fff;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+#searchFilters button:hover {
+	background-color: #357ABD;
+}
+
+#statusFilters {
+    margin-bottom: 20px;
+}
+
+#statusFilters button {
+    padding: 6px 12px;
+    margin-right: 5px;
+    background-color: #4a90e2; 
+    border: none;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    font-weight: 500;
+}
+
+#statusFilters button:hover {
+    background-color: #357ABD;
+    transform: translateY(-2px);
+}
+
+#statusFilters button.active {
+    background-color: #50C878; 
+}
+
+/* 조회 버튼 종료 */
+
+
+
+
 /* 내정보 시작 */
 .info-container {
 	display: flex;
@@ -171,14 +226,127 @@ window.onload = function(){
 	        xhr.setRequestHeader(header, token);
 	    }
 	});  
-	 getApplicantDocuments();
+	
+	// JSP 값 문자열로 받기
+	 // JSP에서 값 문자열로 받기
+  	var fromOuterStart  = "${startDate}";
+    var fromOuterEnd    = "${endDate}";
+
+    // 널, undefined, 빈 문자열 체크 후 기본값 할당
+    if (!fromOuterStart || fromOuterStart === "null") {
+    	fromOuterStart = getTodayDateFormByYyyyMmDd();
+    }
+
+    if (!fromOuterEnd || fromOuterEnd === "null") {
+    	fromOuterEnd = getTomorrowDateFormByYyyyMmDd();
+    }
+
+    console.log("fromOuterStart:", fromOuterStart);
+    console.log("fromOuterEnd:", fromOuterEnd);
+	
+	
+	
+	 getApplicantDocuments(fromOuterStart,fromOuterEnd);
 	 
+	 
+	 
+		$("#btnApplyPeriod").click(function() {
+			const start = $("#startDate").val();
+			const end = $("#endDate").val();
+			if (!start || !end) {
+				alert("시작일과 종료일을 선택해주세요.");
+				return;
+			}
+			getApplicantDocuments(start, end);
+		});
+	 
+	 
+		
+		$("#btnToday").click(function() {
+			const start = getTodayDateFormByYyyyMmDd();
+			const end = getTomorrowDateFormByYyyyMmDd();			
+			getApplicantDocuments(start, end);
+		});
+		
+		
+	 
+		$("#btnRecent7Days").click(function() {
+			const end = new Date();
+			const start = new Date();
+			start.setDate(end.getDate() - 6);
+			$("#startDate").val($.datepicker.formatDate('yy-mm-dd', start));
+			$("#endDate").val($.datepicker.formatDate('yy-mm-dd', end));
+			getApplicantDocuments($.datepicker.formatDate('yy-mm-dd', start), $.datepicker.formatDate('yy-mm-dd', end));
+		});
+		$("#btnCurrentMonth").click(function() {
+			const today = new Date();
+			const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+			const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+			$("#startDate").val($.datepicker.formatDate('yy-mm-dd', firstDay));
+			$("#endDate").val($.datepicker.formatDate('yy-mm-dd', lastDay));
+			getApplicantDocuments($.datepicker.formatDate('yy-mm-dd', firstDay), $.datepicker.formatDate('yy-mm-dd', lastDay));
+		});
+		$("#btnPreviousMonth").click(function() {
+			const date = new Date();
+			date.setMonth(date.getMonth() - 1);
+			const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+			const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+			$("#startDate").val($.datepicker.formatDate('yy-mm-dd', firstDay));
+			$("#endDate").val($.datepicker.formatDate('yy-mm-dd', lastDay));
+			getApplicantDocuments($.datepicker.formatDate('yy-mm-dd', firstDay), $.datepicker.formatDate('yy-mm-dd', lastDay));
+		});
+
+		// 상태 버튼 이벤트 및 트리거 대상
+		$("#statusFilters button").click(function() {
+			selectedStatus = $(this).data("status");
+			const start = $("#startDate").val();
+			const end = $("#endDate").val();
+			getApplicantDocuments(start, end);
+		});
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+}// 온로드 레디
+
+
+
+function getTodayDateFormByYyyyMmDd() {
+    var d = new Date();
+    var y = d.getFullYear();
+    var m = ("0" + (d.getMonth() + 1)).slice(-2);
+    var day = ("0" + d.getDate()).slice(-2);
+    return y + "-" + m + "-" + day; // yyyy-MM-dd
+}
+
+function getTomorrowDateFormByYyyyMmDd() {
+    var d = new Date();
+    d.setDate(d.getDate() + 1); // 다음날
+    var y = d.getFullYear();
+    var m = ("0" + (d.getMonth() + 1)).slice(-2);
+    var day = ("0" + d.getDate()).slice(-2);
+    return y + "-" + m + "-" + day; // yyyy-MM-dd
 }
 
 
-function getApplicantDocuments(){
-	$.ajax({
-		url:"${pageContext.request.contextPath}/api/admin/get-unread-document-list",
+
+
+
+
+
+function getApplicantDocuments(stDate,edDate){
+	
+	console.log('stDate',stDate,' edDate: ',edDate);
+	
+	const url = "${pageContext.request.contextPath}/api/admin/get-unread-document-list"
+        + (stDate ? "?stDate=" + encodeURIComponent(stDate) : "")
+        + (edDate ? (stDate ? "&" : "?") + "edDate=" + encodeURIComponent(edDate) : "");
+
+	 $.ajax({
+		url:url,
 		type:"GET",
 		success:function(res){
 			
@@ -399,6 +567,18 @@ function downloadDocument(teacherId) {
 				<h1>미처리 서류 처리</h1>
 				<div class="header-subtitle">반드시 제출 서류 파일 확인후 상태를 변경하세요</div>
 			</div>
+			
+			<div id="searchFilters">
+				<label for="startDate">시작일:</label> <input type="text" id="startDate" readonly>
+				<label for="endDate">종료일:</label> <input type="text" id="endDate" readonly>
+				<button id="btnApplyPeriod">기간 적용</button>
+				<button id="btnToday">오늘</button>
+				<button id="btnRecent7Days">최근 7일</button>
+				<button id="btnCurrentMonth">당월</button>
+				<button id="btnPreviousMonth">전월</button>
+			</div>
+					
+					
 
 			<!--  우측 시작  -->
 			<div id="content-body">

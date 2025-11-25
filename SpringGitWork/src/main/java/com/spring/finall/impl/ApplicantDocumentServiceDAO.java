@@ -62,10 +62,14 @@ public class ApplicantDocumentServiceDAO {
 		return result;
 	}
 
-	public List<Map<String, Object>> getUnreadDocumentList() {
-		// TODO Auto-generated method stub
+	public List<Map<String, Object>> getUnreadDocumentList(String stDate, String edDat) {
+	
+		Map<String,String> params= new HashMap<>();
+		
+		params.put("stDate",stDate);
+		params.put("edDat", edDat);
 
-		List<Map<String, Object>> list = mybatis.selectList("ApplicantDocumentsMapper.getUnreadDocumentList");
+		List<Map<String, Object>> list = mybatis.selectList("ApplicantDocumentsMapper.getUnreadDocumentList",params);
 		return list;
 	}
 

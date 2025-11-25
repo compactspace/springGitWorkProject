@@ -8,7 +8,7 @@ public interface ApplicantDocumentService {
 
 	Map<String, Object> getAppicantDocumentCountByTodayAndWeek(LocalDate startOfWeek, LocalDate endOfWeek);
 
-	List<Map<String, Object>> getUnreadDocumentList();
+	List<Map<String, Object>> getUnreadDocumentList(String stDate, String edDate);
 	
 	
 	List<Map<String, Object>> getReadedDocumentList();

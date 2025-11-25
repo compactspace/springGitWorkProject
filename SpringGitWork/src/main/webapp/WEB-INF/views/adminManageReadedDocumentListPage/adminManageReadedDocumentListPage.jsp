@@ -453,7 +453,7 @@ function downloadDocument(teacherId) {
 		<!-- 우측 메인 콘텐츠 -->
 		<div id="mainContent">
 			<div id="contentHeader">
-				<h1>미처리 서류 처리</h1>
+				<h1>이미 처리된 서류를 관리하며 수정합니다.</h1>
 				<div class="header-subtitle">반드시 제출 서류 파일 확인후 상태를 변경하세요</div>
 			</div>
 
