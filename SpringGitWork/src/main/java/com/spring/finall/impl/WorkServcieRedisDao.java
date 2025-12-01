@@ -12,7 +12,7 @@ import com.spring.finall.reqDto.writeWorkComment.WorkCommentDTO;
 
 @Repository
 public class WorkServcieRedisDao {
-	  private static final String ATTEMPT_KEY_PREFIX = "workWrite:attempt:";
+	  	private static final String ATTEMPT_KEY_PREFIX = "workWrite:attempt:";
 	    private static final String GLOBAL_ATTEMPT_KEY_PREFIX = "workWrite:GlobalAttempt:";
 	    private static final String DANGEROUS_USER_KEY_PREFIX = "workWriteService:Dangerous:";
 

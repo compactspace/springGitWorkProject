@@ -581,7 +581,65 @@
 
 
 
+.nm_mainbanner {
+  height: 500px; /* 화면의 전체 높이를 배경으로 설정 */
+  display: flex;  /* 가로로 배치 */
+  justify-content: space-between; /* 텍스트와 이미지를 양쪽 끝으로 배치 */
+  align-items: center; /* 세로로 중앙 정렬 */
+  background-size: cover; /* 배경 이미지를 화면 크기에 맞게 조정 */
+  background-position: center; /* 이미지 중앙 정렬 */
+  background-repeat: no-repeat;
+}
 
+.nm_bannerimage{
+    align-items: center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  background-image: url("${pageContext.request.contextPath}/resources/img_mainhome/springMainBanner.jpg");
+}
+
+.nm_bannerinfoarea {
+  width: 50%; /* 왼쪽 부분에 텍스트를 배치 */
+  padding: 20px;
+  color: white;
+}
+
+.nm_bannerinfo h3 {
+color: #f38021;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.nm_bannerinfo p {
+color: #555;
+  font-size: 18px;
+  color: #fff;
+  margin-top: 14px;
+}
+
+
+
+.nm_banneropenbtn {
+  margin-top: 32px;
+  padding: 14px 26px;
+  font-size: 18px;
+  background: #f38021;
+    color: #fff;
+
+ 
+  border: none;
+  border-radius: 28px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.nm_bannerimage {
+  width: 50%; /* 배너 오른쪽에 이미지를 배치 */
+  height: 100%; /* 배너의 전체 높이를 맞추기 */
+}
 
 
 </style>
@@ -834,6 +892,29 @@ const topTenOnedayclassComponentLoad = () => {
 
 
 		<%@ include file="../pcNave.jsp"%>
+				
+<div class="nm_mainbanner">
+  <div class="nm_bannerinfoarea">
+    <div class="nm_bannerinfo">
+      <h3>
+        모두의 화방에서 <br> 새로운 기회를 열어보세요
+      </h3>
+      <p>
+       그림을 그리며 즐거워질 수 있도록
+      </p>
+      <button class="nm_banneropenbtn">
+        클래스 오픈하기
+      </button>
+    </div>
+  </div>
+  <div class="nm_bannerimage">
+    <!-- 여기에 이미지를 배경으로 사용 -->
+  </div>
+</div>
+
+
+
+
 
 
 

@@ -322,13 +322,16 @@ function loadProductList(productGroup) {
                 // 3. 로컬스토리지에서 동일 상품 찾기
                 var localItem = cart.find(item => item.productCod == productCod);
 
+                
                 if (localItem) {
                     var oldPrice = parseInt(localItem.productPrice, 10);
                     // 4. 가격 변동 체크
                     if (oldPrice !== newPrice) {
                         var productName = $(this).find(".product-name").text();
-                    /*     alert(`상품 "${productName}"의 가격이 변경되었습니다.\n기존가격: ${oldPrice}원 → 현재가격: ${newPrice}원`); */
-                        // 필요시 로컬스토리지 업데이트도 고려 가능
+                       alert("상품 ${productName}의 가격이 변경되었습니다.\n기존가격: "+oldPrice+"원 → 현재가격: "+newPrice+"원"); 
+                        
+                       // 필요시 로컬스토리지 업데이트도 고려 가능
+                       
                         
                     }
                 }
