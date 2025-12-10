@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,14 +23,14 @@ public class TeacherMemberServiceImpl implements TeacherMemberService {
 
 	@Override
 	@Transactional
-	public TeacherInsertResult insertTeacherMembership(String id, String hashedPassword, MultipartFile file,Map<String, Object> companyInfo) {
+	public TeacherInsertResult insertTeacherMembership(String id, String hashedPassword, MultipartFile file,Map<String, Object> companyInfo,File tempFile) {
 
 		TeacherInsertResult teacherInsertResult = null;
 
 		try {
 
 			// DB에 저장할 경우 파일명, 절대 경로(C:\ 포함)를 리턴
-			String savedFilePath = insertTeacherDocuments(id, file);
+			String savedFilePath = insertTeacherDocuments(id, file,tempFile);
 
 			Long teacherId = teacherMemberServiceDAO.insertTeacherMembership(id, hashedPassword);
 			if (teacherId <= 0) {
@@ -64,7 +65,7 @@ public class TeacherMemberServiceImpl implements TeacherMemberService {
 
 	}
 
-	public String insertTeacherDocuments(String id, MultipartFile file) {
+	public String insertTeacherDocuments(String id, MultipartFile file,File tempFile) {
 		if (file == null || file.isEmpty()) {
 			throw new TeacherDocumentException("파일이 비어있습니다.");
 		}
@@ -91,7 +92,9 @@ public class TeacherMemberServiceImpl implements TeacherMemberService {
 		File dest = new File(dir, fileName);
 
 		try {
-			file.transferTo(dest); // 실제 파일 저장
+			
+			  FileUtils.copyFile(tempFile, dest);
+			  tempFile.delete();
 			System.out.println("파일 저장 완료: " + dest.getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();

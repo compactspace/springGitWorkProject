@@ -1,5 +1,6 @@
 package com.spring.finall.constroller;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +11,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,19 +23,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.finall.WorkImgVO;
+import com.spring.finall.Validator.UploadSecurityManager.UploadSecurityManager;
 import com.spring.finall.apiResponseController.ApiResponse;
 import com.spring.finall.businessresult.DuplicateCheckResult;
 import com.spring.finall.businessresult.SignUpSmsSendResult;
 import com.spring.finall.businessresult.TeacherInsertResult;
 import com.spring.finall.exception.teacherMemberShip.TeacherDocumentException;
+import com.spring.finall.reqDto.teacherSignUpRequest.TeacherSignupRequestDTO;
 import com.spring.finall.security.UserDetailsVO2;
 import com.spring.finall.service.ArtworkService;
 import com.spring.finall.service.MemberService;
@@ -50,6 +58,9 @@ import com.spring.finall.user.UserVO;
 @Controller
 @RequestMapping("/api/guest")
 public class GuestController {
+
+	@Autowired
+	private UploadSecurityManager uploadSecurityManager;
 
 	@Autowired
 	private ProductService protService;
@@ -71,59 +82,50 @@ public class GuestController {
 
 	@Autowired
 	private TeacherMemberService teacherMemberService;
-	
-	
+
 	@PostMapping("/test")
 	@ResponseBody
-	public ResponseEntity<ApiResponse<Boolean>>  testFNC(){
-		  ApiResponse<Boolean> response = ApiResponse.<Boolean>builder()
-	                .code(502)
-	                .success(false)
-	                .message("커스텀코드는 502 이고 그냥 문자열 커스텀데이터")
-	                .data(false)
-	                .build();
-		  
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-		
+	public ResponseEntity<ApiResponse<Boolean>> testFNC() {
+		ApiResponse<Boolean> response = ApiResponse.<Boolean>builder().code(502).success(false)
+				.message("커스텀코드는 502 이고 그냥 문자열 커스텀데이터").data(false).build();
+
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+
 	}
-	
-	
 
 	@RequestMapping(value = "/productGroupList")
 	public String ajaxProductGroupList(ProductVO vo,
-	        @RequestParam(value = "product_group", required = false, defaultValue = "pencile") String product_group,
-	        @AuthenticationPrincipal UserDetailsVO2 user,
-	        Model model) {
+			@RequestParam(value = "product_group", required = false, defaultValue = "pencile") String product_group,
+			@AuthenticationPrincipal UserDetailsVO2 user, Model model) {
 
-	    // 제품군 미정 처리
-	    if ("groupdetermined".equals(product_group)) {
-	        product_group = "제품군미정";
-	    }
+		// 제품군 미정 처리
+		if ("groupdetermined".equals(product_group)) {
+			product_group = "제품군미정";
+		}
 
-	    vo.setProduct_group(product_group);
-	    List<Map<String, Object>> grouplist = protService.productGroupLlist(vo);
+		vo.setProduct_group(product_group);
+		List<Map<String, Object>> grouplist = protService.productGroupLlist(vo);
 
-	    // 안전하게 새 컬럼만 별도 모델로 추가
-	    for (Map<String, Object> item : grouplist) {
-	        // file_category와 file_name이 존재하고 널이 아닐 때만
-	        if (item.containsKey("file_category") && item.get("file_category") != null &&
-	            item.containsKey("file_name") && item.get("file_name") != null) {
+		// 안전하게 새 컬럼만 별도 모델로 추가
+		for (Map<String, Object> item : grouplist) {
+			// file_category와 file_name이 존재하고 널이 아닐 때만
+			if (item.containsKey("file_category") && item.get("file_category") != null && item.containsKey("file_name")
+					&& item.get("file_name") != null) {
 
-	            // MVC리솔스 처리경로 /images/
-	            item.put("imagePath", "/images/" + item.get("file_category") + "/" + item.get("file_name"));
-	        }
-	    }
+				// MVC리솔스 처리경로 /images/
+				item.put("imagePath", "/images/" + item.get("file_category") + "/" + item.get("file_name"));
+			}
+		}
 
-	    model.addAttribute("productService", grouplist);
+		model.addAttribute("productService", grouplist);
 
-	    // 로그인 여부
-	    Boolean isAuthenticated = user != null;
-	    model.addAttribute("isAuthenticated", isAuthenticated);
+		// 로그인 여부
+		Boolean isAuthenticated = user != null;
+		model.addAttribute("isAuthenticated", isAuthenticated);
 
-	    // JSP는 #content2 부분만 포함한 조각 페이지
-	    return "compoents/productGroupList";
+		// JSP는 #content2 부분만 포함한 조각 페이지
+		return "compoents/productGroupList";
 	}
-
 
 	@RequestMapping(value = "/get-motre-reviews")
 	public String getdynamicworkimg(@RequestParam(defaultValue = "취미만화반") String onedayclass_name,
@@ -216,7 +218,7 @@ public class GuestController {
 		// 2. 이 사용자의 고유 세션 ID 확인
 		String sessionId = session.getId();
 
-		System.out.println("비로그인 사용자의 세션 ID: " + sessionId);
+		//System.out.println("비로그인 사용자의 세션 ID: " + sessionId);
 		SignUpSmsSendResult smsSendResult = signUpSmsSendService.aliveverifySmsCode(sessionId, session, token);
 
 		// 결과에 따라 반환 (문자 발송 성공시 token 반환, 아니면 상태 문자열)
@@ -266,28 +268,111 @@ public class GuestController {
 		}
 	}
 
-	// 선생님 회원가입
-	@RequestMapping(value = "/teacher-action-signup")
-	@ResponseBody
-	public ApiResponse<TeacherInsertResult> insertTeacher(
-	        @RequestParam Map<String, Object> allParams,
-	        @RequestParam("businessCertificate") MultipartFile file
-	) throws Exception {
+	
+	
+		// 선생님 회원가입
+		@RequestMapping(value = "/teacher-action-signup", method = RequestMethod.POST)
+		@ResponseBody
+		public ApiResponse<TeacherInsertResult> insertTeacherTest(
+				@RequestHeader(value = "X-Auth-Token", required = false) String authToken,
+		        @Valid @ModelAttribute TeacherSignupRequestDTO request,
+		        BindingResult bindingResult,
+		        @RequestParam("businessCertificate") MultipartFile file,
+		        HttpServletRequest req
+				
+				) throws Exception {
+				System.out.println("authToken: "+authToken);
+				
+				// 사실 토큰은 헤커를 낚는 낚시값이다. 값만 있냐 없냐로 일차 방어
+				//  다른 레디스 키로  만료를 판단 할것이다.
+				if(authToken==null) {
+					 return ApiResponse.<TeacherInsertResult>builder()
+				                .code(401)
+				                .success(false)
+				                .message("curl요청등 개수작 금지")
+				                .data(new TeacherInsertResult(400, false, "curl요청등 개수작 금지"))
+				                .build();
+				}else {
+					
+					// 1. 현재 사용자의 HttpSession 객체 획득
+					HttpSession session = req.getSession();
 
-	    // Map에서 id, password 추출
-	    String id = String.valueOf(allParams.get("id"));
-	    String password = String.valueOf(allParams.get("password"));
+					// 2. 이 사용자의 고유 세션 ID 확인
+					String sessionId = session.getId();
+
+					System.out.println("비로그인 사용자의 세션 ID: " + sessionId);
+					if(signUpSmsSendService.isExpired(sessionId, session, authToken)<0) {
+						 return ApiResponse.<TeacherInsertResult>builder()
+					                .code(401)
+					                .success(false)
+					                .message("curl요청등 개수작 금지")
+					                .data(new TeacherInsertResult(400, false, "curl요청등 개수작 금지"))
+					                .build();
+					}
+					
+				}
+		
+		
+		
+	    // DTO 유효성 체크
+	    if (bindingResult.hasErrors()) {
+	        String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
+	        return ApiResponse.<TeacherInsertResult>builder()
+	                .code(400)
+	                .success(false)
+	                .message(errorMsg)
+	                .data(new TeacherInsertResult(400, false, errorMsg))
+	                .build();
+	    }
+
+	    // 파일 체크
+	    if (file == null || file.isEmpty()) {
+	        return ApiResponse.<TeacherInsertResult>builder()
+	                .code(400)
+	                .success(false)
+	                .message("사업자등록증을 첨부해주세요")
+	                .data(new TeacherInsertResult(400, false, "파일 필수"))
+	                .build();
+	    }
+
+	    
+	    //C:\Users\82109\AppData\Local\Temp 
+	    // 이건 자바의 내장 세팅으로 File.createTempFile("upload_", null); 는 기본경로 를 위로 세팅한다고하네 
+	    File temp = File.createTempFile("upload_", null);
+	    file.transferTo(temp);
+	    String originalName = file.getOriginalFilename();
+
+	    if (!checkUploadSecurityManager(originalName, temp)) {
+	        return ApiResponse.<TeacherInsertResult>builder()
+	                .code(401)
+	                .success(false)
+	                .message("주작금지")
+	                .data(new TeacherInsertResult(400, false, "주작금지"))
+	                .build();
+	    }
+
+	    String id = request.getId();
+	    String password = request.getPassword();
 	    String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
-	    // Map에서 id, password 제거하고 나머지를 회사 정보로 사용
-	    allParams.remove("id");
-	    allParams.remove("password");
-	    Map<String, Object> companyInfo = allParams;
+	    // 나머지 회사 정보
+	    Map<String, Object> companyInfo = new HashMap<>();
+	    companyInfo.put("company_name", request.getCompany_name());
+	    companyInfo.put("registration_number", request.getRegistration_number());
+	    companyInfo.put("representative_name", request.getRepresentative_name());
+	    companyInfo.put("company_phone", request.getCompany_phone());
+	    companyInfo.put("address", request.getAddress());
+	    companyInfo.put("email", request.getEmail());
+	 // 테스트용 로그 출력
+	    System.out.println("===== Teacher Signup Company Info =====");
+	    companyInfo.forEach((key, value) -> {
+	        System.out.printf("%-20s : %s%n", key, value);
+	    });
+	    System.out.println("=======================================");
 
 	    try {
-	        teacherMemberService.insertTeacherMembership(id, hashedPassword, file,companyInfo);
-	       
-	        
+	        teacherMemberService.insertTeacherMembership(id, hashedPassword, file, companyInfo,temp);
+
 	        return ApiResponse.<TeacherInsertResult>builder()
 	                .code(201)
 	                .success(true)
@@ -305,6 +390,19 @@ public class GuestController {
 	    }
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	private boolean checkUploadSecurityManager(String originalName, File tempFile) {
+
+		return uploadSecurityManager.validate(originalName, tempFile);
+	}
 
 	// 문자인증
 	@RequestMapping(value = "/signup-page4")
@@ -316,38 +414,26 @@ public class GuestController {
 	// 회원가입전 이미 있는 아이디 인지 체그하는 아작스 호출
 	@RequestMapping(value = "/checkout-signup-id")
 	@ResponseBody
-	public ResponseEntity<ApiResponse<DuplicateCheckResult>> checkOutPossibleSignUpId(UserVO vo, HttpSession session, HttpServletRequest req) throws Exception {
+	public ResponseEntity<ApiResponse<DuplicateCheckResult>> checkOutPossibleSignUpId(UserVO vo, HttpSession session,
+			HttpServletRequest req) throws Exception {
 
 		boolean check = memberService.checkidMembership(vo);
 
-		
-
-		
-		
 		if (check) {
-			DuplicateCheckResult  duplicateCheckResult = new DuplicateCheckResult(200,true);
-			
-			  ApiResponse<DuplicateCheckResult> response = ApiResponse.<DuplicateCheckResult>builder()
-		                .code(200)
-		                .success(false)
-		                .message("")
-		                .data(duplicateCheckResult)
-		                .build();
-			  
-		        return ResponseEntity.status(HttpStatus.OK).body(response);
-			
-		
+			DuplicateCheckResult duplicateCheckResult = new DuplicateCheckResult(200, true);
+
+			ApiResponse<DuplicateCheckResult> response = ApiResponse.<DuplicateCheckResult>builder().code(200)
+					.success(false).message("").data(duplicateCheckResult).build();
+
+			return ResponseEntity.status(HttpStatus.OK).body(response);
+
 		} else {
-			DuplicateCheckResult  duplicateCheckResult = new DuplicateCheckResult(409,false,"이미 존재하는 아이디 입니다.");
-			
-			  ApiResponse<DuplicateCheckResult> response = ApiResponse.<DuplicateCheckResult>builder()
-		                .code(409)
-		                .success(false)
-		                .message("")
-		                .data(duplicateCheckResult)
-		                .build();
-			  
-		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+			DuplicateCheckResult duplicateCheckResult = new DuplicateCheckResult(409, false, "이미 존재하는 아이디 입니다.");
+
+			ApiResponse<DuplicateCheckResult> response = ApiResponse.<DuplicateCheckResult>builder().code(409)
+					.success(false).message("").data(duplicateCheckResult).build();
+
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
 
 	}

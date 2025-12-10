@@ -29,6 +29,11 @@
 		location="classpath:mappings/database.properties" />
 
 
+<bean id="uploadSecurityManager" class="com.spring.finall.Validator.UploadSecurityManager.UploadSecurityManager"/>
+
+
+
+
 	<bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="prefix" value="/WEB-INF/views/" />

@@ -674,7 +674,10 @@ $("#submitDocuments").on("click", function() {
     formData.append("company_phone", $("#company_phone").val());
     formData.append("address", $("#address").val());
     formData.append("email", $("#email").val());
-
+    
+    
+    
+    let token = localStorage.getItem("authToken");
     
     $.ajax({
         url: "${pageContext.request.contextPath}/api/guest/teacher-action-signup",
@@ -682,11 +685,22 @@ $("#submitDocuments").on("click", function() {
         data: formData,
         processData: false,
         contentType: false,
-    	success:(data)=>{			
+        headers: {
+            "X-Auth-Token": token
+        },
+    	success:(data)=>{	
+    		
+    		console.log(data);    		
+    		alert("XXXX");
+    		
+    		
+    		
+    		
+    		
 			if(data=="signupfalse"){
 				alert("금새 동일한 아이디로 누가 가입하였습니다. 다른 아이디로 다시 시도해주세요")
 			}else{
-				location.replace("${pageContext.request.contextPath}/teacher/login-page");
+				//location.replace("${pageContext.request.contextPath}/teacher/login-page");
 			}
 			
 		},

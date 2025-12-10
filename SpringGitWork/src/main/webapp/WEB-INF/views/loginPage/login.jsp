@@ -122,6 +122,37 @@
 </style>
 
 
+
+<script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
+ 
+ 
+ <script>
+ 
+$(document).ready(function() {
+    const fpPromise = FingerprintJS.load();
+
+    fpPromise
+        .then(fp => fp.get())
+        .then(result => {
+            const visitorId = result.visitorId;
+            console.log("FingerprintJS Visitor ID:", visitorId);
+
+            // 각 컴포넌트 정보 확인
+            console.log("FingerprintJS Components:", result.components);
+            // 예: 화면 해상도
+            console.log("Screen Info:", result.components.screenResolution.value);
+            // 예: 폰트 목록 일부
+            console.log("Fonts Info:", result.components.fonts.value);
+            // 예: Canvas 해시
+            console.log("Canvas Hash:", result.components.canvas.value);
+        })
+        .catch(err => {
+            console.error("FingerprintJS 오류:", err);
+        });
+});
+</script>
+
+
 <script>
   $(function() {
     $("#naver").click(function() {

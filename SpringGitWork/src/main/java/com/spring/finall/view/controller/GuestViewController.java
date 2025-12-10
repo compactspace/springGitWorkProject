@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.finall.WorkImgVO;
+import com.spring.finall.Validator.UploadValidator.UploadValidator;
 import com.spring.finall.impl.ArtworkServiceDAO;
 import com.spring.finall.impl.WorkServcieRedisDao;
 import com.spring.finall.security.UserDetailsVO2;
@@ -68,6 +69,8 @@ public class GuestViewController {
 
 	@GetMapping("/")
 	public String showMainHome() {
+		
+		
 		// 뷰리졸버 설정 기준: /WEB-INF/views/mainhome.jsp
 		System.out.println(">>> GuestViewController: showMainHome 진입됨");
 		return "mainPage/mainhome";

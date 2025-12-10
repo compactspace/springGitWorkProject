@@ -248,6 +248,28 @@
 
 
 
+
+<dependency>
+    <groupId>org.apache.tika</groupId>
+    <artifactId>tika-core</artifactId>
+    <version>2.9.0</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.tika</groupId>
+    <artifactId>tika-parsers-standard-package</artifactId>
+    <version>2.9.0</version>
+</dependency>
+
+<dependency>
+    <groupId>commons-io</groupId>
+    <artifactId>commons-io</artifactId>
+    <version>2.13.0</version>
+</dependency>
+
+
+
+
+
 		<!-- 스프링 JAP  또 씨발 5.3미만 버젼은 bean등록시 에러-->
 		<dependency> <!-- JPA 사용을 위한 Dependency -->
 		    <groupId>org.hibernate</groupId>

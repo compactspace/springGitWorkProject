@@ -149,6 +149,8 @@ public class SignUpSmsSendServiceImple implements SignUpSmsSendService {
 	
 	}
 
+	// 사실 토큰은 헤커를 낚는 낚시값이다. 의미없는값임.
+	// 단순하게 다른걸로 만료를 판단
 	@Override
 	public SignUpSmsSendResult aliveverifySmsCode(String sessionId, HttpSession session, 
 			String token) {
@@ -156,5 +158,17 @@ public class SignUpSmsSendServiceImple implements SignUpSmsSendService {
 		Long ttlStartTime=System.currentTimeMillis();   
 		return SignUpSmsSendResult.setVerified(ttl,ttlStartTime);
 	}
+	// 사실 토큰은 헤커를 낚는 낚시값이다. 의미없는값임.
+	// 단순하게 다른걸로 만료를 판단
+	@Override
+	public Long isExpired(String sessionId, HttpSession session, String token) {
+	
+		return  	signUpSmsSendServiceRedisDAO.getVerifiedTTL(sessionId);
+	}
 
+	
+	
+	
+	
+	
 }

@@ -1,5 +1,6 @@
 package com.spring.finall.service;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +10,7 @@ import com.spring.finall.businessresult.TeacherInsertResult;
 
 public interface TeacherMemberService {
 
-	public abstract TeacherInsertResult insertTeacherMembership(String id, String hashedPassword, MultipartFile file, Map<String, Object> companyInfo);
+	public abstract TeacherInsertResult insertTeacherMembership(String id, String hashedPassword, MultipartFile file, Map<String, Object> companyInfo, File tempFile);
 	
 	public Map<String,Object>  currentMyinfo(String username);
 	

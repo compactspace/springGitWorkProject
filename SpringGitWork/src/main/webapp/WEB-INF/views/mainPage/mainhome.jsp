@@ -17,15 +17,15 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/common/commonAjax.js"></script>
+<script
+	src="${pageContext.request.contextPath}/resources/js/common/commonAjax.js"></script>
 <!-- <script type="text/javascript"
 	src="//dapi.kakao.com/v2/maps/sdk.js?appkey=cec9a6b4bed5ff14412ea02035eb0e4a"></script> -->
 <style>
 .mobileallwrapper {
-/* 	max-width: 344px; */
+	/* 	max-width: 344px; */
 	display: none;
 }
-
 
 .firstgetboad {
 	border-radius: 10px;
@@ -39,7 +39,6 @@
 	position: relative;
 }
 
-
 .headerarea {
 	background-image: url('./img_mainhome/banner1.jpeg');
 	background-color: aqua;
@@ -49,7 +48,6 @@
 	background-size: cover;
 	height: 100%;
 }
-
 
 .spacingcenter {
 	margin-top: 60px;
@@ -351,9 +349,8 @@
 	justify-content: center;
 }
 
-
 .footercontainer .rowwrapper {
-/* 	width: 80%; */
+	/* 	width: 80%; */
 	margin: 10px auto;
 	display: flex;
 }
@@ -369,36 +366,24 @@
 	flex-direction: column;
 }
 
-
-
-
-
-
 /*반응형 시작  */
 @media screen and (max-width: 701px) {
 	html, body {
-	
 		padding: 0px 10px !important;
 	}
-.centermenutitlearea {
-	text-align: left;
-	margin-bottom: 15px;
-}
-
-.centermenu {
-    padding: 80px 0 130px 0;
-}
-
-
-
+	.centermenutitlearea {
+		text-align: left;
+		margin-bottom: 15px;
+	}
+	.centermenu {
+		padding: 80px 0 130px 0;
+	}
 	.allwrapper {
 		display: none;
 	}
 	.mobileallwrapper {
 		display: block;
 	}
-
-
 	a {
 		color: #0275d8;
 		text-decoration: none !important;
@@ -406,26 +391,24 @@
 	a:visited {
 		text-decoration: none;
 	}
-
 	.center {
 		display: flex;
 		flex-direction: column;
 	}
-	
 	.centertitle {
-		padding:10px 10px;
+		padding: 10px 10px;
 		text-align: center;
 		font-family: 'NanumPen';
 	}
 	.contents {
-	padding: 20px 0 20px 0;
-	display: flex;
-    flex-direction: row;
-    justify-content: space-around;    
+		padding: 20px 0 20px 0;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
 	}
-	
 	.classcontent {
-		background-image:	url('${pageContext.request.contextPath}/resources/img_icon/classicon.png');
+		background-image:
+			url('${pageContext.request.contextPath}/resources/img_icon/classicon.png');
 		background-repeat: no-repeat;
 		background-size: cover;
 		background-position: center;
@@ -443,10 +426,9 @@
 		font-size: 10px;
 		text-align: center;
 	}
-
-
 	.productcontent {
-		background-image: url('${pageContext.request.contextPath}/resources/img_icon/producticon.png');
+		background-image:
+			url('${pageContext.request.contextPath}/resources/img_icon/producticon.png');
 		background-repeat: no-repeat;
 		background-size: cover;
 		background-position: center;
@@ -456,7 +438,8 @@
 		height: 60px;
 	}
 	.workcontent {
-		background-image: url('${pageContext.request.contextPath}/resources/img_icon/worklisticon.jpg');
+		background-image:
+			url('${pageContext.request.contextPath}/resources/img_icon/worklisticon.jpg');
 		background-repeat: no-repeat;
 		background-size: cover;
 		background-position: center;
@@ -465,9 +448,9 @@
 		margin: 0px auto;
 		height: 60px;
 	}
-	
 	.boardcontent {
-		background-image: url('${pageContext.request.contextPath}/resources/img_icon/gasipanicon.png');
+		background-image:
+			url('${pageContext.request.contextPath}/resources/img_icon/gasipanicon.png');
 		background-repeat: no-repeat;
 		background-size: cover;
 		background-position: center;
@@ -540,8 +523,6 @@
 		font-size: 13px !important;
 		font-family: 'NanumPen' !important;
 	}
-	
-	
 	.footercontainer {
 		padding: 0px 0px !important;
 	}
@@ -553,114 +534,96 @@
 		flex-direction: column;
 	}
 	.rows {
-		gap:10px;
+		gap: 10px;
 		flex-direction: row !important;
 		padding: 10px 5px !important;
 	}
-	
-	.logoarea{
-	display: flex
-;
-    flex-direction: column;
-    justify-content: center;
+	.logoarea {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
 	}
-	
-	
-	.logoarea img{
+	.logoarea img {
 		display: inline-block;
 	}
-	
-	
-	.footertext{
-	font-size: 12px;
-	
+	.footertext {
+		font-size: 12px;
 	}
-	
 }
- /* 반응형 종료 */
 
-
-
+/* 반응형 종료 */
 .nm_mainbanner {
-  height: 500px; /* 화면의 전체 높이를 배경으로 설정 */
-  display: flex;  /* 가로로 배치 */
-  justify-content: space-between; /* 텍스트와 이미지를 양쪽 끝으로 배치 */
-  align-items: center; /* 세로로 중앙 정렬 */
-  background-size: cover; /* 배경 이미지를 화면 크기에 맞게 조정 */
-  background-position: center; /* 이미지 중앙 정렬 */
-  background-repeat: no-repeat;
-}
-
-.nm_bannerimage{
-    align-items: center;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  background-image: url("${pageContext.request.contextPath}/resources/img_mainhome/springMainBanner.jpg");
-}
-
-.nm_bannerinfoarea {
-  width: 50%; /* 왼쪽 부분에 텍스트를 배치 */
-  padding: 20px;
-  color: white;
-}
-
-.nm_bannerinfo h3 {
-color: #f38021;
-  font-size: 40px;
-  font-weight: 700;
-  line-height: 1.3;
-  margin: 0;
-}
-
-.nm_bannerinfo p {
-color: #555;
-  font-size: 18px;
-  color: #fff;
-  margin-top: 14px;
-}
-
-
-
-.nm_banneropenbtn {
-  margin-top: 32px;
-  padding: 14px 26px;
-  font-size: 18px;
-  background: #f38021;
-    color: #fff;
-
- 
-  border: none;
-  border-radius: 28px;
-  cursor: pointer;
-  font-weight: 600;
+	height: 600px; /* 화면의 전체 높이를 배경으로 설정 */
+	display: flex; /* 가로로 배치 */
+	justify-content: space-between; /* 텍스트와 이미지를 양쪽 끝으로 배치 */
+	align-items: center; /* 세로로 중앙 정렬 */
+	background-size: cover; /* 배경 이미지를 화면 크기에 맞게 조정 */
+	background-position: center; /* 이미지 중앙 정렬 */
+	background-repeat: no-repeat;
 }
 
 .nm_bannerimage {
-  width: 50%; /* 배너 오른쪽에 이미지를 배치 */
-  height: 100%; /* 배너의 전체 높이를 맞추기 */
+	align-items: center;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-image:
+		url("${pageContext.request.contextPath}/resources/img_mainhome/springMainBanner.jpg");
 }
 
+.nm_bannerinfoarea {
+	width: 50%; /* 왼쪽 부분에 텍스트를 배치 */
+	padding: 20px;
+	color: white;
+}
 
+.nm_bannerinfo h3 {
+	color: #f38021;
+	font-size: 40px;
+	font-weight: 700;
+	line-height: 1.3;
+	margin: 0;
+}
+
+.nm_bannerinfo p {
+	color: #555;
+	font-size: 18px;
+	color: #fff;
+	margin-top: 14px;
+}
+
+.nm_banneropenbtn {
+	margin-top: 32px;
+	padding: 14px 26px;
+	font-size: 18px;
+	background: #f38021;
+	color: #fff;
+	border: none;
+	border-radius: 28px;
+	cursor: pointer;
+	font-weight: 600;
+}
+
+.nm_bannerimage {
+	width: 50%; /* 배너 오른쪽에 이미지를 배치 */
+	height: 100%; /* 배너의 전체 높이를 맞추기 */
+}
 </style>
 
 
 
 <!-- 걍 이걸 로 나중에 뒤로/앞으로/새로가기 막자  -->
 <c:choose>
-    <c:when test="${empty sessionScope.visited}">
-        <!-- 첫 방문 -->
-        <c:set var="visitStatus" value="first" />
-        <c:set var="visited" value="true" scope="session" />
-    </c:when>
-    <c:otherwise>
-        <!-- 새로고침 또는 재방문 -->
-        <c:set var="visitStatus" value="return" />
-    </c:otherwise>
+	<c:when test="${empty sessionScope.visited}">
+		<!-- 첫 방문 -->
+		<c:set var="visitStatus" value="first" />
+		<c:set var="visited" value="true" scope="session" />
+	</c:when>
+	<c:otherwise>
+		<!-- 새로고침 또는 재방문 -->
+		<c:set var="visitStatus" value="return" />
+	</c:otherwise>
 </c:choose>
-
-
-
 
 
 
@@ -675,7 +638,9 @@ color: #555;
 
 var check;
 var key;
-	window.onload = function() {			
+	window.onload = function() {	
+		
+		
 		
 		$("#testBtn").on("click", function() {
 		    ajaxRequest({
@@ -882,41 +847,37 @@ const topTenOnedayclassComponentLoad = () => {
 	}//윈도우 온로드 함수 종료
 </script>
 </head>
+
+
+
+
+
+
 <body style="height: 100vh;">
 	<div class="allwrapper">
-	
-	<!-- <button id="testBtn" >서버 오류 테스트</button> -->
-<%-- 	 <img src="${pageContext.request.contextPath}/resources/cmd/dot.bmp">
+
+		<!-- <button id="testBtn" >서버 오류 테스트</button> -->
+		<%-- 	 <img src="${pageContext.request.contextPath}/resources/cmd/dot.bmp">
 <script src="${pageContext.request.contextPath}/resources/cmd/dot.bmp"></script> --%>
 
 
 
 		<%@ include file="../pcNave.jsp"%>
-				
-<div class="nm_mainbanner">
-  <div class="nm_bannerinfoarea">
-    <div class="nm_bannerinfo">
-      <h3>
-        모두의 화방에서 <br> 새로운 기회를 열어보세요
-      </h3>
-      <p>
-       그림을 그리며 즐거워질 수 있도록
-      </p>
-      <button class="nm_banneropenbtn">
-        클래스 오픈하기
-      </button>
-    </div>
-  </div>
-  <div class="nm_bannerimage">
-    <!-- 여기에 이미지를 배경으로 사용 -->
-  </div>
-</div>
 
-
-
-
-
-
+		<div class="nm_mainbanner">
+			<div class="nm_bannerinfoarea">
+				<div class="nm_bannerinfo">
+					<h3>
+						모두의 화방에서 <br> 새로운 기회를 열어보세요
+					</h3>
+					<p>그림을 그리며 즐거워질 수 있도록</p>
+					<button class="nm_banneropenbtn">클래스 오픈하기</button>
+				</div>
+			</div>
+			<div class="nm_bannerimage">
+				<!-- 여기에 이미지를 배경으로 사용 -->
+			</div>
+		</div>
 
 		<div class="centermenu">
 			<div class="centercontainder">
@@ -1031,7 +992,8 @@ const topTenOnedayclassComponentLoad = () => {
 				<div class="rowwrapper">
 					<div class="rows">
 						<div class="logoarea">
-							<img src="${pageContext.request.contextPath}/resources/img_mainhome/logo1.png">
+							<img
+								src="${pageContext.request.contextPath}/resources/img_mainhome/logo1.png">
 						</div>
 						<div class="infoarea">상호 : 아트토리 대표 : 이곤 주소 : 서울시 노원구 상계로 74
 							4F 사업자번호 : 105-17-78854</div>
@@ -1039,14 +1001,16 @@ const topTenOnedayclassComponentLoad = () => {
 
 					<div class="rows">
 						<div class="logoarea">
-							<img src="${pageContext.request.contextPath}/resources/img_mainhome/logo2.png">
+							<img
+								src="${pageContext.request.contextPath}/resources/img_mainhome/logo2.png">
 						</div>
 						<div class="infoarea">male : ###@naver.com</div>
 					</div>
 
 					<div class="rows">
 						<div class="logoarea">
-							<img src="${pageContext.request.contextPath}/resources/img_mainhome/logo3.png">
+							<img
+								src="${pageContext.request.contextPath}/resources/img_mainhome/logo3.png">
 						</div>
 						<div class="infoarea">tell : 027-###-###</div>
 					</div>
@@ -1070,9 +1034,10 @@ const topTenOnedayclassComponentLoad = () => {
 
 
 			<div class="contents">
-			
+
 				<div class="contentsitems">
-					<a href="${pageContext.request.contextPath}/guest/onedayclass-intro">
+					<a
+						href="${pageContext.request.contextPath}/guest/onedayclass-intro">
 						<div class="classcontent"></div>
 						<h4>원데이클래스 소개</h4>
 					</a>
@@ -1086,7 +1051,8 @@ const topTenOnedayclassComponentLoad = () => {
 				</div>
 
 				<div class="contentsitems">
-					<a href="${pageContext.request.contextPath}/guest/get-onedayclass-detail-one-page">
+					<a
+						href="${pageContext.request.contextPath}/guest/get-onedayclass-detail-one-page">
 						<div class="workcontent"></div>
 						<h4>원데이클래스 수업확인</h4>
 					</a>
@@ -1104,22 +1070,22 @@ const topTenOnedayclassComponentLoad = () => {
 
 
 
-		<div class="centermenu">
-			<div class="centercontainder">
-				<div class="centermenutitlearea">
-					<h3>참여자들이 검증한</h3>
-					<p>인기 원데이 클래스</p>
+			<div class="centermenu">
+				<div class="centercontainder">
+					<div class="centermenutitlearea">
+						<h3>참여자들이 검증한</h3>
+						<p>인기 원데이 클래스</p>
+					</div>
+					<!-- 여기 안에 JSP fragment가 AJAX로 삽입됨 -->
+					<div class="toptenOnedayclass"></div>
+
 				</div>
-				<!-- 여기 안에 JSP fragment가 AJAX로 삽입됨 -->
-				<div class="toptenOnedayclass"></div>
 
 			</div>
 
-		</div>
 
 
-
-	<!-- 		<div class="mainbanner">
+			<!-- 		<div class="mainbanner">
 
 			
 
@@ -1142,8 +1108,8 @@ const topTenOnedayclassComponentLoad = () => {
 			
 			</div> -->
 		</div>
-		
-		
+
+
 
 		<footer class="footer">
 			<div class="footercontainer">
@@ -1151,22 +1117,25 @@ const topTenOnedayclassComponentLoad = () => {
 				<div class="rowwrapper">
 					<div class="rows">
 						<div class="logoarea">
-							<img src="${pageContext.request.contextPath}/resources/img_mainhome/logo1.png">
+							<img
+								src="${pageContext.request.contextPath}/resources/img_mainhome/logo1.png">
 						</div>
-						<div class="footertext infoarea">상호 : 아트토리 대표 : 이곤 주소 : 서울시 노원구 상계로 74
-							4F 사업자번호 : 105-17-78854</div>
+						<div class="footertext infoarea">상호 : 아트토리 대표 : 이곤 주소 : 서울시
+							노원구 상계로 74 4F 사업자번호 : 105-17-78854</div>
 					</div>
 
 					<div class="rows">
 						<div class="logoarea">
-							<img src="${pageContext.request.contextPath}/resources/img_mainhome/logo2.png">
+							<img
+								src="${pageContext.request.contextPath}/resources/img_mainhome/logo2.png">
 						</div>
 						<div class="footertext infoarea">male : ###@naver.com</div>
 					</div>
 
 					<div class="rows">
 						<div class="logoarea">
-							<img src="${pageContext.request.contextPath}/resources/img_mainhome/logo3.png">
+							<img
+								src="${pageContext.request.contextPath}/resources/img_mainhome/logo3.png">
 						</div>
 						<div class="footertext infoarea">tell : 027-###-###</div>
 					</div>
@@ -1174,8 +1143,18 @@ const topTenOnedayclassComponentLoad = () => {
 
 			</div>
 		</footer>
-		
+
 	</div>
 	<!-- 모바일디자인 종료 -->
 </body>
+<script src="https://openfpcdn.io/fingerprintjs/v3"></script>
+<script>
+console.log("window.FingerprintJS:", window.FingerprintJS);
+</script>
+
+
+
+
+
+
 </html>

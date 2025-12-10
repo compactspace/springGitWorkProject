@@ -22,12 +22,13 @@ public class TeacherInsertResult {
 		this.bussinessStatus = bussinessStatus;
 		
 		if(!bussinessStatus) {
-			
-			this.bussinessFaileReason = bussinessStatusReason;
+		    this.bussinessFaileReason = bussinessStatusReason;
+		    this.bussinessSuccessReason = null; // 실패이면 성공 메시지는 제거
+		} else {
+		    this.bussinessSuccessReason = bussinessStatusReason;
+		    this.bussinessFaileReason = null; // 성공이면 실패 메시지는 제거
 		}
-		else {
-			this.bussinessSuccessReason = bussinessStatusReason;
-		}
+
 	}
 	
 	

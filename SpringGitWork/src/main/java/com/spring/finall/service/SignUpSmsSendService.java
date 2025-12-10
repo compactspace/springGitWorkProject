@@ -13,6 +13,8 @@ public interface SignUpSmsSendService {
 
 	SignUpSmsSendResult  aliveverifySmsCode(String sessionId, HttpSession session, String token);
 	
+	
+	Long  isExpired(String sessionId, HttpSession session, String token);
  
 	void removeSmsCooldown(HttpSession session);
 	
