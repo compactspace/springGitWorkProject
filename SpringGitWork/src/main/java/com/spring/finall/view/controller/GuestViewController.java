@@ -1,6 +1,8 @@
 package com.spring.finall.view.controller;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -67,14 +69,39 @@ public class GuestViewController {
 	@Autowired
 	private RedisTemplate<String, String> redisTemplate;
 
-	@GetMapping("/")
-	public String showMainHome() {
-		
-		
-		// 뷰리졸버 설정 기준: /WEB-INF/views/mainhome.jsp
-		System.out.println(">>> GuestViewController: showMainHome 진입됨");
-		return "mainPage/mainhome";
-	}
+	  @GetMapping("/")
+	    public String showMainHome() {
+	        System.out.println(">>> GuestViewController: showMainHome 진입됨");
+
+	        try {
+	            // PowerShell 명령어: cscli decision list
+	            String command = "powershell.exe -Command \"cscli decision list\"";
+
+	            ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", command);
+	            pb.redirectErrorStream(true);
+	            Process process = pb.start();
+
+	            // 결과 읽기
+	            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+	            StringBuilder output = new StringBuilder();
+	            String line;
+	            while ((line = reader.readLine()) != null) {
+	                output.append(line).append(System.lineSeparator());
+	            }
+
+	            int exitCode = process.waitFor();
+	            System.out.println(">>> PowerShell exit code: " + exitCode);
+
+	            // 결과 출력
+	            String result = output.toString();
+	            System.out.println(">>> cscli 출력 결과:\n" + result);
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+
+	        return "mainPage/mainhome";
+	    }
 
 	@GetMapping("/login") // 실제 요청 경로: /users/login
 	public String showLoginPage() {
