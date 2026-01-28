@@ -104,8 +104,10 @@ public class GuestViewController {
 	    }
 
 	@GetMapping("/login") // 실제 요청 경로: /users/login
-	public String showLoginPage() {
+	public String showLoginPage(HttpSession session) {
 	
+		session.setAttribute("age", 21);
+		
 		return "loginPage/login"; // 뷰리졸버에 의해 /WEB-INF/views/login.jsp로 매핑됨
 	}
 
@@ -410,48 +412,44 @@ public class GuestViewController {
 	}
 	
 	@RequestMapping(value = "/search")
-	public String showSearchResultPage(Model model,
-			@RequestParam(defaultValue = "community") String keywordType,
-			@RequestParam("query") String query	,	
-			  @RequestParam(defaultValue = "1") int page,
-		        @RequestParam(defaultValue = "10") int limit	,
-			 @CookieValue(value = "cachyTotalCnt", defaultValue = "0") String cachyTotalCnt  // 쿠키값 읽기
-			) throws Exception {
-		System.out.println("쿠키 cachyTotalCnt 값: " + cachyTotalCnt);	
-		
-		if(keywordType.equals("community")) {
-			
-			
-			ArtworkVO artWorkVO= new ArtworkVO();
-			 int offSet = (page - 1) * limit;
-			    
-	
-			    artWorkVO.setContent(query);
-			    artWorkVO.setLimit(limit);
-			    artWorkVO.setOffSet(offSet);
+	public String showSearchResultPage(Model model, @RequestParam(defaultValue = "community") String keywordType,
+			@RequestParam("query") String query, @RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "10") int limit,
+			@CookieValue(value = "cachyTotalCnt", defaultValue = "0") String cachyTotalCnt // 쿠키값 읽기
+	) throws Exception {
+		System.out.println("쿠키 cachyTotalCnt 값: " + cachyTotalCnt);
 
-			int TotalCnt=Integer.parseInt(cachyTotalCnt);
-			
-			if(TotalCnt<=0) {				
-			int totalCnt=artWorkService.searchyCntAll(artWorkVO);
-			model.addAttribute("totalCnt", totalCnt);
-			}
-			else {
-				
+		if (keywordType.equals("community")) {
+
+			ArtworkVO artWorkVO = new ArtworkVO();
+			int offSet = (page - 1) * limit;
+
+			artWorkVO.setContent(query);
+			artWorkVO.setLimit(limit);
+			artWorkVO.setOffSet(offSet);
+
+			int TotalCnt = Integer.parseInt(cachyTotalCnt);
+
+			if (TotalCnt <= 0) {
+				int totalCnt = artWorkService.searchyCntAll(artWorkVO);
+				model.addAttribute("totalCnt", totalCnt);
+			} else {
+
 				model.addAttribute("totalCnt", TotalCnt);
 			}
+
+			Map<String, Object> searchData = artWorkService.searchyArtWork(artWorkVO);
+			model.addAttribute("searchyList", searchData.get("searchyList")); // List<Map<String,Object>>
+			model.addAttribute("query", query); // Boolean
+		}
+		if(keywordType.equals("product")) {
 			
-			Map<String, Object>  searchData =	artWorkService.searchyArtWork(artWorkVO);
-			model.addAttribute("searchyList", searchData.get("searchyList"));  // List<Map<String,Object>>
-			model.addAttribute("query", query);          // Boolean
+			
 		}
 		
 		
-		
 
-	    return "searchResultPage/searchResultPage";
+		return "searchResultPage/searchResultPage";
 	}
-	
-	
 	
 }

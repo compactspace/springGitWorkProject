@@ -41,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
 		List<Map<String, Object>> list = orderServiceDAO.selectOneDraftOrder(user_id);
 		Map<String, Object> myDraftOrderInfo = null;
 		boolean 장바구니가변했니 = false;
-
+		
 		if (list != null && !list.isEmpty()) {
 			myDraftOrderInfo = list.get(0);
 			장바구니가변했니 = findUpdateDraftValues(params, myDraftOrderInfo);
@@ -51,7 +51,13 @@ public class OrderServiceImpl implements OrderService {
 			myDraftOrderInfo = list.get(0);
 			List<Long> orderItemIdList = new ArrayList<Long>();
 
-			for (int k = 0; k < list.size(); k++) {
+			
+			int 디비에서결제대기중인오더항목갯수=list.size();
+			if(orderRequestDTO.getItems().size()<list.size()) {
+				디비에서결제대기중인오더항목갯수=orderRequestDTO.getItems().size();
+				
+			}
+			for (int k = 0; k < 디비에서결제대기중인오더항목갯수; k++) {
 				Long order_item_id = (Long) list.get(k).get("order_item_id");
 				orderItemIdList.add(k, order_item_id);
 				orderRequestDTO.getItems().get(k).setOrderItemId(order_item_id);
@@ -66,7 +72,7 @@ public class OrderServiceImpl implements OrderService {
 			params.put("order_info_id", order_info_id);
 
 			// 여기서부턴 좀 위험하니 생각하자.
-			//
+			
 
 			orderServiceDAO.updateDraftOrderItem(params);
 			// 여기서 항목도 찾아서 업데이트해주는 DAO메서드 추가하자.

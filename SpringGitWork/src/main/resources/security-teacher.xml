@@ -16,19 +16,19 @@
 <!-- =========================
 1. Teacher 뷰 (JSP 페이지) 관련 보안
 ========================= -->
-<http pattern="/teachers/**" 
+<!-- <http pattern="/teacher/**" 
       use-expressions="true" entry-point-ref="teacherAuthenticationEntryPoint">
 
-    <!-- 권한 부족(403) 처리 -->
+    권한 부족(403) 처리
     <access-denied-handler ref="teacher403" />
 
-    <!-- /teachers/** 는 로그인된 teacher만 접근 가능 -->
-    <intercept-url pattern="/teachers/**" access="hasRole('ROLE_TEACHER')" />
+    /teachers/** 는 로그인된 teacher만 접근 가능
+    <intercept-url pattern="/teacher/**" access="hasRole('ROLE_TEACHER')" />
 
-    <!-- 로그아웃 -->
-    <logout logout-url="/teachers/logout"
+    로그아웃
+    <logout logout-url="/teacher/logout"
             logout-success-url="/guest/" />
-</http>
+</http> -->
 
 <!-- =========================
 2. Teacher API
@@ -50,9 +50,18 @@
     <intercept-url pattern="/teacher/signup-page" access="permitAll" />
     <intercept-url pattern="/teacher/login-page" access="permitAll" />
     <intercept-url pattern="/teacher/logingo.do" access="permitAll" />
+
+	<!-- 권한 부족(403) 처리 -->
+    <access-denied-handler ref="teacher403" />
+
+    <!-- /teachers/** 는 로그인된 teacher만 접근 가능 -->
+    <intercept-url pattern="/teacher/**" access="hasRole('ROLE_TEACHER')" />
+
   
     <!-- teacher 로그인 필터 -->
     <custom-filter before="FORM_LOGIN_FILTER" ref="loginFormTeacherFilter" />
+
+
 
  
 </http>

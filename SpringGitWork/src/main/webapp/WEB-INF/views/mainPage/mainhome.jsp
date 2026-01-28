@@ -630,6 +630,15 @@
 
 
 
+<script>
+    window.AUTH = {
+        isUser: false,
+        isTeacher: false,
+        isAnonymous: false
+    };
+</script>
+
+
 
 
 <script>
@@ -810,6 +819,27 @@ var key;
 
 
 
+$(document).on('click', ".nm_banneropenbtn", function () {
+	
+	const pageContext="${pageContext.request.contextPath}";
+    if (AUTH.isTeacher) {
+    	location.href=pageContext+"/teacher/teacher-my-info"
+    } else if (AUTH.isUser) {
+    	location.href=pageContext+"/guest/onedayclass-intro"
+    } else if (AUTH.isAnonymous) {
+    	location.href=pageContext+"/guest/login"
+    }
+});
+	
+	
+
+	
+	
+	
+	
+
+
+
 const topTenOnedayclassComponentLoad = () => {
 
 	
@@ -867,12 +897,61 @@ const topTenOnedayclassComponentLoad = () => {
 		<div class="nm_mainbanner">
 			<div class="nm_bannerinfoarea">
 				<div class="nm_bannerinfo">
-					<h3>
-						모두의 화방에서 <br> 새로운 기회를 열어보세요
-					</h3>
-					<p>그림을 그리며 즐거워질 수 있도록</p>
-					<button class="nm_banneropenbtn">클래스 오픈하기</button>
-				</div>
+	<h3>
+		<sec:authorize access="hasRole('ROLE_TEACHER')">
+			모두의 화방에서 <br> 클래스를 열어보세요
+		</sec:authorize>
+
+		<sec:authorize access="hasAuthority('user')">
+			모두의 화방에서 <br> 배움을 시작해보세요
+		</sec:authorize>
+
+		<sec:authorize access="!isAuthenticated()">
+			모두의 화방에서 <br> 새로운 기회를 열어보세요
+		</sec:authorize>
+	</h3>
+
+	<p>
+		<sec:authorize access="hasRole('ROLE_TEACHER')">
+			나만의 클래스를 만들어 수강생을 만나보세요
+		</sec:authorize>
+
+		<sec:authorize access="hasAuthority('user')">
+			그림을 그리며 즐거워질 수 있도록
+		</sec:authorize>
+
+		<sec:authorize access="!isAuthenticated()">
+			회원가입 후 다양한 클래스를 만나보세요
+		</sec:authorize>
+	</p>
+
+					<sec:authorize access="hasAuthority('user')">
+						<script> AUTH.isUser = true; </script>
+					</sec:authorize>
+					<sec:authorize access="hasRole('ROLE_TEACHER')">
+						<script> AUTH.isTeacher = true; </script>
+					</sec:authorize>
+					<sec:authorize access="!isAuthenticated()">
+						<script> AUTH.isAnonymous = true; </script>
+					</sec:authorize>
+
+
+
+					<button class="nm_banneropenbtn">
+		<sec:authorize access="hasRole('ROLE_TEACHER')">
+			클래스 관리하기
+		</sec:authorize>
+
+		<sec:authorize access="hasAuthority('user')">
+			클래스 둘러보기
+		</sec:authorize>
+
+		<sec:authorize access="!isAuthenticated()">
+			회원가입하기
+		</sec:authorize>
+	</button>
+</div>
+
 			</div>
 			<div class="nm_bannerimage">
 				<!-- 여기에 이미지를 배경으로 사용 -->

@@ -415,25 +415,29 @@ if (request.getParameter("cmd") != null)
          
         <!-- 🔍 검색창 삽입 -->
         <div class="search_box" id="top_search2" >
-            <div class="search_section">
-       <form id="searchBarForm" method="GET" action="${pageContext.request.contextPath}/guest/search">
-  <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-  
-  <div class="search_form">
-    <input id="queryTop" name="query" type="text" placeholder="검색어를 입력하세요" autocomplete="off" required>
-    <div class="divider"></div>
-    <select class="search_type" name="search_type">
-      <option value="community" selected>커뮤니티</option>
-      <option value="product">상품</option>
-    </select>
-    <div class="divider"></div>
-    <button type="submit" class="search_button">
-      <img src="https://hwabang.net/web/img/icon/search_icon.png" alt="검색" />
-    </button>
-  </div>
-</form>
-            </div>
-        </div>
+				<div class="search_section">
+					<form id="searchBarForm" method="GET"
+						action="${pageContext.request.contextPath}/guest/search">
+						<input type="hidden" name="${_csrf.parameterName}"
+							value="${_csrf.token}" />
+
+						<div class="search_form">
+							<input id="queryTop" name="query" type="text"
+								placeholder="검색어를 입력하세요" autocomplete="off" required>
+							<div class="divider"></div>
+							<select class="search_type" name="search_type">
+								<option value="community" selected>커뮤니티</option>
+								<!-- <option value="product">상품</option> -->
+							</select>
+							<div class="divider"></div>
+							<button type="submit" class="search_button">
+								<img src="https://hwabang.net/web/img/icon/search_icon.png"
+									alt="검색" />
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
         
            <!-- ✅ 글쓰기 버튼 추가 -->
         <sec:authorize access="!isAuthenticated()">

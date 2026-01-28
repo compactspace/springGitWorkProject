@@ -31,6 +31,24 @@
 
 
 
+<!-- JNA: Java Native Access -->
+<dependency>
+    <groupId>net.java.dev.jna</groupId>
+    <artifactId>jna</artifactId>
+    <version>5.13.0</version>
+</dependency>
+
+<!-- JNA 플랫폼 라이브러리 (윈도우 API 포함) -->
+<dependency>
+    <groupId>net.java.dev.jna</groupId>
+    <artifactId>jna-platform</artifactId>
+    <version>5.13.0</version>
+</dependency>
+
+
+
+
+
 		<!--스프링 시큐리티를 위한 2개의 라이브러리 -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>

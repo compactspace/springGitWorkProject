@@ -149,6 +149,8 @@
 <mapper resource="mappings/ManageOrderMapper.xml" />
 <mapper resource="mappings/ManageinventoryMapper.xml" />
 <mapper resource="mappings/ManageUserMapper.xml" />
+<mapper resource="mappings/FakeArtworkMapper.xml" />
+
 
 	</mappers>
 

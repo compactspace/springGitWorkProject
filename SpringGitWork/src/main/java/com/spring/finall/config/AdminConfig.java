@@ -60,6 +60,13 @@ public class AdminConfig implements WebMvcConfigurer {
 		datasource.setUrl("jdbc:mariadb://localhost:3306/finall");
 		datasource.setUsername("root");
 		datasource.setPassword("1111");
+		
+		// ★ 핵심 설정
+	    datasource.setInitialSize(1);   // 최초 생성 커넥션 수
+	    datasource.setMaxTotal(1);      // 최대 커넥션 수 (가장 중요)
+	    datasource.setMaxIdle(1);       // 유휴 커넥션 최대
+	    datasource.setMinIdle(1);       // 유휴 커넥션 최소
+		
 		return datasource;
 	}
 
