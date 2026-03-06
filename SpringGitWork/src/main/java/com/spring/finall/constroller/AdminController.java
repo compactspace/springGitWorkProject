@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,17 +40,23 @@ import org.springframework.web.multipart.MultipartFile;
 import com.spring.finall.apiResponseController.ApiResponse;
 import com.spring.finall.exception.applicantDocumentException.ApplicantDocumentException;
 import com.spring.finall.exception.common.CommonFileException;
+import com.spring.finall.reqDto.InsertCategoryRequestDTO;
+import com.spring.finall.reqDto.atemptStockInRequestDTO.AtemptStockInRequestDTO;
+import com.spring.finall.reqDto.atemptStockInRequestDTO.AtemptStockInWrapperDTO;
 import com.spring.finall.reqDto.deliverRequest.RequestDeliverDTO;
+import com.spring.finall.reqDto.newInsertVendorRequest.newInsertVendorRequest;
 import com.spring.finall.reqDto.orderRequest.OrderItemDTO;
 import com.spring.finall.reqDto.refundRequest.AfterSuccesPgRefundDTO;
 import com.spring.finall.resDto.mannageUserListResPonse.ManageUserListResponseDTO;
 import com.spring.finall.service.ApplicantDocumentService;
+import com.spring.finall.service.CategoryService;
 import com.spring.finall.service.DeliverService;
 import com.spring.finall.service.ManageInventoryService;
 import com.spring.finall.service.ManageProductService;
 import com.spring.finall.service.ManageUserService;
 import com.spring.finall.service.OrderService;
 import com.spring.finall.service.ProductRefundService;
+import com.spring.finall.service.VendorService;
 import com.spring.finall.user.ProductGroupVO;
 import com.spring.finall.user.ProductVO;
 
@@ -82,7 +87,12 @@ public class AdminController {
 
 	@Autowired
 	private DeliverService deliverService;
-
+	@Autowired
+	private CategoryService categoryService;
+	
+	@Autowired
+	private VendorService vendorService;
+	
 	// unread-document-list
 	@GetMapping("/get-unread-document-list") // 실제 요청 경로: /users/login
 	@ResponseBody
@@ -228,26 +238,132 @@ public class AdminController {
 		return result;
 	}
 
-	@PostMapping("/add-product")
+//	@PostMapping("/add-product")
+//	@ResponseBody
+//	public ResponseEntity<ApiResponse<Map<String, Object>>> addProduct(@RequestParam("group_id") int groupId,
+//			@RequestParam("product_group") String product_group, @RequestParam("product_name") String name,
+//			@RequestParam("product_price") int price,
+//			@RequestParam(value = "online_product_quantity", required = false, defaultValue = "0") int online_product_quantity,
+//			@RequestParam(value = "product_info", required = false) String info,
+//			@RequestParam(value = "product_img", required = false) MultipartFile img,
+//			// 🔹 추가된 부분 (창고 ID 리스트)
+//			@RequestParam(value = "warehouse_id[]", required = false) List<Long> warehouseIds,
+//
+//			// 🔹 창고별 수량 Map (product_quantity[창고ID] 형태로 들어옴)
+//			@RequestParam Map<String, String> allParams) {
+//		Map<String, Object> resBodyData = new HashMap<>();
+//
+//		ApiResponse<Map<String, Object>> apiRes = null;
+//
+//		try {
+//			ProductVO productVO = new ProductVO();
+//
+//			productVO.setProduct_group(product_group);
+//			productVO.setGroup_id(groupId);
+//			productVO.setProduct_name(name);
+//			productVO.setProduct_price(price);
+//			productVO.setProduct_quantity(online_product_quantity);
+//			productVO.setProduct_info(info);
+//
+//			// 🔹 창고별 수량만 추출
+//			// 🔹 창고별 수량 Map 생성
+//			Map<String, Integer> quantityMap = new HashMap<>();
+//
+//			Iterator<Map.Entry<String, String>> it = allParams.entrySet().iterator();
+//			while (it.hasNext()) {
+//				Map.Entry<String, String> entry = it.next();
+//				String key = entry.getKey();
+//
+//				if (key.startsWith("product_quantity[")) {
+//					// [] 안의 값이 창고ID
+//					String warehouseId = key.substring("product_quantity[".length(), key.length() - 1);
+//					String valueStr = entry.getValue();
+//
+//					// 안전하게 Integer 변환
+//					int quantity = 0;
+//					if (valueStr != null && !valueStr.isEmpty()) {
+//						try {
+//							quantity = Integer.parseInt(valueStr);
+//						} catch (NumberFormatException e) {
+//							System.out.println("Invalid quantity for warehouse " + warehouseId + ": " + valueStr);
+//						}
+//					}
+//
+//					quantityMap.put(warehouseId, quantity);
+//				} else {
+//					// 🔹 나머지 키는 제거
+//					it.remove();
+//				}
+//			}
+//
+//			manageProductService.saveProduct(productVO, img, warehouseIds, quantityMap);
+//			resBodyData.put("success", true);
+//
+//			apiRes = ApiResponse.<Map<String, Object>>builder().code(201).success(true).message("상품을 등록하였습니다.")
+//					.data(resBodyData).build();
+//			return ResponseEntity.status(200).body(apiRes);
+//
+//		} catch (CommonFileException cfe) {
+//			resBodyData.put("success", false);
+//			resBodyData.put("message", cfe.getMessage());
+//
+//			apiRes = ApiResponse.<Map<String, Object>>builder().code(cfe.getBussinessCode()).success(false)
+//					.message(cfe.getMessage()).data(resBodyData).build();
+//			return ResponseEntity.status(400).body(apiRes);
+//
+//		}
+//
+//	}
+//		
+	
+	@PostMapping("/atempt-StockIn")
+	public ResponseEntity<?> atemptStockIn(
+	        @RequestBody AtemptStockInWrapperDTO request) {
+
+	    List<AtemptStockInRequestDTO> purchaseList = request.getPurchaceRows();
+	    List<AtemptStockInRequestDTO> initialList = request.getInitialRows();
+
+	    
+	    
+	    manageInventoryService.atemptStockIn(purchaseList, initialList);
+	    if (purchaseList != null) {
+	        purchaseList.forEach(dto ->
+	            System.out.println("일반입고: " + dto.getProductId())
+	        );
+	    }
+
+	    if (initialList != null) {
+	        initialList.forEach(dto ->
+	            System.out.println("최초입고: " + dto.getProductId())
+	        );
+	    }
+
+	    return ResponseEntity.ok().build();
+	}
+	
+	
+	
+	@PostMapping("/insert-product-infomation")
 	@ResponseBody
-	public ResponseEntity<ApiResponse<Map<String, Object>>> addProduct(@RequestParam("group_id") int groupId,
-			@RequestParam("product_group") String product_group, @RequestParam("product_name") String name,
+	public ResponseEntity<ApiResponse<Map<String, Object>>> insertProductInfomation(
+			@RequestParam("group_id") int groupId,
+			@RequestParam("category_id") int category_id,
+			@RequestParam("vendor_id") int vendor_id,			
+			@RequestParam("product_group") String product_group,
+			@RequestParam("product_name") String name,
 			@RequestParam("product_price") int price,
 			@RequestParam(value = "online_product_quantity", required = false, defaultValue = "0") int online_product_quantity,
 			@RequestParam(value = "product_info", required = false) String info,
-			@RequestParam(value = "product_img", required = false) MultipartFile img,
-			// 🔹 추가된 부분 (창고 ID 리스트)
-			@RequestParam(value = "warehouse_id[]", required = false) List<Long> warehouseIds,
-
-			// 🔹 창고별 수량 Map (product_quantity[창고ID] 형태로 들어옴)
-			@RequestParam Map<String, String> allParams) {
+			@RequestParam(value = "product_img", required = false) MultipartFile img
+		) {
 		Map<String, Object> resBodyData = new HashMap<>();
 
 		ApiResponse<Map<String, Object>> apiRes = null;
 
 		try {
-			ProductVO productVO = new ProductVO();
-
+			ProductVO productVO  = new ProductVO();
+			productVO.setVendor_id(vendor_id);
+			productVO.setCategory_id(category_id);
 			productVO.setProduct_group(product_group);
 			productVO.setGroup_id(groupId);
 			productVO.setProduct_name(name);
@@ -255,38 +371,9 @@ public class AdminController {
 			productVO.setProduct_quantity(online_product_quantity);
 			productVO.setProduct_info(info);
 
-			// 🔹 창고별 수량만 추출
-			// 🔹 창고별 수량 Map 생성
-			Map<String, Integer> quantityMap = new HashMap<>();
+		
 
-			Iterator<Map.Entry<String, String>> it = allParams.entrySet().iterator();
-			while (it.hasNext()) {
-				Map.Entry<String, String> entry = it.next();
-				String key = entry.getKey();
-
-				if (key.startsWith("product_quantity[")) {
-					// [] 안의 값이 창고ID
-					String warehouseId = key.substring("product_quantity[".length(), key.length() - 1);
-					String valueStr = entry.getValue();
-
-					// 안전하게 Integer 변환
-					int quantity = 0;
-					if (valueStr != null && !valueStr.isEmpty()) {
-						try {
-							quantity = Integer.parseInt(valueStr);
-						} catch (NumberFormatException e) {
-							System.out.println("Invalid quantity for warehouse " + warehouseId + ": " + valueStr);
-						}
-					}
-
-					quantityMap.put(warehouseId, quantity);
-				} else {
-					// 🔹 나머지 키는 제거
-					it.remove();
-				}
-			}
-
-			manageProductService.saveProduct(productVO, img, warehouseIds, quantityMap);
+			manageProductService.insertProductInfomation(productVO,img);
 			resBodyData.put("success", true);
 
 			apiRes = ApiResponse.<Map<String, Object>>builder().code(201).success(true).message("상품을 등록하였습니다.")
@@ -304,6 +391,25 @@ public class AdminController {
 		}
 
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	@PostMapping("/add-product-group")
 	@ResponseBody
@@ -336,6 +442,13 @@ public class AdminController {
 		}
 
 	}
+	
+	
+	
+	
+	
+	
+	
 
 	// order-list
 	@GetMapping("/search-order-list-with-date")
@@ -389,7 +502,9 @@ public class AdminController {
 	@PostMapping("/delegate-to-pg-refund")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> sendPayCancel(@RequestParam("impUid") String impUid,
-			@RequestParam("merchantUid") String merchantUid, @RequestParam("amount") int amount) {
+			@RequestParam("merchantUid") String merchantUid, @RequestParam("amount") int amount,
+			@RequestParam("orderInfoId") String orderInfoId
+			) {
 
 		Map<String, Object> resBodyData = new HashMap<>();
 
@@ -409,6 +524,9 @@ public class AdminController {
 
 			// PG 상태 코드에 따라 Spring 상태 코드 설정
 			if (pgStatus.is2xxSuccessful()) {
+				
+				
+				
 				return ResponseEntity.ok(resBodyData); // 성공
 			} else if (pgStatus.is4xxClientError()) {
 				return ResponseEntity.status(400).body(resBodyData);
@@ -425,6 +543,61 @@ public class AdminController {
 		}
 	}
 
+	
+	
+	@PostMapping("/payment-Cancelle-by-admmin")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> paymentCancelleByAdmmin(@RequestParam("impUid") String impUid,
+			@RequestParam("merchantUid") String merchantUid, @RequestParam("amount") int amount,
+			@RequestParam("orderInfoId") String orderInfoId
+			) {
+
+		Map<String, Object> resBodyData = new HashMap<>();
+
+		try {
+			ResponseEntity<Map<String, Object>> resFromPgServer = sendRefund(impUid, merchantUid, amount,
+					IMP_SECRET_KEY);
+
+			HttpStatus pgStatus = resFromPgServer.getStatusCode();
+			Map<String, Object> pgBody = resFromPgServer.getBody();
+
+			// JSON 바디에서 success, message 추출
+			Boolean success = pgBody != null ? (Boolean) pgBody.get("success") : false;
+			String message = pgBody != null ? (String) pgBody.get("message") : "PG 서버 응답 없음";
+
+			resBodyData.put("success", success);
+			resBodyData.put("message", message);
+
+			// PG 상태 코드에 따라 Spring 상태 코드 설정
+			if (pgStatus.is2xxSuccessful()) {			
+				
+				
+				return ResponseEntity.ok(resBodyData); // 성공
+			} else if (pgStatus.is4xxClientError()) {
+				return ResponseEntity.status(400).body(resBodyData);
+			} else if (pgStatus.is5xxServerError()) {
+				return ResponseEntity.status(500).body(resBodyData);
+			} else {
+				return ResponseEntity.status(pgStatus).body(resBodyData); // 기타 상태
+			}
+
+		} catch (Exception e) {
+			resBodyData.put("success", false);
+			resBodyData.put("message", "PF 서버 요청 중 오류 발생: " + e.getMessage());
+			return ResponseEntity.status(500).body(resBodyData);
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public ResponseEntity<Map<String, Object>> sendRefund(String impUid, String merchantUid, int amount,
 			String IMP_SECRET_KEY) throws Exception {
 		// 1️⃣ payload 생성
@@ -489,6 +662,36 @@ public class AdminController {
 		resBodyData.put("message", "PG사로부터 정식 환불이 되었으며, 재고반영에 성공하였습니다.");
 		return ResponseEntity.status(200).body(resBodyData);
 	}
+	
+	
+	
+	@PostMapping("/cancelled-by-admin-after-succes-pg-refund")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> cancelledByAdminAfterSuccesPgRefund(@RequestBody AfterSuccesPgRefundDTO request) {
+
+		// 단일 값 사용
+		String impUid = request.getImpUid();
+		String merchantUid = request.getMerchantUid();
+		String orderInfoId = request.getOrderInfoId();
+		String paymentId = request.getPaymentId();
+		int amount = request.getAmount();
+		// 주문 항목 리스트
+		List<OrderItemDTO> orderList = request.getOrderItemList();
+
+		Map<String, Object> resBodyData = new HashMap<>();
+		boolean status = orderService.updateOrderStatusToRefunded(impUid, merchantUid, orderInfoId, paymentId,
+				orderList);
+		if (!status) {
+			resBodyData.put("message", "백엔드 디비 에러");
+			return ResponseEntity.status(500).body(resBodyData);
+
+		}
+		resBodyData.put("message", "PG사로부터 정식 환불이 되었으며, 재고반영에 성공하였습니다.");
+		return ResponseEntity.status(200).body(resBodyData);
+	}
+	
+	
+	
 
 	@PostMapping("/delegate-to-deliver")
 	@ResponseBody
@@ -511,16 +714,79 @@ public class AdminController {
 
 	@PostMapping("/get-userlist")
 	@ResponseBody
-	public ResponseEntity<Map<String, List<ManageUserListResponseDTO>>> getUserList() {
-		
+	public ResponseEntity<Map<String, List<ManageUserListResponseDTO>>> getUserList() {		
 		Map<String,List<ManageUserListResponseDTO>> map = new HashMap<>();
-		map.put("findUserList", manageUserService.getUserList());
-		
+		map.put("findUserList", manageUserService.getUserList());		
 	return	ResponseEntity.status(200).body(map);
+	}
+	
+	// new-vendor-insert
+	@PostMapping("/new-vendor-insert")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> newVendorInsert(
+	        @RequestBody newInsertVendorRequest newInsertVendorRequestVO) {
+
+	    System.out.println("받은 데이터 = " + newInsertVendorRequestVO.toString());
+
+	    int result = vendorService.newVendorInsert(newInsertVendorRequestVO);
+
+	    Map<String, Object> resBodyData = new HashMap<>();
+
+	    if (result > 0) { // 성공
+	        resBodyData.put("success", true);
+	        resBodyData.put("message", "거래처 등록 완료!");
+	        return ResponseEntity.ok(resBodyData);
+
+	    } else if (result == -1) { // 중복 사업자 번호
+	        resBodyData.put("success", false);
+	        resBodyData.put("message", "사업자 번호가 이미 존재합니다.");
+	        return ResponseEntity.status(HttpStatus.CONFLICT).body(resBodyData);
+
+	    } else if (result == -2) { // 무결성 위반 (DB 제약 조건 등)
+	        resBodyData.put("success", false);
+	        resBodyData.put("message", "데이터 무결성 오류가 발생했습니다.");
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resBodyData);
+
+	    } else { // 기타 서버 오류
+	        resBodyData.put("success", false);
+	        resBodyData.put("message", "서버 내부 오류가 발생했습니다.");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(resBodyData);
+	    }
+	}
+
+	
+	
+	@PostMapping("/category-insert")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> categoryInsert(
+	        @RequestBody InsertCategoryRequestDTO insertCategoryRequestDTO) {
+		
+		int result= categoryService.insertCategory(insertCategoryRequestDTO);
 		
 		
+		
+		  Map<String, Object> resBodyData = new HashMap<>();
 
+		    if (result > 0) { // 성공
+		        resBodyData.put("success", true);
+		        resBodyData.put("message", "거래처 등록 완료!");
+		        return ResponseEntity.ok(resBodyData);
 
+		    } else if (result == -1) { // 중복 사업자 번호
+		        resBodyData.put("success", false);
+		        resBodyData.put("message", "사업자 번호가 이미 존재합니다.");
+		        return ResponseEntity.status(HttpStatus.CONFLICT).body(resBodyData);
+
+		    } else if (result == -2) { // 무결성 위반 (DB 제약 조건 등)
+		        resBodyData.put("success", false);
+		        resBodyData.put("message", "데이터 무결성 오류가 발생했습니다.");
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resBodyData);
+
+		    } else { // 기타 서버 오류
+		        resBodyData.put("success", false);
+		        resBodyData.put("message", "서버 내부 오류가 발생했습니다.");
+		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(resBodyData);
+		    }
 	}
 	
 	

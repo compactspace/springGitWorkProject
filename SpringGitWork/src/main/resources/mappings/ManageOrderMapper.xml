@@ -52,9 +52,8 @@
     LEFT JOIN order_status AS os
         ON oi.order_status_id = os.status_id
     WHERE oi.order_date BETWEEN #{startOfWeek} AND #{endOfWeek}
-    <if test="statusCode != null and statusCode != ''">
-        AND os.status_code = #{statusCode}
-    </if>
+    AND os.status_id = #{statusId} 
+        AND oi.order_status_id=#{statusId}
     ORDER BY oi.order_info_id DESC
 </select>
 

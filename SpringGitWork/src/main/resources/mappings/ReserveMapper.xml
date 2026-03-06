@@ -16,6 +16,7 @@
 		WHERE
 		r.onedayclass_num = #{onedayclass_num}
 		AND DATE_FORMAT(r.openday, '%Y-%m') = #{searchMonth}
+		AND manageStatus='open'
 	</select>
 
 

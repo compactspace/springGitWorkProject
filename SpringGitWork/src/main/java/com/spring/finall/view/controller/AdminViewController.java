@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,12 +18,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spring.finall.reqDto.getCateGoryListDTO.GetCateGoryListDTO;
+import com.spring.finall.reqDto.getVendorListDTO.GetVendorListDTO;
 import com.spring.finall.service.ApplicantDocumentService;
 import com.spring.finall.service.ArtworkService;
+import com.spring.finall.service.CategoryService;
 import com.spring.finall.service.ManageInventoryService;
 import com.spring.finall.service.ManageProductService;
 import com.spring.finall.service.OrderService;
 import com.spring.finall.service.ProductRefundService;
+import com.spring.finall.service.VendorService;
+import com.spring.finall.user.CategoryWithProductsVO;
+import com.spring.finall.user.GetIncomingStockListVO;
 import com.spring.finall.user.InventoryVO;
 import com.spring.finall.user.OrderStatusVO;
 import com.spring.finall.user.WarehouseVO;
@@ -49,6 +56,13 @@ public class AdminViewController {
 	@Autowired
 	private ManageInventoryService manageInventoryService;
 
+	
+	@Autowired
+	private CategoryService categoryService;
+	
+	@Autowired
+	private VendorService vendorService;
+	
 	@GetMapping("/main")
 	public String showMainHome(Model model) {
 
@@ -111,6 +125,15 @@ public class AdminViewController {
 		return "adminManageOrderListPage/adminManageOrderListPage";
 	}
 
+	
+	//
+	// order-list
+		@GetMapping("/new-vendor-insert")
+		public String newVendorInsert(Model model) throws JsonProcessingException {		
+			return "adminNewVendorInsert/adminNewVendorInsert";
+		}
+	
+	
 	// delivery-list
 
 	@GetMapping("/delivery-list")
@@ -179,11 +202,28 @@ public class AdminViewController {
 	
 
 	@GetMapping("/active-product-list") // 실제 요청 경로: /users/login
-	public String showgActiveProductList(Model model) {
+	public String showgActiveProductList(Model model) throws JsonProcessingException {
 
 		List<Map<String, Object>> productCodeList = manageProductService.getProductCode();
+			List<CategoryWithProductsVO>	buildedTreeProductWithCategoryList	=	manageProductService.getProductListWithCategory();
 
-		model.addAttribute("productCodeList", productCodeList);
+						model.addAttribute("productCodeList", productCodeList);
+						model.addAttribute("buildedTreeProductWithCategoryList", new ObjectMapper().writeValueAsString(buildedTreeProductWithCategoryList));
+						
+		
+		List<GetCateGoryListDTO> categoryList = categoryService.getCategoryList();
+		
+		// 벤더 목록 가져오기 (isActive 필터 적용 가능)
+		List<GetVendorListDTO> vendorList = vendorService.getVendorList();			
+		// 모델에 추가
+		model.addAttribute("categoryList", new ObjectMapper().writeValueAsString(categoryList));
+		model.addAttribute("vendorList", new ObjectMapper().writeValueAsString(vendorList));
+
+		
+	
+	
+		
+		
 
 		return "adminManageActiveProductListPage/adminManageActiveProductListPage"; // 뷰리졸버에 의해
 																					// /WEB-INF/views/login.jsp로 매핑됨
@@ -195,9 +235,60 @@ public class AdminViewController {
 
 		List<Map<String, Object>> productCodeList = manageProductService.getProductCode();
 		List<WarehouseVO> wareHouseList = manageInventoryService.getWarehouseList();
+		List<CategoryWithProductsVO> buildedTreeProductWithCategoryList = manageProductService.getProductListWithCategory();
 		model.addAttribute("productCodeList", productCodeList);
 		model.addAttribute("wareHouseList", wareHouseList);
+		model.addAttribute("buildedTreeProductWithCategoryList", buildedTreeProductWithCategoryList);
 		return "adminManageAdProductPage/adminManageAdProductPage"; // 뷰리졸버에 의해
+																	// /WEB-INF/views/login.jsp로 매핑됨
+
+	}
+	//
+	
+	@GetMapping("/manage-vendor-list") 
+	public String showManageVendorList(
+	        Model model,
+	        @CookieValue(value = "isCashed", defaultValue = "false") boolean isCashed
+	      ) throws JsonProcessingException {
+
+		if(!isCashed) {
+			// 카테고리 목록 가져오기
+			List<GetCateGoryListDTO> categoryList = categoryService.getCategoryList();
+			
+			// 벤더 목록 가져오기 (isActive 필터 적용 가능)
+			List<GetVendorListDTO> vendorList = vendorService.getVendorList();			
+			// 모델에 추가
+			model.addAttribute("categoryList", new ObjectMapper().writeValueAsString(categoryList));
+			model.addAttribute("vendorList", new ObjectMapper().writeValueAsString(vendorList));
+
+		}
+		
+		List<Map<String, Object>> productCodeList = manageProductService.getProductCode();
+		List<WarehouseVO> wareHouseList = manageInventoryService.getWarehouseList();
+		model.addAttribute("productCodeList", productCodeList);
+		model.addAttribute("wareHouseList", wareHouseList);
+
+	    return "adminManageVendorListPage/adminManageVendorListPage";
+	}
+	//stockin-from-vendor
+	@GetMapping("/stockin-from-vendor") // 실제 요청 경로: /users/login
+	public String showgStockinFromVendor(Model model) throws JsonProcessingException {
+		
+		
+		List<GetIncomingStockListVO>  getIncomingStockListVO=	manageInventoryService.getIncomingStockList();
+		List<WarehouseVO> wareHouseList = manageInventoryService.getWarehouseList();
+		model.addAttribute("wareHouseList",  new ObjectMapper().writeValueAsString(wareHouseList));
+		model.addAttribute("getIncomingStockListVO", new ObjectMapper().writeValueAsString(getIncomingStockListVO));
+		return "adminManageStockinFromVendorPage/adminManageStockinFromVendorPage"; // 뷰리졸버에 의해
+																	// /WEB-INF/views/login.jsp로 매핑됨
+
+	}
+	
+	@GetMapping("/add-category") // 실제 요청 경로: /users/login
+	public String showgAddCategoryPage(Model model) {
+
+		
+		return "adminManageAddCategoryPage/adminManageAddCategoryPage"; // 뷰리졸버에 의해
 																	// /WEB-INF/views/login.jsp로 매핑됨
 
 	}

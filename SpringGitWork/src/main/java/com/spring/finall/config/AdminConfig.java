@@ -4,6 +4,14 @@ import java.util.List;
 
 import org.apache.commons.chain.web.WebContext;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.QueueBuilder;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -14,11 +22,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import com.spring.interceptor.SecurityLogInterceptor;
 
 //@Configuration
 //→ 해당 클래스가 스프링 설정 클래스임을 나타냄.
@@ -47,84 +52,137 @@ import com.spring.interceptor.SecurityLogInterceptor;
 //@EnableJpaRepositories("com.spring.finall")
 public class AdminConfig implements WebMvcConfigurer {
 
-	// aws 로 연결 할거면 jdbc:mysql://13.209.16.121:3306/octfair2?allowMultiQueries=true
-	// 아이디는 root 비번은 hwangkh704!
+    // aws 로 연결 할거면 jdbc:mysql://13.209.16.121:3306/octfair2?allowMultiQueries=true
+    // 아이디는 root 비번은 hwangkh704!
 
-	// local로 연결할거면 jdbc:mariadb://localhost:3306/finall
-	// 아이디는 root 비번은 1111
+    // local로 연결할거면 jdbc:mariadb://localhost:3306/finall
+    // 아이디는 root 비번은 1111
 
-	@Bean
-	public BasicDataSource dataSource() {
-		BasicDataSource datasource = new BasicDataSource();
-		datasource.setDriverClassName("org.mariadb.jdbc.Driver");
-		datasource.setUrl("jdbc:mariadb://localhost:3306/finall");
-		datasource.setUsername("root");
-		datasource.setPassword("1111");
-		
-		// ★ 핵심 설정
-	    datasource.setInitialSize(1);   // 최초 생성 커넥션 수
-	    datasource.setMaxTotal(1);      // 최대 커넥션 수 (가장 중요)
-	    datasource.setMaxIdle(1);       // 유휴 커넥션 최대
-	    datasource.setMinIdle(1);       // 유휴 커넥션 최소
-		
-		return datasource;
-	}
+    @Bean
+    public BasicDataSource dataSource() {
+        BasicDataSource datasource = new BasicDataSource();
+        datasource.setDriverClassName("org.mariadb.jdbc.Driver");
+        datasource.setUrl("jdbc:mariadb://localhost:3306/finall");
+        datasource.setUsername("root");
+        datasource.setPassword("1111");
 
-	// jpa 설정
-	// META-INF에서 만들었던 persistence.xml 을 가지고 메니져를 만든다.
-	/*
-	 * @Bean public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-	 * LocalContainerEntityManagerFactoryBean entityManagerFactory = new
-	 * LocalContainerEntityManagerFactoryBean();
-	 * entityManagerFactory.setDataSource(dataSource());
-	 * entityManagerFactory.setPersistenceUnitName("jpa-maria"); // persistence.xml의
-	 * 설정 정의된 이름 entityManagerFactory.setJpaVendorAdapter(new
-	 * HibernateJpaVendorAdapter());
-	 * 
-	 * return entityManagerFactory; }
-	 */
+        // ★ 핵심 설정
+        datasource.setInitialSize(1);   // 최초 생성 커넥션 수
+        datasource.setMaxTotal(1);      // 최대 커넥션 수 (가장 중요)
+        datasource.setMaxIdle(1);       // 유휴 커넥션 최대
+        datasource.setMinIdle(1);       // 유휴 커넥션 최소
 
-	// transactional 설정
-	// 만들어진 메니져에게 트랜잭션을 세팅해준다는 정도로 이해
-	@Bean
-	public PlatformTransactionManager transactionManager() throws Exception {
-		// 단 주의 하자. 지금 presentation.xml 에서 사용하고 있는 트랜잭션 메니져랑 동일해서 충돌이 있을 수도 있다.
-		// mariadb transactional
-		DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
-		dataSourceTransactionManager.setDataSource(dataSource());
+        return datasource;
+    }
 
-		// JPA transactional
-//		JpaTransactionManager jpaTransactionManager = new JpaTransactionManager();
-//		jpaTransactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
+    // jpa 설정
+    // META-INF에서 만들었던 persistence.xml 을 가지고 메니져를 만든다.
+    /*
+     * @Bean public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+     * LocalContainerEntityManagerFactoryBean entityManagerFactory = new
+     * LocalContainerEntityManagerFactoryBean();
+     * entityManagerFactory.setDataSource(dataSource());
+     * entityManagerFactory.setPersistenceUnitName("jpa-maria"); // persistence.xml의
+     * 설정 정의된 이름 entityManagerFactory.setJpaVendorAdapter(new
+     * HibernateJpaVendorAdapter());
+     * 
+     * return entityManagerFactory; }
+     */
 
-		// Chained transaction manager (MyBatis X JPA)
-		/*
-		 * ChainedTransactionManager transactionManager = new
-		 * ChainedTransactionManager(jpaTransactionManager,
-		 * dataSourceTransactionManager);
-		 */
+    // transactional 설정
+    // 만들어진 메니져에게 트랜잭션을 세팅해준다는 정도로 이해
+    @Bean
+    public PlatformTransactionManager transactionManager() throws Exception {
+        // 단 주의 하자. 지금 presentation.xml 에서 사용하고 있는 트랜잭션 메니져랑 동일해서 충돌이 있을 수도 있다.
+        // mariadb transactional
+        DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
+        dataSourceTransactionManager.setDataSource(dataSource());
 
-		ChainedTransactionManager transactionManager = new ChainedTransactionManager(dataSourceTransactionManager);
-		return transactionManager;
-	}
+        // JPA transactional
+//        JpaTransactionManager jpaTransactionManager = new JpaTransactionManager();
+//        jpaTransactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
 
-	@Override
-	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-		resolvers.add(new AuthenticationPrincipalArgumentResolver());
-	}
+        // Chained transaction manager (MyBatis X JPA)
+        /*
+         * ChainedTransactionManager transactionManager = new
+         * ChainedTransactionManager(jpaTransactionManager,
+         * dataSourceTransactionManager);
+         */
 
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		// /images/** 요청을 C:/upload/product/ 경로와 매핑
-		registry.addResourceHandler("/images/**").addResourceLocations("file:///C:/upload/product/")
-				.setCachePeriod(3600); // 캐시 설정 (선택)
-	}
+        ChainedTransactionManager transactionManager = new ChainedTransactionManager(dataSourceTransactionManager);
+        return transactionManager;
+    }
 
-//	@Override
-//	public void addInterceptors(InterceptorRegistry registry) {
-//		registry.addInterceptor(new SecurityLogInterceptor()).addPathPatterns("/**") // 모든 경로 적용
-//				.excludePathPatterns("/resources/**", "/static/**", "/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg",
-//						"/**/*.gif"); // 정적 리소스 제외
-//	}
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new AuthenticationPrincipalArgumentResolver());
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // /images/** 요청을 C:/upload/product/ 경로와 매핑
+        registry.addResourceHandler("/images/**").addResourceLocations("file:///C:/upload/product/")
+                .setCachePeriod(3600); // 캐시 설정 (선택)
+    }
+
+    // RabbitMQ 관련 설정
+    public static final String RESERVE_QUEUE = "reserveQueue";
+    public static final String RESERVE_FAILURE_QUEUE = "reserveQueue.DLQ";
+    public static final String EXCHANGE = "reserveExchange";
+
+    // ConnectionFactory 정의
+    @Bean
+    public CachingConnectionFactory connectionFactory() {
+        CachingConnectionFactory connectionFactory = new CachingConnectionFactory("localhost");
+        connectionFactory.setUsername("guest");
+        connectionFactory.setPassword("guest");
+        return connectionFactory;
+    }
+
+    // RabbitTemplate 정의
+    @Bean
+    public RabbitTemplate rabbitTemplate() {
+        return new RabbitTemplate(connectionFactory());
+    }
+
+    // RabbitAdmin 정의 (큐/익스체인지 생성용)
+    @Bean
+    public RabbitAdmin rabbitAdmin() {
+        return new RabbitAdmin(connectionFactory());
+    }
+
+    // 실제 큐
+    @Bean
+    public Queue reserveQueue() {
+        return QueueBuilder.durable(RESERVE_QUEUE).build();
+    }
+
+    // 실패 큐 (수동 DLQ)
+    @Bean
+    public Queue reserveFailureQueue() {
+        return QueueBuilder.durable(RESERVE_FAILURE_QUEUE).build();
+    }
+
+    // Exchange (Direct)
+    @Bean
+    public DirectExchange exchange() {
+        return new DirectExchange(EXCHANGE);
+    }
+
+    // 메인 큐 바인딩
+    @Bean
+    public Binding reserveQueueBinding() {
+        return BindingBuilder.bind(reserveQueue())
+                .to(exchange())
+                .with(RESERVE_QUEUE);
+    }
+
+    // 실패 큐 바인딩 (Direct Exchange 사용)
+    @Bean
+    public Binding reserveFailureQueueBinding() {
+        return BindingBuilder.bind(reserveFailureQueue())
+                .to(exchange())
+                .with(RESERVE_FAILURE_QUEUE);
+    }
 
 }

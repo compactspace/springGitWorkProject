@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CategoryMapper">
+
+
+
+
+<select id="getCategoryList" resultType="GetCateGoryListDTO">
+    SELECT category_id AS categoryId,
+           parent_id AS parentId,
+           name,
+           sort_order AS sortOrder,
+           is_active AS isActive,
+           created_at AS createdAt,
+           updated_at AS updatedAt
+    FROM category;
+</select>
+
+
+    <!-- 상위 카테고리 insert -->
+ <insert id="insertCategory" parameterType="InsertCategoryRequestDTO" useGeneratedKeys="true" keyProperty="categoryId" keyColumn="category_id">
+    INSERT INTO category (parent_id, name, sort_order, is_active)
+    VALUES (#{parentId}, #{name}, #{sortOrder}, #{isActive})
+</insert>
+
+
+    <!-- 하위 카테고리 insert -->
+    <insert id="insertChildrenCategory" parameterType="map">
+        INSERT INTO category (parent_id, name, sort_order, is_active)
+        VALUES (#{parent_id}, #{name}, #{sort_order}, #{is_active})
+    </insert>
+
+    <!-- 카테고리 속성 insert -->
+    <insert id="insertCategoryAttribute" parameterType="map">
+        INSERT INTO category_attribute (category_id, name, input_type, options, is_required)
+        VALUES (#{category_id}, #{name}, #{input_type}, #{options}, #{is_required})
+    </insert>
+
+</mapper>

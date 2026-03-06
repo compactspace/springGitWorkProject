@@ -14,6 +14,17 @@ public class OrderRequestDTO {
 	
 	private String merchantUid;	
 
+	
+	public String getOrderStatusId() {
+		return orderStatusId;
+	}
+
+	public void setOrderStatusId(String orderStatusId) {
+		this.orderStatusId = orderStatusId;
+	}
+
+	private String orderStatusId;
+	
 	public String getMerchantUid() {
 		return merchantUid;
 	}

@@ -33,6 +33,17 @@ public class ProductDAOMybatis {
 	    return list;
 	}
 
+	// 일반 상품 최초 링크를 타거나 제품군 선택시 호출되는 메서드
+	public List<Map<String, Object>> productCategoryLlist(ProductVO vo) {
+	    List<Map<String, Object>> list = mybatis.selectList("ProductVO.productCategoryLlist", vo);
+	
+	    return list;
+	}
+
+	
+	
+	
+	
 
 	public List<ProductGroupVO> getProductGroupList() {
 		List<ProductGroupVO> list = mybatis.selectList("ProductVO.getProductGroupList");

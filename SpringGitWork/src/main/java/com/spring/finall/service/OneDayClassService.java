@@ -16,4 +16,7 @@ public interface OneDayClassService {
 	public abstract HashMap<String,Object> getReview(OneDayClassVO ovo);
 	
 	public abstract HashMap<String,Object> getReview2(OneDayClassVO ovo);
+	
+	public abstract OneDayClassVO getReviewsShortForm(OneDayClassVO ovo);
+	
 }

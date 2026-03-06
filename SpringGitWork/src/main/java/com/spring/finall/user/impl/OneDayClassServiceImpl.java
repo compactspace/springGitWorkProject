@@ -41,6 +41,11 @@ public class OneDayClassServiceImpl implements OneDayClassService {
 		// TODO Auto-generated method stub
 		return odao.getOneOneDayClass(vo);
 	}
+	@Override
+	public OneDayClassVO getReviewsShortForm(OneDayClassVO ovo) {
+		// TODO Auto-generated method stub
+		return odao.getReviewsShortForm(ovo);
+	}
 	
 
 }

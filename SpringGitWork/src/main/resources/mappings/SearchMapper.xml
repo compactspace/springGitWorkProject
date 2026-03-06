@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SearchMapper">
+
+<select id="SearchFindProductList" parameterType="String" resultType="com.spring.finall.resDto.SearchProductResDTO.SearchProductResDTO">
+    SELECT
+        p.product_id AS productId,
+          p.product_cod AS productCod,
+        p.product_name AS productName,
+        p.product_img AS productImg,
+        p.product_file_path AS productFilePath,
+        ph.new_price AS lastedUpdatePrice,
+        ph.changed_at AS lastedChangedAt
+    FROM product AS p
+    LEFT JOIN product_price_history ph
+      ON p.product_id = ph.product_id
+      AND ph.changed_at = (
+          SELECT MAX(changed_at)
+          FROM product_price_history
+          WHERE product_id = p.product_id
+      )
+    WHERE p.product_Registration_status = 1
+      AND p.product_name LIKE CONCAT('%', #{productName}, '%')
+</select>
+
+
+
+</mapper>

@@ -30,13 +30,37 @@ a {
 	margin-top: 20px; /* 너무 위에 붙지 않게 여백 */
 }
 
+
 /* ✅ 상단 로그인/로그아웃 영역 */
-.header_top {
-	display: flex;
-	justify-content: flex-end;
-	padding: 10px 20px;
-	font-size: 14px;
+.pcheader_top {
+    display: flex;
+    justify-content: space-between; /* 좌우 분리 */
+    align-items: center;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #666;
+    background-color: #fafafa;
 }
+
+/* 🔥 로고를 배경으로 */
+.logo_link {
+    display: block;
+    width: 256px;
+    height: 52px;
+    background-image: url("${pageContext.request.contextPath}/resources/img_main_logo/main_logo.png");
+   background-size: 300px 300px;
+    background-position-x: -38px;
+    background-position-y: -50px;
+}
+
+/* 오른쪽 메뉴 */
+.login_menu {
+    text-align: right;
+}
+
+
+
+
 
 /* ✅ 하단 메뉴 및 검색창 영역 */
 .header_bottom {
@@ -217,6 +241,17 @@ $(document).ready(function() {
 	  });
 	  
 	  
+	   // URL 파라미터 읽기
+	    const params = new URLSearchParams(window.location.search);
+	    const searchType = params.get("search_type"); // null이면 값 없음
+
+	    if (searchType) {
+	        const selectElem = document.querySelector("select[name='search_type']");
+	        if (selectElem) {
+	            selectElem.value = searchType; // value에 맞춰서 선택
+	        }
+	    }
+	  
 		  const 현재저장되어있는검색어=getCurrentCachySearchQueryFromCookie();
 		
 	  if(getCurrentCachySearchQueryFromCookie()!=null){		  
@@ -236,6 +271,12 @@ $(document).ready(function() {
 		  $("#searchBarForm").on("submit", function(e) {
 			  
 			  const query = $.trim($("#queryTop").val());
+			  
+			  const type = $("select[name='search_type']").val();
+			    console.log("submit type:", type); // 확인용	    
+			    
+			  
+			  
 			  const 현재저장되어있는검색어=getCurrentCachySearchQueryFromCookie();
 			  if(query===현재저장되어있는검색어){
 				    e.preventDefault();  // 제출 막기
@@ -246,10 +287,10 @@ $(document).ready(function() {
 								
 				if(cachyedTotalCnt>0){
 					deleteCachyTotalCntCookie()
-				}		
+				} 
 			  
 			  
-			  
+				
 		  
 		    if (query === "") {
 		      alert("검색어를 입력해주세요.");
@@ -354,16 +395,13 @@ if (request.getParameter("cmd") != null)
 	
 
 	
-	
-	
 <div id="header_wrapper" >
 
     <!-- ✅ 1행: 로그인/로그아웃 -->
-    <div class="header_top" >   
+    <div class="pcheader_top" >   
 
- 
- 
-     
+    <!-- 🔥 로고 -->
+    <a href="${pageContext.request.contextPath}/" class="logo_link"></a>
        <!-- ✅ 로그인 상태일 때 -->
 <sec:authorize access="hasAuthority('user')">
     <a href="${pageContext.request.contextPath}/users/mypage">나의정보</a> &nbsp;|&nbsp;
@@ -421,13 +459,14 @@ if (request.getParameter("cmd") != null)
 						<input type="hidden" name="${_csrf.parameterName}"
 							value="${_csrf.token}" />
 
+
 						<div class="search_form">
 							<input id="queryTop" name="query" type="text"
 								placeholder="검색어를 입력하세요" autocomplete="off" required>
 							<div class="divider"></div>
 							<select class="search_type" name="search_type">
 								<option value="community" selected>커뮤니티</option>
-								<!-- <option value="product">상품</option> -->
+								<option value="product">상품</option>
 							</select>
 							<div class="divider"></div>
 							<button type="submit" class="search_button">

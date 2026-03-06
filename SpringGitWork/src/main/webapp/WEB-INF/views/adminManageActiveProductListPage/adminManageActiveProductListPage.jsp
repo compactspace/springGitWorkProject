@@ -71,6 +71,16 @@ html, body {
 }
 
 
+
+
+/* 카테고리 묵는 레퍼 시작 */
+.categoryWrapper{
+display: flex;
+}
+/* 카테고리 묵는 레퍼 종료 */
+
+
+
 /* 셀렉트 시작  */
 /* 셀렉트 박스 wrapper */
 .select-box-wrapper {
@@ -193,24 +203,189 @@ html, body {
 			}
 		});
 		
-		changeProductGroup();
-		// select change 이벤트
-	    const selectElem = document.getElementById("productGroupSelect");
-	    selectElem.addEventListener("change", changeProductGroup);
+		
+		
+		
+		
+		   let categoryList = ${categoryList};
+		   let vendorList = ${vendorList};
+		  let buildedTreeProductWithCategoryList=${buildedTreeProductWithCategoryList};
+		
+		
+		
+		
+	
+		
+		
+	productArrays = copyProductArray(buildedTreeProductWithCategoryList);
+	
+	
+	createMainCategoryMenu(buildedTreeProductWithCategoryList);
+	
+	
+/* 	console.log("----------");
+	console.log(buildedTreeProductWithCategoryList);
+	console.log(copyProductArray(buildedTreeProductWithCategoryList));
+	console.log("----------");   */  
+	    
+	}	
 
+	var myParentMemo={}
+	function copyProductArray(categoryList) {
+		 const result = {};
+
+		    categoryList.forEach(category => {
+		        if (category.parent_id === null) {
+		        
+		        	
+		        	
+		            // 최상위 카테고리 key
+		            const key = category.category_id;
+		            result[key] = {
+		                category_id: category.category_id,
+		                category_name: category.category_name,
+		                products: [...category.products] // 자기 상품 먼저 복사
+		            };
+
+		            // 재귀로 하위 카테고리 상품까지 모두 합치기
+		            function addChildProducts(children) {
+		                children.forEach(child => {
+		                	
+		                	
+		                	myParentMemo[child.category_id]=child.parent_id
+		                	
+		                    result[key].products.push(...child.products);
+		                    if (child.children && child.children.length > 0) {
+		                        addChildProducts(child.children);
+		                    }
+		                });
+		            }
+
+		            if (category.children && category.children.length > 0) {
+		                addChildProducts(category.children);
+		            }
+		        }
+		    });
+		    copyActiveProductList=result;
+	    return result;
 	}
+	
+	
+	
+	function createMainCategoryMenu(categoryList){
+		
+		//console.log("categoryList");
+		
+
+	    const mainSelect = document.getElementById("mainCategory");
+
+	    categoryList.forEach(category => {
+	        const option = document.createElement("option");
+	        option.value = category.category_id;
+	        option.textContent = category.category_name;
+	        mainSelect.appendChild(option);
+	    });
+
+	    mainSelect.addEventListener("change", function(){
+	        handleSubCategory(this, categoryList); // 🔥 DOM 넘김
+	    });
+	}
+	
+	
+	function handleSubCategory(selectElem, categoryList){
+
+	//    console.log("handleSubCategory");
+
+	    const selectedId = selectElem.value;
+
+	    const selectedCategory = categoryList.find(
+	        cat => cat.category_id == selectedId
+	    );
+
+	    if(!selectedCategory){
+	        return;
+	    }
+
+	    
+	    // 🔥 하위 없음
+	    if(!selectedCategory.children || selectedCategory.children.length === 0){
+	     
+	    	const beforeSubCate=document.getElementById("subCategoryBox");
+	    	if(beforeSubCate){
+	    		
+	    		beforeSubCate.remove();
+	    	}    	
+	    	
+	    	changeCategory(selectElem);
+	        return;
+	    }
+	    
+
+	    changeCategory(selectElem);
+
+	    // 기존에 생성된 하위 셀렉트 제거 (중복 방지)
+	    const oldSub = document.getElementById("subCategoryBox");
+	    if(oldSub) oldSub.remove();
+
+	    // 🔥 wrapper 생성
+	    const wrapper = document.createElement("div");
+	    wrapper.className = "select-box-wrapper";
+	    wrapper.id = "subCategoryBox";
+
+	    // 🔥 select 생성
+	    const subSelect = document.createElement("select");
+	    subSelect.className = "styled-select";
+	    subSelect.id = "productGroupSelect";
+
+	    // 🔥 label 생성
+	    const subLabel = document.createElement("label");
+	    subLabel.textContent = "하위 카테고리 선택";
+	    subLabel.className = "select-label";
+	    subLabel.htmlFor = "productGroupSelect";
+
+	    const defaultOption = document.createElement("option");
+	    defaultOption.textContent = "하위 카테고리 선택";
+	    defaultOption.value = "";
+	    subSelect.appendChild(defaultOption);
+
+	    selectedCategory.children.forEach(child => {
+	        const option = document.createElement("option");
+	        option.value = child.category_id;
+	        option.textContent = child.category_name;
+	        subSelect.appendChild(option);
+	    });
+
+	    subSelect.addEventListener("change", function(){
+	        if(this.value){
+	            changeCategory(this);
+	        }
+	    });
+
+	    wrapper.appendChild(subLabel);
+	    wrapper.appendChild(subSelect);
+
+	    // 🔥 categoryArea의 동생으로 추가
+	    const categoryArea = document.getElementById("categoryArea");
+	    categoryArea.after(wrapper);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	
 	
-	
-	
-	function changeProductGroup() {
-		
-		
-	    // select 요소 가져오기
-	    const selectElem = document.getElementById("productGroupSelect"); 
-	    
-	    
+	function changeCategory(selectElem) {
+	//console.log("changeCategory");	    
 	    
 	    // 선택된 값 (groupId)
 	    const selectedGroupId = selectElem.value;
@@ -223,18 +398,20 @@ html, body {
 	    
 	    let  cashedTarget=null;
 	    if(isCashed!=null){
-	    	
 	    	cashedTarget= isCashed[groupIdToSend]
-	    }
-	    
-	    console.log(cashedTarget);
+	    	  console.log(cashedTarget);
+	    }    
+	  
 	    
 	    if(cashedTarget != undefined||cashedTarget != null){
-	        console.log(cashedTarget);
+	     //   console.log(cashedTarget);
 	       
-	        copyActiveProductList[groupIdToSend] = cashedTarget;
+	       // copyActiveProductList[groupIdToSend] = cashedTarget;
 	        
 	        
+	       
+	       
+	       
 	        // 잠시 주석처리, html태그를 비우고 호출할지 아니면 그냥 이렇게 주석처리할지 고민하자.
 	        
 	        htmlRender(groupIdToSend)
@@ -252,6 +429,18 @@ html, body {
 
 	    
 	    
+	    
+	       
+	    
+	    
+	       
+	   //   localStorage.setItem("copyActiveProductList", JSON.stringify(copyActiveProductList));
+	       
+	       htmlRender(groupIdToSend);
+	       
+	       
+	       
+/* 	    
 	    $.ajax({
 	        url: contextPath + "/api/admin/get-active-product-list",
 	        type: "POST",
@@ -267,9 +456,17 @@ html, body {
 	    	   
 	       }
 	    
+	       console.log(data);
+	       
+	       
+	       
+	       
+	       
+	       
+	       
 	       copyActiveProductList[groupIdToSend]=data;
 	       
-	       localStorage.setItem("copyActiveProductList", JSON.stringify(copyActiveProductList));
+	   //   localStorage.setItem("copyActiveProductList", JSON.stringify(copyActiveProductList));
 	       
 	       htmlRender(groupIdToSend);
 	       
@@ -278,18 +475,40 @@ html, body {
 	        error: function(xhr, status, error) {
 	            console.error("그룹 변경 실패:", error);
 	        }
-	    });
+	    }); */
 	    
-	}
+	}	
 	
 	
-
-	
-	
-	function htmlRender(groupId) {
-	    var items = Array.isArray(copyActiveProductList[groupId])
+	function htmlRender(groupId) {	
+	     
+        console.log("--htmlRender--"); 
+        
+        
+        var items =null;
+        let products=null
+        if(isSubCategory(groupId).length>0){
+        	products=isSubCategory(groupId);
+        	
+        }else{
+        	
+	  items = Array.isArray(copyActiveProductList[groupId])
 	                ? copyActiveProductList[groupId]
-	                : Object.values(copyActiveProductList[groupId] || {});
+	                : Object.values(copyActiveProductList[groupId] || {});        
+	    
+	               
+	                products=copyActiveProductList[groupId].products;
+        	
+        }
+        
+        
+        
+        
+	                
+	       
+     
+	                
+	                
 
 	    // 문자열로 HTML 생성
 	    var htmlTag = '<div class="product-table">';
@@ -302,20 +521,22 @@ html, body {
 	    htmlTag += '<div class="product-col col-status">상태</div>';
 	    htmlTag += '</div>';
 
-	    // 데이터 행
-	    for (var i = 0; i < items.length; i++) {
-	        var item = items[i];
-	        htmlTag += '<div class="product-table-row" data-idx="' + i + '" data-product_id="' + item.product_id + '">';
-	        htmlTag += '<div class="product-col col-id">' + item.product_id + '</div>';
-	        htmlTag += '<div class="product-col col-name">' + item.product_name + '</div>';
-	        htmlTag += '<div class="product-col col-price">' + item.new_price + '</div>';
-	        htmlTag += '<div class="product-col col-status">' + item.product_status + '</div>';
+	   
+	    // 데이터 행	    
+	    for (var i = 0; i < products.length; i++) {
+	        var p = products[i];
+	        htmlTag += '<div class="product-table-row" data-idx="' + i + '" data-product_id="' + p.product_id + '">';
+	        htmlTag += '<div class="product-col col-id">' + p.product_id + '</div>';
+	        htmlTag += '<div class="product-col col-name">' + p.product_name + '</div>';
+	        htmlTag += '<div class="product-col col-price">' + p.product_price + '</div>';
+	        htmlTag += '<div class="product-col col-status" data-product_registration_status="' 
+	            + p.product_Registration_status + '">'
+	            + (p.product_Registration_status === "1" ? "판매중" : "판매중단") 
+	            + '</div>';
 	        htmlTag += '</div>';
 	    }
 
 	    htmlTag += '</div>';
-
-	    
 	    
 
 	    
@@ -328,6 +549,8 @@ html, body {
 	    
 	    // ⭐ 기존 product-table 존재하면 제거
 	    var oldTable = contentBody.querySelector('.product-table');
+	
+	    
 	    if (oldTable) {
 	        oldTable.remove();
 	    }
@@ -355,17 +578,71 @@ html, body {
 	}
 
 	
+	
+	
+	function isSubCategory(groupId){
+		
+		
+		
+		
+		
+		
+	 let subArray=[]
+		console.log("isSubCategory=>>>   "+myParentMemo[groupId])
+		 if(myParentMemo[groupId] != undefined){
+			 
+			 let myParentId=myParentMemo[groupId];
+			 console.log("나의 엄마 아이디:  "+myParentId)
+			 
+			 var items = copyActiveProductList[myParentId].products			 
+			 console.log(items);		 
+			 
+			 for(let k=0; k<items.length; k++){	
+				 console.log(items[k].parent_id , groupId )	
+				 if(items[k].parent_id===myParentId){
+						
+					 subArray.push(items[k]);  
+					
+				 }
+				 
+			 }			 
+		 }
+		    
+		   
+		  return subArray;       
+		               
+		                
+	}
+	
+	
+	
+	
 	// document에 이벤트 위임으로 클릭 이벤트 설정
 // 이벤트 위임으로 테이블 클릭
 document.addEventListener("click", function(event) {
     const row = event.target.closest(".product-table-row");
     if (!row) return;
 
+    
+    
+    //product_Registration_status
     const productId = row.getAttribute("data-product_id");
     const productName = row.querySelector(".col-name").innerText;
     const productPrice = row.querySelector(".col-price").innerText;
     const productStatus = row.querySelector(".col-status").innerText;
-
+    const productRegistrationStatus =
+        row.querySelector(".col-status")
+           .getAttribute("data-product_registration_status");  
+    
+    
+    
+    
+    
+    
+    
+    console.log("productRegistrationStatus: "+productRegistrationStatus);   
+    
+    
     // 모달 열기
     const modal = document.getElementById("productModal");
     modal.style.display = "flex";
@@ -374,14 +651,17 @@ document.addEventListener("click", function(event) {
     document.getElementById("modalProductName").innerText = "상품명: " + productName;
     document.getElementById("modalProductPrice").innerText = "가격: " + productPrice;
 
+    
     // 상태 select 세팅 (현재 상태와 반대 상태만)
     const statusSelect = document.getElementById("modalProductStatus");
     statusSelect.innerHTML = ""; // 초기화
-    if (productStatus === "판매") {
-        statusSelect.innerHTML = '<option value="중단">중단</option>';
-    } else if (productStatus === "판매 중단") {
-        statusSelect.innerHTML = '<option value="판매">판매</option>';
+    if (productRegistrationStatus === "1") {
+        statusSelect.innerHTML = '<option value="0">중단</option>';
+    } else if (productRegistrationStatus === "0") {
+        statusSelect.innerHTML = '<option value="1">판매</option>';
     }
+    
+    
 
     // 확인 버튼 클릭
     document.getElementById("modalConfirm").onclick = function() {
@@ -436,21 +716,26 @@ window.onclick = function(event) {
 		</div>
 		<!-- 우측 메인 콘텐츠 -->
 		<div id="mainContent">
+		
+		
 			<div id="contentHeader">
 				<h1>상품 홈페이지 노출 관리</h1>
-				<div class="header-subtitle">등록된 상퓸정보를 홈페이지에서 노출시킬지를 결정합니다.</div>
+				<div class="header-subtitle">공급업체(거래처)별 등록된 상퓸정보를 홈페이지에서 노출시킬지를 결정합니다.</div>
 			</div>
-			<div id="contentBody">			
-		<div class="select-box-wrapper">
-    <label for="productGroupSelect" class="select-label">상품 그룹 선택</label>
-    <select id="productGroupSelect" name="productGroup" class="styled-select">
-        <c:forEach var="group" items="${productCodeList}">
-            <option value="${group.groupId}">${group.groupName}</option>
-        </c:forEach>
-    </select>
-</div>
+			<div id="contentBody">
 
-			
+				<div class="categoryWrapper">
+					<div id="categoryArea" class="select-box-wrapper">
+						<label for="productGroupSelect" class="select-label">상품
+							카테고리 선택 선택</label> <select id="mainCategory" class="styled-select">
+							<option value="">카테고리 선택</option>
+						</select>
+
+					</div>
+										
+				</div>		
+
+
 			</div>
 
 		</div>

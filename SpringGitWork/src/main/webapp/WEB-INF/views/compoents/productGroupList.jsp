@@ -166,7 +166,7 @@
     <!-- 인증 여부를 JS로 안전하게 넘기기 -->
     <script>
       var isAuthenticated = ${isAuthenticated};
-      console.log("isAuthenticated: "+isAuthenticated);
+    //  console.log("isAuthenticated: "+isAuthenticated);
     </script>
     
     
@@ -174,164 +174,10 @@
   
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
-    
-    <script>
-    $(document).ready(function() {
-        addEventListeners();
-        toggleCancelCartButton(); 
-    });
-
-    function toggleCancelCartButton() {
-        const cart = JSON.parse(localStorage.getItem('cart'));
-        if (cart && cart.length > 0) {
-            $(".cancel-cart-btn").show();
-        } else {
-            $(".cancel-cart-btn").hide();
-        }
-    }
-    
-    
-    function addEventListeners() {
-        $(".add-to-cart-btn").on("click", handleAddToCart);
-        $(".add-all-to-cart-btn").on("click", handleAddAllToCart);
-        $(".cancel-cart-btn").on("click", handleCancelCart);
-    }
-
-    function handleAddToCart() {
-    	
-    console.log("isAuthenticated: "+isAuthenticated);
-    
-    	
-        if (!isAuthenticated) {
-            showLoginModal();
-            return;
-        }
-
-        var $item = $(this).closest(".product-item");
-        var productCod = $item.data("product-cod");
-        var productId = $item.data("product-id");  // ← productId 가져오기
-        var productName = $item.find(".product-name").text();
-        var productPrice = $item.find(".price").text().replace(' 원', '');
-        var productImg = $item.find(".product-image").css("background-image");
-
-        var cart = JSON.parse(localStorage.getItem('cart')) || [];
-        var existingProduct = cart.find(item => item.productCod === productCod);
-
-        if (existingProduct) {
-            alert("이미 장바구니에 담긴 상품입니다.");
-            return;
-        }
-
-        
-        
-        var newProduct = {
-            productCod: productCod,
-            productId: productId,  // ← productId 추가
-            productName: productName,
-            productPrice: productPrice,
-            productImg: productImg,
-            quantity:1
-        };
-
-        cart.push(newProduct);
-        localStorage.setItem('cart', JSON.stringify(cart));
-        toggleCancelCartButton();
-
-     /*    $.ajax({
-            url: '/addToCart',
-            method: 'POST',
-            data: newProduct,
-            success: function(response) {
-                if (response.success) {
-                    alert("상품이 장바구니에 추가되었습니다.");
-                } else {
-                    alert("장바구니에 추가하는데 문제가 발생했습니다.");
-                }
-            },
-            error: function() {
-                alert("장바구니에 추가하는데 문제가 발생했습니다.");
-            }
-        }); */
-    }
-
-
-    function handleAddAllToCart() {
-        if (!isAuthenticated) {
-            showLoginModal();
-            return;
-        }
-        
-        
-        var allProducts = [];
-        $(".product-item").each(function() {
-            var productCod = $(this).data("product-cod");
-            var productId = $(this).data("product-id");  // ← productId 가져오기
-            var productName = $(this).find(".product-name").text();
-            var productPrice = $(this).find(".price").text().replace(' 원', '');
-            var productImg = $(this).find(".product-image").css("background-image");
-
-            
-            allProducts.push({
-                productCod: productCod,
-                productId: productId,  // ← productId 추가
-                productName: productName,
-                productPrice: productPrice,
-                productImg: productImg,
-                quantity:1
-            });
-        });
-
-        localStorage.setItem('cart', JSON.stringify(allProducts));
-        toggleCancelCartButton();
-
- /*        $.ajax({
-            url: '/addAllToCart',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(allProducts),
-            success: function(response) {
-                if (response.success) {
-                    alert("모든 상품이 장바구니에 추가되었습니다.");
-                } else {
-                    alert("장바구니에 추가하는데 문제가 발생했습니다.");
-                }
-            },
-            error: function() {
-                alert("장바구니에 추가하는데 문제가 발생했습니다.");
-            }
-        }); */
-    }  
-
-    
-    function handleCancelCart() {
-        localStorage.removeItem('cart');
-        toggleCancelCartButton();
-        alert("장바구니가 비워졌습니다.");
-
-      /*   $.ajax({
-            url: '/cancelCart',
-            method: 'POST',
-            success: function(response) {
-                alert("서버에서 장바구니가 취소되었습니다.");
-            },
-            error: function() {
-                alert("장바구니 취소에 문제가 발생했습니다.");
-            }
-        }); */
-        
-    }
-    
-    function showLoginModal() {
-        $("#login-modal").show();
-        $("#modal-backdrop").show();
-    }
-
-    function closeLoginModal() {
-        $("#login-modal").hide();
-        $("#modal-backdrop").hide();
-    }
-    </script>
-
+   
+   
+   
+   
 
     <div class="content2">
         
@@ -340,11 +186,15 @@
                 등록된 상품이 없습니다.
             </div>
         </c:if>
-
-        <c:forEach var="p" items="${productService}">
-            <c:if test="${p.product_Registration_status eq 'open'}">
+        
+        
+        <c:forEach var="p" items="${productService}">   
+          
+            <c:if test="${p.product_Registration_status eq '1'}">
                 <div class="product-item" data-product-cod="${p.product_cod}" data-product-id="${p.product_id}">             
                   <c:if test="${p.imagePath ne null}">
+                
+                  
                       <div class="product-image" style="background-image: url('${pageContext.request.contextPath}${p.imagePath}')"></div>
                   </c:if>     
                        
@@ -377,9 +227,10 @@
                 </div>
             </c:if>
         </c:forEach>
+     
         <div class="control-buttons">
-            <button type="button" class="add-all-to-cart-btn">전체 담기</button>
-            <button type="button" class="cancel-cart-btn">장바구니 비우기</button>
+           <!--  <button type="button" class="add-all-to-cart-btn">전체 담기</button>
+            <button type="button" class="cancel-cart-btn">장바구니 비우기</button> -->
         </div>
     </div>
         

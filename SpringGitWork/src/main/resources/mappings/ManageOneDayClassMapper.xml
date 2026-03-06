@@ -4,47 +4,114 @@
 
 <mapper namespace="ManageOneDayClassMapper">
 
-<select id="getMyActiveOnedayclass" resultType="map"
-	parameterType="map">
-	SELECT *
-	FROM onedayclass AS o
-	INNER JOIN reserverest AS r
-	ON o.onedayclass_num = r.onedayclass_num
-	WHERE o.teacher_id =
-	#{teacherId}
-	AND DATE_FORMAT(r.openday, '%Y-%m') = #{yearMonth}
+
+	<select id="myOnedayClassNum" resultType="Long"
+		parameterType="Long">
+
+		select onedayclass_num from onedayclass where teacher_id =#{teacher_id} 
+	</select>
+
+	<select id="getNowOnedayclassStatus"
+		resultType="map" parameterType="map">
+<![CDATA[
+select manageStatus from  reserverest where  onedayclass_num =#{onedayclass_num}
+ AND openday >= STR_TO_DATE(#{openday}, '%Y-%m-%d')
+      AND openday < DATE_ADD(STR_TO_DATE(#{openday}, '%Y-%m-%d'), INTERVAL 1 DAY)
+
+ ]]>
+	</select>
+
+
+	<select id="getMyActiveOnedayclass" resultType="map"
+		parameterType="map">
+		SELECT *
+		FROM onedayclass AS o
+		INNER JOIN reserverest AS r
+		ON o.onedayclass_num = r.onedayclass_num
+		WHERE o.teacher_id =
+		#{teacherId}
+		AND DATE_FORMAT(r.openday, '%Y-%m') = #{yearMonth}
+	</select>
+
+
+<select id="getAsyncCurrentMonthOpenningOnedyaClassBySelectOpenList" parameterType="AsyncCurrentMonthOpenningOnedyaClassBySelectOpenDTO" resultType="map">
+SELECT *
+FROM onedayclass AS o
+INNER JOIN reserverest AS r
+    ON o.onedayclass_num = r.onedayclass_num
+WHERE o.teacher_id = #{teacher_id}
+  AND r.openday BETWEEN #{selectOpenMinDate} AND #{selectOpenMaxDate} and r.manageStatus='open';
 </select>
 
 
-<select id="getMyActiveMonthList" resultType="map" parameterType="map">
-    SELECT DISTINCT DATE_FORMAT(r.openday, '%Y-%m') AS reg_month
-    FROM onedayclass o
-    JOIN reserverest r ON o.onedayclass_num = r.onedayclass_num
-    WHERE o.teacher_id = #{teacherId}
-      AND r.openday >= DATE_FORMAT(NOW(), '%Y-%m-01')  -- 현재 달의 시작일 이후
-    ORDER BY reg_month ASC
-</select>
 
 
-<select id="getMyOneDayClassInfo" resultType="oneDayClassVO" parameterType="Long">
- select * from onedayclass where teacher_id=#{teacher_id};
-</select>
 
- <!-- 주의: ${}는 문자열 그대로 삽입, SQL injection 주의 -->
-<update id="updateOneDayClassInfo" parameterType="map">
-    UPDATE onedayclass
-    SET ${updateColumns} 
-    WHERE teacher_id = #{teacherId}
-</update>
+	<select id="getMyActiveMonthList" resultType="map"
+		parameterType="map">
+		SELECT DISTINCT DATE_FORMAT(r.openday, '%Y-%m') AS reg_month,o.onedayclass_num
+		FROM onedayclass o
+		JOIN reserverest r ON o.onedayclass_num = r.onedayclass_num
+		WHERE o.teacher_id = #{teacherId}
+		AND r.openday >= DATE_FORMAT(NOW(), '%Y-%m-01') -- 현재 달의 시작일 이후
+		ORDER BY reg_month ASC
+	</select>
 
 
-<insert id="openMonthOnedayClass" parameterType="map">
-  INSERT INTO reserverest (onedayclass_num, openday, rest)
-  VALUES
-  <foreach collection="opendayArr" item="day" separator=",">
-    (#{onedayclass_num}, #{day}, 10)
-  </foreach>
+	<select id="getMyOneDayClassInfo" resultType="oneDayClassVO"
+		parameterType="Long">
+		select * from onedayclass where teacher_id=#{teacher_id};
+	</select>
+
+	<!-- 주의: ${}는 문자열 그대로 삽입, SQL injection 주의 -->
+	<update id="updateOneDayClassInfo" parameterType="map">
+		UPDATE onedayclass
+		SET ${updateColumns}
+		WHERE teacher_id = #{teacherId}
+	</update>
+
+
+	<insert id="openMonthOnedayClass" parameterType="map">
+		INSERT INTO reserverest (onedayclass_num, openday, rest)
+		VALUES
+		<foreach collection="opendayArr" item="day" separator=",">
+			(#{onedayclass_num}, #{day}, 10)
+		</foreach>
+	</insert>
+
+
+
+<insert id="openSelectdayOnedyaclass">
+    INSERT INTO reserverest
+    (
+        onedayclass_num,
+        openday,
+        rest
+    )
+    VALUES
+    <foreach collection="list" item="item" separator=",">
+        (
+            #{item.onedayclass_num},
+            #{item.openday},
+            #{item.rest}
+        )
+    </foreach>
 </insert>
+
+
+
+	<update id="changeOnedayclassStatus" parameterType="map">
+<![CDATA[
+    UPDATE reserverest
+    SET manageStatus = #{manageStatus}
+    WHERE onedayclass_num = #{onedayclass_num}
+      AND openday >= STR_TO_DATE(#{openday}, '%Y-%m-%d')
+      AND openday < DATE_ADD(STR_TO_DATE(#{openday}, '%Y-%m-%d'), INTERVAL 1 DAY)
+      AND manageStatus = #{nowStatus}
+]]>
+	</update>
+
+
 
 
 </mapper>

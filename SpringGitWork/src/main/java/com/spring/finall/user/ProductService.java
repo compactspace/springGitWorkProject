@@ -12,6 +12,9 @@ public interface ProductService {
 
 	// 일반 상품 최초 링크를 타거나 제품군 선택시 호출되는 메서드
 	public abstract List<Map<String, Object>> productGroupLlist(ProductVO vo);
+	public abstract List<Map<String, Object>> productCategoryList(ProductVO vo);
+	
+	
 
 	public abstract int completequantity(HashMap<String, ArrayList<Object>> map);
 

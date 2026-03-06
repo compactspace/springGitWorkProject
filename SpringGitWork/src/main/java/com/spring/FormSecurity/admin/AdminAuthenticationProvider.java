@@ -7,13 +7,14 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 import com.spring.finall.security.AuthenticationToken;
-
+import com.spring.finall.security.UserDetailsVO2;
 import com.spring.finall.service.ManageOnedayClassService;
 
 @Component  // ✅ 반드시 추가
@@ -37,6 +38,28 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 
 		UserAdminDetail user = (UserAdminDetail) userAdminDetailServiceImple.loadUserByUsername(userId);
 
+
+	    if (user == null) {
+	        System.out.println("❌ 아이디 없음: " + userId);
+	        throw new BadCredentialsException("존재하지 않는 사용자입니다.");
+	    }
+
+	    // 타입 체크 후 캐스팅
+	    if (!(user instanceof UserAdminDetail)) {
+	        throw new InternalAuthenticationServiceException("UserDetails 타입이 예상과 다릅니다.");
+	    }
+
+	 
+	    
+	    if (!BCrypt.checkpw(userPwd, user.getPassword())) {
+	        throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
+	    }
+	    
+	  
+		
+		
+		
+		
 		// 인증 성공, 권한은 
 		return new UsernamePasswordAuthenticationToken(user, userPwd, user.getAuthorities());
 	}

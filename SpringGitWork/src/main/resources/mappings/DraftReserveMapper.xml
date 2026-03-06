@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DraftReserveMapper">
+
+	<select id="findDraftReserveInfoByOnedayAndSelectedDate"
+        parameterType="map" resultType="DraftReserveinfoVO">
+    SELECT
+        draft_reserveinfo_num AS draftReserveinfoNum,
+        merchant_uid AS merchantUid,
+        user_code AS userCode,
+        onedayclass_num AS onedayclassNum,
+        selectedDate AS selectedDate,
+        onedayclass_price AS onedayclassPrice,
+        status AS status,
+        created_at AS createdAt
+    FROM draft_reserveinfo
+    WHERE onedayclass_num = #{onedayclassNum}
+    AND selectedDate = #{selectedDate}
+    AND user_code = #{userCode}
+    AND status = 'READY'
+    LIMIT 1
+</select>
+
+	<insert id="insertDraftReserveInfo"
+		parameterType="com.spring.finall.reqDto.InsertDraftReserveinfoRequestDTO.InsertDraftReserveinfoDTO"
+		useGeneratedKeys="true" keyProperty="draftReserveinfoNum">
+		INSERT INTO draft_reserveinfo
+		(merchant_uid, user_code, onedayclass_num, selectedDate, onedayclass_price)
+		VALUES
+		(#{merchantUid}, #{userCode}, #{onedayclassNum}, #{selectedDate}, #{onedayclassPrice})
+	</insert>
+
+
+	<select id="currentDraftInfoEqulLastedSnapshot"
+		parameterType="Long" resultType="HasRecentUpdateOnedayClassInfoResDTO">
+	SELECT
+		h.history_id as history_id,
+		h.onedayclass_num as onedayclassNum,
+		h.onedayclass_price as onedayclassPrice,
+		dr.draft_reserveinfo_num as draftReserveinfoNum,
+		dr.merchant_uid as merchantUid,
+		dr.user_code as userCode,
+		dr.selectedDate as selectedDate,
+		dr.status as Status
+		FROM
+		onedayclass_history AS h
+		LEFT JOIN draft_reserveinfo AS dr
+		ON dr.onedayclass_num = h.onedayclass_num
+		WHERE
+		h.history_id = (
+		SELECT MAX(history_id)
+		FROM onedayclass_history
+		WHERE onedayclass_num = h.onedayclass_num
+		)
+		AND h.onedayclass_num = #{onedayclassNum} and dr.status='READY'
+
+	</select>
+
+
+<update id="confirmUpdatedOnedayPrice" parameterType="map">
+    UPDATE draft_reserveinfo
+    SET onedayclass_price = #{priceUpdated}
+    WHERE status = 'READY'
+      AND selectedDate = #{selectedDate}
+      AND merchant_uid = #{merchant_uid}
+      AND user_code = #{userCode}
+</update>
+
+
+<update id="rejectUpdatedOnedayPrice" parameterType="map">
+    UPDATE draft_reserveinfo
+    SET status = 'CANCEL'
+    WHERE status = 'READY'
+      AND selectedDate = #{selectedDate}
+      AND merchant_uid = #{merchant_uid}
+      AND user_code = #{userCode}
+</update>
+
+
+</mapper>

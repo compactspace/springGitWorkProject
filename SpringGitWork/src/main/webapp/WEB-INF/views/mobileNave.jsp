@@ -32,6 +32,8 @@ a {
 	background-color: #fff;
 }
 
+
+
 /* ✅ 상단 로그인/로그아웃 영역 */
 .header_top {
 	display: flex;
@@ -42,6 +44,19 @@ a {
 	color: #666;
 	background-color: #fafafa;
 }
+
+.header_top  .logo_link {
+ display: block;
+    width: 256px;
+    height: 58px;
+    background-image: url(/finall/resources/img_main_logo/main_logo.png);
+    background-size: 353px 173px;
+    background-position-x: -134px;
+    background-position-y: -80px;
+    background-repeat: no-repeat;
+}
+
+
 
 .header_top a, 
 .header_top button {
@@ -128,6 +143,9 @@ $(document).ready(function() {
 
 	<!-- ✅ 로그인/로그아웃 -->
 	<div class="header_top">
+	
+		<a href="${pageContext.request.contextPath}/" class="logo_link"></a>
+	
 		<sec:authorize access="hasAuthority('user')">
 			<a href="${pageContext.request.contextPath}/users/mypage">나의정보</a>&nbsp;|&nbsp;
 			<a href="${pageContext.request.contextPath}/users/generalcartlist">장바구니</a>&nbsp;|&nbsp;

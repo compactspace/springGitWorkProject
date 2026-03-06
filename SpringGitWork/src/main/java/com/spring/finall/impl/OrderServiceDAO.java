@@ -101,6 +101,9 @@ public class OrderServiceDAO {
 		return 업데이트상태; // int로 반환
 	}
 
+	
+
+	
 	public boolean duplicateOrderCheck(String merchantUid) {
 		boolean 같은주문번호니 = false;
 
@@ -225,6 +228,16 @@ public class OrderServiceDAO {
 		int affectedRows = mybatis.insert("OrderDAO.insertOrderPerson", param);
 		return affectedRows;
 	}
+	
+	
+	
+	public int updateOrderInfoStatusByAfterSuccesspaymentComplement(Long orderInfoId) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("orderInfoId", orderInfoId);
+		int affectedRows = mybatis.insert("OrderDAO.updateOrderInfoStatusByAfterSuccesspaymentComplement", param);
+		return affectedRows;
+		
+	}
 
 	// 2. 페이징으로 6개월 이내 주문 목록 조회
 	public List<OrderPaymentRequestDTO> selectOrdersByDateWithPaging(LocalDate startDate, LocalDateTime endDate,
@@ -313,7 +326,11 @@ public class OrderServiceDAO {
 		Map<String, Object> params = new HashMap<>();
 		params.put("startOfWeek", startOfWeek);
 		params.put("endOfWeek", endOfWeek);
-		params.put("statusCode", statusCode);
+		if (statusCode != null && !statusCode.isBlank()) {
+	        Integer statusId = orderStatusId(statusCode);
+	        params.put("statusId", statusId);
+	    }
+	
 
 		// DB 조회
 		List<Map<String, Object>> list = mybatis.selectList("ManageOrderMapper.findOrdersByFilter", params);
@@ -351,6 +368,25 @@ public class OrderServiceDAO {
 
 		return result;
 	}
+	
+	
+	private static final Map<String, Integer> ORDER_STATUS_MAP = Map.of(
+	        "Pending", 1,
+	        "Paid", 2,
+	        "Preparing", 3,
+	        "Shipping", 4,
+	        "Delivered", 5,
+	        "Cancelled", 6,
+	        "RefundRequested", 7,
+	        "Refunded", 8
+	);
+
+	private Integer orderStatusId(String statusCode) {
+	    return ORDER_STATUS_MAP.get(statusCode);
+	}
+
+	
+	
 
 	public List<Map<String, Object>> findOrdersItemByOrderInfoId(String orderInfoId) {
 
@@ -437,13 +473,17 @@ public class OrderServiceDAO {
 		return affectedRow > 0 ? true : false;
 
 	}
+	//섹
 	public boolean approveForReqeustClientPayCancel(String orderInfoId) {
 		int affectedRow = mybatis.update("OrderDAO.approveForReqeustClientPayCancel", orderInfoId);
 
 		return affectedRow > 0 ? true : false;
 
 	}
-	
+public int orderInfoStatusByAdmminCancellPayment(String orderInfoId) {
+		
+		return mybatis.update("OrderDAO.orderInfoStatusByAdmminCancellPayment",orderInfoId);
+	}
 	
 	public void updateStatusToShippingByShipping(List<RequestDeliverDTO> requestList) {
 		
@@ -505,6 +545,7 @@ public class OrderServiceDAO {
 	    return totalUpdated > 0;
 	}
 
+	
 
 	
 }

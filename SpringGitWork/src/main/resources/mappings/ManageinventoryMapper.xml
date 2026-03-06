@@ -27,6 +27,152 @@
 </resultMap>
 
 
+
+<resultMap id="getIncomingStockListMap"
+           type="com.spring.finall.user.GetIncomingStockListVO">
+
+    <id property="inventoryId" column="inventory_id"/>
+
+    <result property="productId" column="product_id"/>
+    <result property="productName" column="product_name"/>
+
+    <result property="warehouseId" column="warehouse_id"/>
+    <result property="warehouseName" column="warehouse_name"/>
+
+    <result property="quantity" column="quantity"/>
+
+    <result property="hasInitialStock" column="has_initial_stock"/>
+    <result property="lastMovementType" column="last_movement_type"/>
+
+</resultMap>
+
+<select id="getIncomingStockList" resultMap="getIncomingStockListMap">
+ SELECT
+	p.product_id,
+	p.product_name,
+	i.inventory_id,
+	i.warehouse_id AS warehouse_id,
+	w.name AS warehouse_name,
+	COALESCE(i.quantity, 0) AS quantity,
+	COALESCE(i.has_initial_stock, FALSE) AS has_initial_stock,
+	il.type AS last_movement_type
+FROM
+	product AS p
+LEFT JOIN inventory AS i ON
+	i.product_id = p.product_id
+	LEFT JOIN warehouse AS w ON
+	i.warehouse_id = w.warehouse_id
+LEFT JOIN (
+	SELECT
+		inventory_id,
+		type
+	FROM
+		inventory_log
+	WHERE
+		created_at = (
+		SELECT
+			MAX(created_at)
+		FROM
+			inventory_log il2
+		WHERE
+			il2.inventory_id = inventory_log.inventory_id
+        )
+    ) AS il ON
+	il.inventory_id = i.inventory_id
+ORDER BY
+	has_initial_stock ASC,
+	p.product_name;
+</select>
+
+
+<insert id="batchInitialStockIn" parameterType="java.util.List">
+    INSERT INTO inventory
+    (
+        product_id,
+        warehouse_id,
+        lot_no,
+        quantity,
+        reserved_quantity,
+        expire_date,
+        has_initial_stock
+    )
+    VALUES
+    <foreach collection="list" item="item" separator=",">
+        (
+            #{item.productId},
+            #{item.warehouseId},
+            #{item.lotNo},
+            #{item.quantity},
+            #{item.reservedQuantity},
+            #{item.expireDate},
+            #{item.hasInitialStock}
+        )
+    </foreach>
+</insert>
+
+
+
+<select id="selectInsertedInventoryIds" parameterType="java.util.List" resultType="long">
+    SELECT inventory_id
+    FROM inventory
+    WHERE
+    <foreach collection="list" item="item" separator=" OR ">
+        (product_id = #{item.productId} AND lot_no = #{item.lotNo} AND warehouse_id = #{item.warehouseId})
+    </foreach>
+</select>
+
+
+
+
+
+<insert id="batchInitialStockInLog" parameterType="java.util.List">
+        INSERT INTO inventory_log
+        (
+            inventory_id,
+            change_qty,
+            type
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.inventory_id},
+                #{item.change_qty},
+                #{item.type}
+            )
+        </foreach>
+    </insert>
+
+
+
+
+<update id="updateInventoryByPurchase" parameterType="java.util.List">
+    UPDATE inventory
+    <set>
+        quantity = CASE
+        <foreach collection="list" item="item">
+            WHEN inventory_id = #{item.inventoryId}
+            THEN quantity + #{item.quantity}
+        </foreach>
+        ELSE quantity
+        END
+    </set>
+    WHERE inventory_id IN
+    <foreach collection="list" item="item" open="(" separator="," close=")">
+        #{item.inventoryId}
+    </foreach>
+</update>
+
+
+<insert id="insertInventoryLog" parameterType="java.util.List">
+INSERT INTO inventory_log (inventory_id,  change_qty, type, created_at)
+VALUES
+<foreach collection="list" item="item" separator=",">
+    (#{item.inventoryId},  #{item.quantity}, #{item.type}, NOW())
+</foreach>
+</insert>
+
+
+
 <select id="getFullinventory" resultMap="inventoryResultMap">
     SELECT
         -- Inventory
@@ -131,6 +277,12 @@ useGeneratedKeys="true"
 insert into inventory_log (inventory_id,change_qty,type,note) values(#{inventoryId},#{quantity},'IN','당해 창고 첫상품 자체가등록됨')
 
 </insert>
+
+
+
+
+
+
 
 
 </mapper>

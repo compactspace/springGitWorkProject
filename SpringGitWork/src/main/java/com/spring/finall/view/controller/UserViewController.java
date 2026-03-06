@@ -10,28 +10,37 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.spring.finall.impl.SmsServiceRedisDao;
+import com.spring.finall.reqDto.InsertDraftReserveinfoRequestDTO.InsertDraftReserveinfoDTO;
 import com.spring.finall.reqDto.orderRequest.OrderItemDTO;
 import com.spring.finall.reqDto.orderRequest.OrderRequestDTO;
 import com.spring.finall.reqDto.payMentRequest.PaymentDTO;
 import com.spring.finall.reqDto.refundRequest.ProductRefundDTO;
 import com.spring.finall.reqDto.wrapperRequest.OrderPaymentRequestDTO;
+import com.spring.finall.resDto.HasRecentUpdateOnedayClassInfoResDTO.HasRecentUpdateOnedayClassInfoResDTO;
 import com.spring.finall.security.UserDetailsVO2;
 import com.spring.finall.service.ArtworkService;
+import com.spring.finall.service.DraftReserveinfoService;
 import com.spring.finall.service.MemberService;
 import com.spring.finall.service.OneDayClassService;
 import com.spring.finall.service.OrderService;
 import com.spring.finall.service.ReserveService;
 import com.spring.finall.user.CartService;
+import com.spring.finall.user.DraftReserveinfoVO;
 import com.spring.finall.user.OneDayClassVO;
 import com.spring.finall.user.UserVO;
 
@@ -59,6 +68,9 @@ public class UserViewController {
 
 	@Autowired
 	private ArtworkService artworkService;
+
+	@Autowired
+	private DraftReserveinfoService draftReserveinfoService;
 
 	// "가맹점 식별코드 값으로 설정"
 	public static final String IMPKEY = "imp77544746";
@@ -112,8 +124,7 @@ public class UserViewController {
 			@RequestParam("product_id") List<String> productIds,
 			@RequestParam("cart_quantity") List<Integer> quantities,
 			@RequestParam("pricePerUnit") List<Integer> pricePerUnit, // 새로 추가
-			@RequestParam("product_name") List<String> productNames, 
-			@RequestParam("finallsum") String finallsum,
+			@RequestParam("product_name") List<String> productNames, @RequestParam("finallsum") String finallsum,
 
 			Model model) {
 
@@ -187,17 +198,17 @@ public class UserViewController {
 
 	@RequestMapping("/listMore")
 	public String listMore(@RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10") int limit,
-			@AuthenticationPrincipal UserDetailsVO2 userDetails,
-			Model model) {
+			@AuthenticationPrincipal UserDetailsVO2 userDetails, Model model) {
 		LocalDate today = LocalDate.now();
-		
+
 		LocalDateTime endDate = today.plusDays(1).atStartOfDay().minusNanos(1); // 오늘 23:59:59.999999999
 
 		LocalDate sixMonthsAgo = today.minusMonths(6);
 
 		int user_code = userDetails.getUser_code();
 		// limit + 1개만 조회해서 다음 페이지 존재 여부 판단
-		List<OrderPaymentRequestDTO> orderList = orderService.getPagedOrders(sixMonthsAgo, endDate, offset, limit + 1, user_code);
+		List<OrderPaymentRequestDTO> orderList = orderService.getPagedOrders(sixMonthsAgo, endDate, offset, limit + 1,
+				user_code);
 
 		boolean hasNext = false;
 		if (orderList.size() > limit) {
@@ -212,91 +223,86 @@ public class UserViewController {
 		model.addAttribute("limit", limit); // for JSP에서도 필요하면 사용
 		return "compoents/orderListFragment"; // JSP 조각 리턴
 	}
-	
-	
+
 	private List<Map<String, Object>> convertToViewList(List<OrderPaymentRequestDTO> orderList) {
-	    // orderInfoId 기준으로 중복 제거 및 합치기
-	    Map<Long, Map<String, Object>> orderMapById = new HashMap<>();
+		// orderInfoId 기준으로 중복 제거 및 합치기
+		Map<Long, Map<String, Object>> orderMapById = new HashMap<>();
 
-	    for (OrderPaymentRequestDTO dto : orderList) {
-	        OrderRequestDTO order = dto.getOrder();
-	        PaymentDTO payment = dto.getPayment();
-	        ProductRefundDTO refund = dto.getRefund();
-	        
-	        
-	        Map<String, Object> orderMap = orderMapById.get(order.getOrderInfoId());
-	        if (orderMap == null) {
-	            orderMap = new HashMap<>();
-	            orderMap.put("orderInfoId", order.getOrderInfoId());
-	            orderMap.put("userId", order.getUserId());
-	            orderMap.put("userCode", order.getUserCode());
-	            orderMap.put("person", order.getPerson()); // 필요시 필드만 추출
+		for (OrderPaymentRequestDTO dto : orderList) {
+			OrderRequestDTO order = dto.getOrder();
+			PaymentDTO payment = dto.getPayment();
+			ProductRefundDTO refund = dto.getRefund();
 
-	            // items와 pay를 리스트로 초기화
-	            orderMap.put("items", new ArrayList<Map<String, Object>>());
-	            orderMap.put("pay", new ArrayList<Map<String, Object>>());
-	            orderMap.put("refund", new ArrayList<Map<String, Object>>());
+			Map<String, Object> orderMap = orderMapById.get(order.getOrderInfoId());
+			if (orderMap == null) {
+				orderMap = new HashMap<>();
+				orderMap.put("orderInfoId", order.getOrderInfoId());
+				orderMap.put("userId", order.getUserId());
+				orderMap.put("userCode", order.getUserCode());
+				orderMap.put("person", order.getPerson()); // 필요시 필드만 추출
+				orderMap.put("order_status_id", order.getOrderStatusId()); // 필요시 필드만 추출
+				// items와 pay를 리스트로 초기화
+				orderMap.put("items", new ArrayList<Map<String, Object>>());
+				orderMap.put("pay", new ArrayList<Map<String, Object>>());
+				orderMap.put("refund", new ArrayList<Map<String, Object>>());
 
-	            orderMapById.put(order.getOrderInfoId(), orderMap);
-	        }
+				orderMapById.put(order.getOrderInfoId(), orderMap);
+			}
 
-	        // items 합치기
-	        List<Map<String, Object>> itemsList = (List<Map<String, Object>>) orderMap.get("items");
-	        if (order.getItems() != null) {
-	            for (OrderItemDTO item : order.getItems()) {
-	                Map<String, Object> itemMap = new HashMap<>();
-	                itemMap.put("productId", item.getProductId());
-	                itemMap.put("productName", item.getProductName());
-	                itemMap.put("quantity", item.getQuantity());
-	                itemMap.put("pricePerUnit", item.getPricePerUnit());
-	                itemsList.add(0, itemMap);  // 맨 앞에 추가 → DESC
-	            }
-	        }
+			// items 합치기
+			List<Map<String, Object>> itemsList = (List<Map<String, Object>>) orderMap.get("items");
+			if (order.getItems() != null) {
+				for (OrderItemDTO item : order.getItems()) {
+					Map<String, Object> itemMap = new HashMap<>();
+					itemMap.put("productId", item.getProductId());
+					itemMap.put("productName", item.getProductName());
+					itemMap.put("quantity", item.getQuantity());
+					itemMap.put("pricePerUnit", item.getPricePerUnit());
+					itemsList.add(0, itemMap); // 맨 앞에 추가 → DESC
+				}
+			}
 
-	        // pay 합치기
-	        if (payment != null) {
-	        
-	            Map<String, Object> payMap = new HashMap<>();
-	            payMap.put("paymentId", payment.getPaymentId());
-	            payMap.put("paymentMethod", payment.getPaymentMethod());
-	            payMap.put("paymentNumber", payment.getPaymentNumber());
-	            LocalDateTime createdAt = payment.getCreatedAt(); // 혹은 .toLocalDateTime() 필요할 수도 있음
-	            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-	            String formattedDate = createdAt.format(formatter);
-	            payMap.put("paymentDate", formattedDate);
-	            boolean refundable = createdAt.isAfter(LocalDateTime.now().minusDays(14));
-	            payMap.put("refundable", refundable);
-	            payMap.put("amount", payment.getAmount());
-	            orderMap.put("pay", payMap);  // 리스트가 아니라 하나만
-	        }
-	        
-	        if (refund != null) {
-	            Map<String, Object> refundMap = new HashMap<>();
-	            refundMap.put("productRefundId", refund.getProductRefundId());
-	            refundMap.put("refundedAmount", refund.getRefundedAmount());
-	            refundMap.put("reason", refund.getReason());
-	            refundMap.put("status", refund.getStatus());
-	            refundMap.put("requestedAt", refund.getRequestedAt() != null
-	                ? refund.getRequestedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-	                : null);
-	            refundMap.put("refundedAt", refund.getRefundedAt() != null
-	                ? refund.getRefundedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-	                : null);
-	            refundMap.put("processedBy", refund.getProcessedBy());
-	            
-	            orderMap.put("refund", refundMap); // 리스트가 아니라 단일 Map
-	        }
+			// pay 합치기
+			if (payment != null) {
 
-	        
-	    }
+				Map<String, Object> payMap = new HashMap<>();
+				payMap.put("paymentId", payment.getPaymentId());
+				payMap.put("paymentMethod", payment.getPaymentMethod());
+				payMap.put("paymentNumber", payment.getPaymentNumber());
+				LocalDateTime createdAt = payment.getCreatedAt(); // 혹은 .toLocalDateTime() 필요할 수도 있음
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+				String formattedDate = createdAt.format(formatter);
+				payMap.put("paymentDate", formattedDate);
+				boolean refundable = createdAt.isAfter(LocalDateTime.now().minusDays(14));
+				payMap.put("refundable", refundable);
+				payMap.put("amount", payment.getAmount());
+				orderMap.put("pay", payMap); // 리스트가 아니라 하나만
+			}
 
-	    // 최종 리스트 생성
-	    return new ArrayList<>(orderMapById.values());
+			if (refund != null) {
+				Map<String, Object> refundMap = new HashMap<>();
+				refundMap.put("productRefundId", refund.getProductRefundId());
+				refundMap.put("refundedAmount", refund.getRefundedAmount());
+				refundMap.put("reason", refund.getReason());
+				refundMap.put("status", refund.getStatus());
+				refundMap.put("requestedAt",
+						refund.getRequestedAt() != null
+								? refund.getRequestedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+								: null);
+				refundMap.put("refundedAt",
+						refund.getRefundedAt() != null
+								? refund.getRefundedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+								: null);
+				refundMap.put("processedBy", refund.getProcessedBy());
+
+				orderMap.put("refund", refundMap); // 리스트가 아니라 단일 Map
+			}
+
+		}
+
+		// 최종 리스트 생성
+		return new ArrayList<>(orderMapById.values());
 	}
-
-	
-	
-	
 
 //	private List<Map<String, Object>> convertToViewList(List<OrderPaymentRequestDTO> orderList) {
 //		List<Map<String, Object>> viewList = new ArrayList<>();
@@ -414,13 +420,23 @@ public class UserViewController {
 		return "compoents/mypage/changePassword";
 
 	}
-
-	@RequestMapping("/onedayclass-payment")
-	public String showOnedayClassPaymentPage(@RequestParam("onedayclass_num") int onedayclass_num,
-			@RequestParam("choiceOpenDay") String choiceOpenDay, @RequestParam("selectedDate") String selectedDate,
-
+	@GetMapping("/onedayclass-payment")
+	@ResponseBody
+	public ResponseEntity<String> blockGet() {
+	    return ResponseEntity
+	            .status(HttpStatus.BAD_REQUEST)
+	            .body("Only POST Request Permitted");
+	}
+	
+	@PostMapping("/onedayclass-payment")
+	public String showOnedayClassPaymentPage(@AuthenticationPrincipal UserDetailsVO2 userDetails,
+			@RequestParam("onedayclass_num") int onedayclass_num, @RequestParam("choiceOpenDay") String choiceOpenDay,
+			@RequestParam("selectedDate") String selectedDate,
+			@RequestParam("onedayclass_price") String onedayclass_price,
 			@RequestParam("onedayclass_name") String onedayclass_name,
-			@RequestParam("reserveRest_id") String reserveRest_id, Model model) throws JsonProcessingException {
+			@RequestParam("reserveRest_id") String reserveRest_id, Model model
+
+	) throws JsonProcessingException {
 		// onedayclass_num을 뷰에 전달 (필요시)
 
 		OneDayClassVO onedayVo = new OneDayClassVO();
@@ -449,7 +465,51 @@ public class UserViewController {
 
 		model.addAttribute("reserveRest_id", reserveRest_id);
 
-		return "compoents/onedayclassinfopage/onedayClassPaymentPage";
+		// 0.거래번호 발급
+		int userCode = userDetails.getUser_code();
+		String userId = userDetails.getId();
+		String merchant_uid = null;
+
+		// 1. 가맹점 정보
+		String merchantId = "M003"; // 테스트용, 발급받은 가맹점 ID
+
+		DraftReserveinfoVO draftReserveinfoVO = draftReserveinfoService
+				.findDraftReserveInfoByOnedayAndSelectedDate(onedayclass_num, selectedDate, userCode);
+		if (draftReserveinfoVO != null) {
+			Long onedayclassNum = Long.valueOf(onedayclass_num); // int -> Long 객체로 변환
+			Map<String,Object> resultMap = draftReserveinfoService.currentDraftInfoEqulLastedSnapshot(onedayclassNum,
+					draftReserveinfoVO);
+			merchant_uid = draftReserveinfoVO.getMerchantUid();
+
+			boolean isEqual=(boolean) resultMap.get("isEqual");
+			HasRecentUpdateOnedayClassInfoResDTO recentUpdateOnedayClassInfoResDTO=(HasRecentUpdateOnedayClassInfoResDTO) resultMap.get("recentUpdateOnedayClassInfoResDTO");
+			model.addAttribute("isEqual", true);
+			if (!isEqual) {
+				Integer priceUpdated=recentUpdateOnedayClassInfoResDTO.getOnedayclassPrice();
+				
+				model.addAttribute("priceUpdated", priceUpdated);
+				model.addAttribute("isEqual", isEqual);
+
+			}
+
+		} else {
+			merchant_uid = "order_" + userId + "_" + System.currentTimeMillis();
+
+			// DTO 생성 후 필요한 값 세팅
+			InsertDraftReserveinfoDTO insertDraftReserveinfoDTO = new InsertDraftReserveinfoDTO();
+			insertDraftReserveinfoDTO.setMerchantUid(merchant_uid);
+			insertDraftReserveinfoDTO.setUserCode(userCode);
+			insertDraftReserveinfoDTO.setOnedayclassNum((long) onedayclass_num);
+
+			insertDraftReserveinfoDTO.setOnedayclassPrice(Integer.parseInt(onedayclass_price));
+			insertDraftReserveinfoDTO.setSelectedDate(LocalDate.parse(selectedDate.substring(0, 10))); // yyyy-MM-dd만 사용
+
+			draftReserveinfoService.insertDraftReserveInfo(insertDraftReserveinfoDTO);
+		}
+		model.addAttribute("merchant_uid", merchant_uid);
+		model.addAttribute("merchantId", merchantId);
+		model.addAttribute("pgUrl", "http://localhost:7010/fake-pg/index.html");
+		return "onedayclassPaymentPage/onedayclassPaymentPage";
 	}
 
 	@RequestMapping("/get-free-write-gasigle")

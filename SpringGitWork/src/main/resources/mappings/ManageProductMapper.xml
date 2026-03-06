@@ -14,6 +14,91 @@
 
 
 
+<select id="getProductWithCategoryFlatList"
+        resultMap="getProductWithCategoryFlatListMap">
+
+    SELECT
+        -- =======================
+        -- Product
+        -- =======================
+        p.product_id,
+        p.product_cod,
+        p.product_name,
+        p.product_price,
+        p.product_img,
+        p.product_info,
+        p.product_registration_status,
+        p.product_status,
+        p.product_group,
+        p.group_id,
+        p.product_quantity,
+        p.product_order_quantity,
+        p.product_delivery_quantity,
+        p.product_file_path,
+        p.file_category,
+        p.file_name,
+        p.category_id,
+        p.vendor_id,
+
+        -- =======================
+        -- Category (alias 필수)
+        -- =======================
+        c.parent_id      AS category_parent_id,
+        c.name           AS category_name,
+        c.sort_order     AS category_sort_order,
+        c.is_active      AS category_is_active,
+        c.created_at     AS category_created_at,
+        c.updated_at     AS category_updated_at
+
+    FROM product p
+    LEFT JOIN category c
+        ON p.category_id = c.category_id
+   -- 이건 .product_status 컬럼과 is_active 컬럼이 혼용되어 있기에 컬럼 통일시킨후 주석 해제한다.
+   -- WHERE p.product_status = '판매'
+   --   AND (c.is_active = 1 OR c.is_active IS NULL)
+
+    ORDER BY c.sort_order ASC, p.product_id ASC
+
+</select>
+
+<resultMap id="getProductWithCategoryFlatListMap"
+           type="com.spring.finall.user.getProductWithCategoryFlatListVO">
+
+    <!-- ===================== -->
+    <!-- Product -->
+    <!-- ===================== -->
+    <id     property="product_id" column="product_id"/>
+    <result property="product_cod" column="product_cod"/>
+    <result property="product_name" column="product_name"/>
+    <result property="product_price" column="product_price"/>
+    <result property="product_img" column="product_img"/>
+    <result property="product_info" column="product_info"/>
+    <result property="product_Registration_status" column="product_registration_status"/>
+    <result property="product_status" column="product_status"/>
+    <result property="product_group" column="product_group"/>
+    <result property="group_id" column="group_id"/>
+    <result property="product_quantity" column="product_quantity"/>
+    <result property="product_order_quantity" column="product_order_quantity"/>
+    <result property="product_delivery_quantity" column="product_delivery_quantity"/>
+    <result property="product_file_path" column="product_file_path"/>
+    <result property="file_category" column="file_category"/>
+    <result property="file_name" column="file_name"/>
+    <result property="category_id" column="category_id"/>
+    <result property="vendor_id" column="vendor_id"/>
+
+    <!-- ===================== -->
+    <!-- Category -->
+    <!-- ===================== -->
+    <result property="category_parent_id" column="category_parent_id"/>
+    <result property="category_name" column="category_name"/>
+    <result property="category_sort_order" column="category_sort_order"/>
+    <result property="category_is_active" column="category_is_active"/>
+    <result property="category_created_at" column="category_created_at"/>
+    <result property="category_updated_at" column="category_updated_at"/>
+
+</resultMap>
+
+
 <select id="getActiveProductList" parameterType="int" resultType="map">
    SELECT
 	p.product_img,
@@ -57,7 +142,7 @@ ORDER BY
    <!-- 상품 상태 업데이트 -->
     <update id="updateProductStatus" parameterType="map">
         UPDATE product
-        SET product_status = #{status}
+        SET product_Registration_status = #{status} AND product_status=#{product_status}
         WHERE product_id = #{productId}
     </update>
 
@@ -74,7 +159,43 @@ ORDER BY
     select max(product_cod) from product
 </select>
 
+<insert id="insertProductInfomation" useGeneratedKeys="true"
+        keyProperty="product_id"
+>
+    INSERT INTO product (
+        product_cod,
+        product_group,
+        product_Registration_status,
+        group_id,
+        product_name,
+        product_price,
+        product_quantity,
+        product_info,
+        product_img,
+        product_file_path,
+        file_category,
+        file_name,
+        category_id,
+        vendor_id
+    ) VALUES (
+        #{product_cod},
+        #{product_group},
+        'close',
+        #{group_id},
+        #{product_name},
+        #{product_price},
+        0,
+        #{product_info},
+        #{product_img},
+        #{product_file_path},
+        #{file_category},
+        #{file_name},
+        #{category_id},
+        #{vendor_id}
+    )
 
+
+</insert>
 
 
 
@@ -109,6 +230,7 @@ useGeneratedKeys="true"
         #{file_name}
     )
 </insert>
+
 
 
 

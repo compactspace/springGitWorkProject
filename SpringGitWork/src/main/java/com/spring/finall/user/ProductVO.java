@@ -2,9 +2,7 @@ package com.spring.finall.user;
 
 public class ProductVO {
 
-	
 	private int product_id;
-	
 
 	private int product_cod;
 	private String product_name;
@@ -18,20 +16,54 @@ public class ProductVO {
 	private int product_quantity;
 	private int product_order_quantity;
 	private int product_delivery_quantity;
+	
+	
+	
+	
+	
 	private String product_file_path;
 
-
-	
-	
 	private String file_category;
 
-	private String 	file_name;
+	private String file_name;
 	
-	
-	
-	
+	private int category_id;
+	private int vendor_id;
 
 	
+	
+//	=== DB랑 상관없는 json 가공  리턴용 필드 시작
+	private int parent_id;
+	
+	
+	public int getParent_id() {
+		return parent_id;
+	}
+
+	public void setParent_id(int parent_id) {
+		this.parent_id = parent_id;
+	}
+
+	
+//	=== DB랑 상관없는 json 가공  리턴용 필드 종료	
+	
+	
+	public int getCategory_id() {
+		return category_id;
+	}
+
+	public void setCategory_id(int category_id) {
+		this.category_id = category_id;
+	}
+
+	public int getVendor_id() {
+		return vendor_id;
+	}
+
+	public void setVendor_id(int vendor_id) {
+		this.vendor_id = vendor_id;
+	}
+
 	public String getFile_category() {
 		return file_category;
 	}
@@ -55,8 +87,7 @@ public class ProductVO {
 	public void setProduct_id(int product_id) {
 		this.product_id = product_id;
 	}
-	
-	
+
 	public String getProduct_file_path() {
 		return product_file_path;
 	}
@@ -73,7 +104,6 @@ public class ProductVO {
 		this.group_id = group_id;
 	}
 
-	
 	public int getProduct_order_quantity() {
 		return product_order_quantity;
 	}
@@ -114,9 +144,6 @@ public class ProductVO {
 		this.product_status = product_status;
 	}
 
-
-	
-	
 	public int getProduct_quantity() {
 		return product_quantity;
 	}
@@ -124,10 +151,6 @@ public class ProductVO {
 	public void setProduct_quantity(int product_quantity) {
 		this.product_quantity = product_quantity;
 	}
-
-	
-	
-	
 
 	public String getProduct_info() {
 		return product_info;

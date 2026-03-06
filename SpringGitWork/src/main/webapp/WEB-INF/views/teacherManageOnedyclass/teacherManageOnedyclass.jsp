@@ -19,48 +19,48 @@
 
 <style>
 html, body {
-    height: 100%;
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
+	height: 100%;
+	margin: 0;
+	font-family: 'Roboto', sans-serif;
 }
 
 #pageWrapper {
-    display: flex;
-    height: 100vh;
+	display: flex;
+	height: 100vh;
 }
 
 #sidebar {
-    width: 240px;
-    border-right: 1px solid #e0e0e0;
-    overflow-y: auto;
+	width: 240px;
+	border-right: 1px solid #e0e0e0;
+	overflow-y: auto;
 }
 
 #mainContent {
-    flex: 1;
-    padding: 24px;
-    overflow-y: auto;
+	flex: 1;
+	padding: 24px;
+	overflow-y: auto;
 }
 
 #contentHeader {
-    padding: 20px 24px;
-    background-color: #f5f7fa;
-    border-left: 6px solid #4a90e2;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-    margin-bottom: 20px;
+	padding: 20px 24px;
+	background-color: #f5f7fa;
+	border-left: 6px solid #4a90e2;
+	border-radius: 4px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+	margin-bottom: 20px;
 }
 
 #contentHeader h1 {
-    margin: 0;
-    font-size: 1.8em;
-    font-weight: 700;
-    color: #333;
+	margin: 0;
+	font-size: 1.8em;
+	font-weight: 700;
+	color: #333;
 }
 
 #contentHeader .header-subtitle {
-    margin: 6px 0 0 0;
-    font-size: 0.95em;
-    color: #666;
+	margin: 6px 0 0 0;
+	font-size: 0.95em;
+	color: #666;
 }
 
 /* 좌측 메뉴 */
@@ -96,7 +96,6 @@ html, body {
 	min-height: 400px; /* 기본 높이 */
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
-
 
 /*현재 개강이 등록된 벌 셀렉트 시작 */
 .month-control-bar {
@@ -139,126 +138,120 @@ html, body {
 	font-size: 0.9em;
 	transition: background-color 0.2s;
 }
+
 .add-btn:hover {
 	background-color: #1e5bb8;
 }
 
 /*현재 개강이 등록된 벌 셀렉트 종료 */
 
-
-
-
 /* 달력 시작 */
 .calendar-wrapper {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr); /* 7일 기준 */
-    gap: 8px;
-    padding: 10px;
-    background-color: #f5f5f5;
-    border-radius: 8px;
+	display: grid;
+	grid-template-columns: repeat(7, 1fr); /* 7일 기준 */
+	gap: 8px;
+	padding: 10px;
+	background-color: #f5f5f5;
+	border-radius: 8px;
 }
 
 /* 각 날짜 박스 */
 .calendar-day {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 8px;
-    font-family: Arial, sans-serif;
-    font-size: 0.85em;
-    min-height: 80px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+	background-color: #ffffff;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	padding: 8px;
+	font-family: Arial, sans-serif;
+	font-size: 0.85em;
+	min-height: 80px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 /* 첫 번째 행: 관리 상태 */
 .calendar-day .manageStatus {
-    font-weight: bold;
-    color: #2a7ae2;
-    margin-bottom: 4px;
+	font-weight: bold;
+	color: #2a7ae2;
+	margin-bottom: 4px;
 }
 
 /* 두 번째 행: 오픈 날짜 */
 .calendar-day .openday {
-    color: #333;
-    margin-bottom: 4px;
+	color: #333;
+	margin-bottom: 4px;
 }
 
 /* 세 번째 행: 휴무/기타 */
 .calendar-day .rest {
-    color: #e74c3c;
+	color: #e74c3c;
 }
 
 /* 개강 중인 월 버튼 (예: pagination) */
 .active-month {
-    display: inline-block;
-    padding: 4px 8px;
-    margin: 2px;
-    background-color: #2a7ae2;
-    color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85em;
-    transition: background-color 0.2s;
+	display: inline-block;
+	padding: 4px 8px;
+	margin: 2px;
+	background-color: #2a7ae2;
+	color: #fff;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 0.85em;
+	transition: background-color 0.2s;
 }
 
 .active-month:hover {
-    background-color: #1e5bb8;
+	background-color: #1e5bb8;
 }
-
-
 
 /* 4행 버튼 영역 */
 .calendar-actions {
-    display: flex;
-    justify-content: space-between; /* 좌/우 분리 */
-    margin-top: 6px;
+	display: flex;
+	justify-content: space-between; /* 좌/우 분리 */
+	margin-top: 6px;
 }
 
 /* 버튼 기본 스타일 */
-.calendar-actions .btn-close,
-.calendar-actions .btn-edit {
-    flex: 1; /* 균등 배분 */
-    margin: 0 2px; 
-    padding: 4px 6px;
-    font-size: 0.8em;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    color: #fff;
-    transition: background-color 0.2s;
+.calendar-actions .btn-close, .calendar-actions .btn-edit {
+	flex: 1; /* 균등 배분 */
+	margin: 0 2px;
+	padding: 4px 6px;
+	font-size: 0.8em;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	color: #fff;
+	transition: background-color 0.2s;
 }
-
 
 /* 마감하기 버튼 */
 .btn-close {
-    background-color: #e74c3c;
+	background-color: #e74c3c;
 }
+
 .btn-close:hover {
-    background-color: #c0392b;
+	background-color: #c0392b;
 }
 
 /* 인원수정 버튼 */
 .btn-edit {
-    background-color: #3498db;
-}
-.btn-edit:hover {
-    background-color: #2980b9;
+	background-color: #3498db;
 }
 
+.btn-edit:hover {
+	background-color: #2980b9;
+}
 
 /* 달력 종료 */
-
-
-
 
 /* 모달 시작  */
 .modal-overlay {
 	position: fixed;
-	top: 0; left: 0;
-	width: 100%; height: 100%;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
 	background: rgba(0, 0, 0, 0.4);
 	display: flex;
 	align-items: center;
@@ -272,7 +265,7 @@ html, body {
 	padding: 20px;
 	border-radius: 10px;
 	width: 320px;
-	box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
@@ -294,6 +287,7 @@ html, body {
 	color: #333;
 	font-size: 0.9em;
 }
+
 .select-openday {
 	width: 100%;
 	padding: 6px;
@@ -309,6 +303,7 @@ html, body {
 	color: #333;
 	font-size: 0.9em;
 }
+
 .rest-field {
 	width: 100%;
 	padding: 6px;
@@ -324,6 +319,7 @@ html, body {
 	gap: 8px;
 	margin-top: 10px;
 }
+
 .btn-confirm, .btn-cancel {
 	padding: 6px 12px;
 	border: none;
@@ -331,25 +327,25 @@ html, body {
 	cursor: pointer;
 	font-size: 0.9em;
 }
+
 .btn-confirm {
 	background-color: #2a7ae2;
 	color: #fff;
 }
+
 .btn-confirm:hover {
 	background-color: #1e5bb8;
 }
+
 .btn-cancel {
 	background-color: #ccc;
 	color: #333;
 }
+
 .btn-cancel:hover {
 	background-color: #aaa;
 }
 /* 모달 종료 */
-
-
-
-
 .null-error {
 	display: inline-block;
 	margin-top: 4px;
@@ -357,8 +353,86 @@ html, body {
 	font-size: 0.8em;
 }
 
+/* s */
+.modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.4);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 9999;
+}
 
+.modal-box {
+	background: #fff;
+	width: 480px;
+	padding: 25px;
+	border-radius: 12px;
+}
 
+.modal-header h3 {
+	margin-bottom: 20px;
+}
+
+.add-row {
+	border: 2px dashed #dcdcdc;
+	padding: 15px;
+	margin-bottom: 12px;
+	border-radius: 10px;
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	background: #fafafa;
+}
+
+.add-row select, .add-row input {
+	height: 38px;
+	padding: 0 10px;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+}
+
+.btn-add-row {
+	background: none;
+	border: none;
+	color: #4a6cf7;
+	font-weight: 600;
+	cursor: pointer;
+	margin-top: 10px;
+}
+
+.btn-remove-row {
+	background: none;
+	border: none;
+	color: #ff4d4f;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+.modal-buttons {
+	margin-top: 20px;
+	text-align: right;
+}
+
+.btn-confirm {
+	background: #4a6cf7;
+	color: #fff;
+	border: none;
+	padding: 8px 16px;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.btn-cancel {
+	background: #eee;
+	border: none;
+	padding: 8px 16px;
+	border-radius: 6px;
+	margin-left: 8px;
+	cursor: pointer;
+}
+/*  */
 </style>
 <script>
 
@@ -367,8 +441,8 @@ let activeMonthLists=null;
 let activeMonthOnedayClassList=null;
 var remainingDates 
 let changeMonth=null
-
-
+var onedayclass_num=null;
+var 추가제외배열=null;
 
 
 
@@ -382,6 +456,9 @@ window.onload= async function(){
 	      xhr.setRequestHeader(header, token);
 	    }
 	  });  
+	  
+	  
+	  
 	  
 	  
 	  
@@ -461,6 +538,8 @@ let alreadyOpenDate=date||null;
  
  
 
+ 
+ var rerenderList=null;
 async function getActiveOnedayclassList(yearMonth) {
     if (!yearMonth) yearMonth = todayYyyyMmFormatted();
 
@@ -473,7 +552,28 @@ async function getActiveOnedayclassList(yearMonth) {
                 const { activeMonthList, list } = res;
 
                 activeMonthLists = activeMonthList;
-                activeMonthOnedayClassList = list;
+                activeMonthOnedayClassList = list;   
+                rerenderList=list;
+            	
+            	
+                onedayclass_num=activeMonthLists[0].onedayclass_num;
+                
+               // console.log("onedayclass_num: "+onedayclass_num);
+                
+                
+                
+                
+                
+              추가제외배열 = list.map(제외일 => {
+                             	
+                	
+                	  return YYYYMMDDFormatted(제외일.openday);
+                	});                 
+              
+              
+                
+                
+                
 
                 $(".month-control-bar").remove();
                 
@@ -498,6 +598,28 @@ async function getActiveOnedayclassList(yearMonth) {
 }
 
 
+
+
+
+
+
+
+
+
+function YYYYMMDDFormatted(timestamp) {
+	  const date = new Date(timestamp);
+
+	  const yyyy = date.getFullYear();
+	  const mm = String(date.getMonth() + 1).padStart(2, '0');
+	  const dd = String(date.getDate()).padStart(2, '0');
+
+	  return yyyy + '-' + mm + '-' + dd;
+	}
+
+
+
+
+	
 
 
 function createCalendarHTMLTag(list){
@@ -529,22 +651,41 @@ function createCalendarHTMLTag(list){
     list.forEach(function(item){
     	
         var dateStr = formatted(item.openday); // timestamp에서 YYYY-MM-DD
-        let isClose=item.manageStatus?  '진행중' : '수업종료';
-        let 진행중이니=item.manageStatus;       
+     	console.log(item.openday);     
         
+        
+        const statusLabels = {
+      		  open: "진행중",
+      		  closed_by_teacher_user: "내가 직접 마감",
+      		  closed_by_time: "날짜 지나서 마감"
+      		};        
+        
+        
+    	// 사용 예시
+		let displayStatus = statusLabels[item.manageStatus] || "알 수 없음";
+		//console.log("displayStatus: "+displayStatus);			
+        let isClose=item.manageStatus?  '진행중' : '수업종료';
+        let 진행중이니=item.manageStatus;        
         html += '<div class="calendar-day" data-position="'+i+'">';
-        html += '<div class="manageStatus">' + isClose + '</div>';
-        html += '<div class="openday">개강날짜: ' + dateStr + '</div>';
+        html += '<div class="manageStatus">' + displayStatus + '</div>';
+        if(item.manageStatus==="closed_by_time" || item.manageStatus==="closed_by_teacher_user" ||item.manageStatus==="closed_by_time"){
+        html += '<div class="openday">종료된 날: ' + dateStr + '</div>';
+        html += '<div class="rest">종료된 수업</div>'; 
+        html += '<div class="calendar-actions">';
+        }else{
+        html += '<div class="openday" data-openday='+dateStr+'>개강날짜: ' + dateStr + '</div>';
         html += '<div class="rest">남은자리: ' + item.rest + '</div>';
      // 4행: 2열 버튼
         html += '<div class="calendar-actions">';
         html += '<button class="btn-close" data-isactive="' + 진행중이니 + '">마감하기</button>';
-        html += '<button class="btn-edit" data-isactive="' + 진행중이니 + '">인원수정</button>';
+        html += '<button class="btn-edit" data-isactive="' + 진행중이니 + '">인원수정</button>';        	
+        }
         html += '</div>';
         html += '</div>'; // calendar-day
         i++;
     });
 
+    
     html += '</div>'; // calendar-wrapper
     return html;
 }
@@ -565,7 +706,7 @@ function createPagiNationButtonHTMLTag(activeMonthList, list) {
     
     activeMonthList.forEach(function(item){
         var regMonth = item.reg_month; // 예: 2025-10
-        console.log(regMonth);
+       // console.log(regMonth);
         
         var month = regMonth.split("-")[1];
 
@@ -588,7 +729,8 @@ function createPagiNationButtonHTMLTag(activeMonthList, list) {
     }
 
     remainingDates = addCrrentPossible(list, futureYyyyMmFormat); // ["2025-10-28", "2025-10-29", ...]
-   
+   //console.log(remainingDates);
+    
     
 
     if (remainingDates.length > 0) {
@@ -629,11 +771,19 @@ function formatted(timestamp){
 
 
 function addCrrentPossible(futureList, futureYyyyMmFormat) {
+	
+	
+	
+	
+	
+	
     var today = new Date();
     var year = today.getFullYear();
     var month = today.getMonth() + 1; // 0~11
-    var lastDay = new Date(year, month + 1, 0).getDate(); // 해당 달 마지막 날
-
+    var lastDay = new Date(year, month, 0).getDate(); // 해당 달 마지막 날
+   // console.log("month: "+month);
+   // console.log("lastDay: "+lastDay);      
+    
  
     if (month < 10) {
         month = '0' + month;
@@ -658,6 +808,10 @@ function addCrrentPossible(futureList, futureYyyyMmFormat) {
         var dd = ('0' + day).slice(-2);
         result.push(year + '-' + mm + '-' + dd);
     }
+
+    
+ // 🔥 여기서 제외 처리
+    result = result.filter(date => !추가제외배열.includes(date));
 
     return result;
 }
@@ -699,92 +853,277 @@ function addFuturePossibleWithSet(futureList, futureYyyyMmFormat) {
 
 
 
-
 function eventResister(){
 	
 	// 수업 마감 버튼
 	$(".btn-close").on("click",function(){
-		var isactive = $(this).data("isactive");
-		var active = (isactive === true || isactive === "true");
-		if(!active){
-			alert("해당수업은 이미 종료된 수업입니다.");
-			return;
-		}	
+		var isactive = $(this).data("isactive");		
 		
-		console.log("마감!!!");
+		const possibleNextStep = {
+	      		  open: "closed_by_teacher_user",
+	      		  closed_by_teacher_user: "open",
+	      		};
+	        
+			const nextStep=	possibleNextStep[isactive] 
 		
 		
+			
 		
+		 var opendayText = $(this)
+	        .closest(".calendar-day")   // 상위 calendar-day 찾고
+	        .find(".openday").data("openday")            // 그 안에서 openday 찾기
+	                     
+	        
+		
+	                      
+	        
+	        const bodyData={
+	        
+	        	openday:opendayText,
+	        	nowStatus:isactive,
+	        	manageStatus :nextStep
+	        	
+	        }
+	     //   console.log(bodyData);    
+			
+			
+			
+	        
+	        
+	    $.ajax({
+	            url: contextPath + "/api/teacher/update-manage-onedayclass-status",
+	            type: "post",
+	            data: bodyData,
+	            success: function(res) {
+	                         
+	            	}
+	    }
+	    )
+	     
+	        
+	        
+	        
+	
 		
 	});
-
+	
+	
+	
+	
+	
+	
+	
 	
 	// 개강날짜 추가 버튼 → 모달 띄우기
-	$(".add-btn").on("click", function() {
-	   
-	    var today = new Date();
-	    var year = today.getFullYear();
-	    var month = ('0' + (today.getMonth() + 1)).slice(-2);
-	    var yearMonth = year + '-' + month;
+// 개강날짜 추가 버튼 → 모달 띄우기
+$(".add-btn").on("click", function() {
 
-	    var html = '';
-	    html += '<div class="modal-overlay">';
-	    html += '  <div class="modal-box">';
-	    html += '    <div class="modal-row modal-header">';
-	    html += '      <h3>' + yearMonth + ' 개강 날짜 추가</h3>';
-	    html += '    </div>';
-	    html += '    <div class="modal-row modal-select">';
-	    html += '      <label>개강일 선택</label>';
-	    html += '      <select id="select-openday" class="select-openday">';
-	    for (var i = 0; i < remainingDates.length; i++) {
-	        html += '        <option value="' + remainingDates[i] + '">' + remainingDates[i] + '</option>';
-	    }
-	    html += '      </select>';
-	    html += '    </div>';
-	    html += '    <div class="modal-row modal-rest">';
-	    html += '      <label>남은 자리</label>';
-	    html += '      <input type="number" class="rest-field" min="1" placeholder="인원 입력">';
-	    html += '      <span class="null-error">인원 수를 입력하세요.</span>';  // ✅ 추가
-	    html += '    </div>';
-	    html += '    <div class="modal-row modal-buttons">';
-	    html += '      <button id="btn-add-confirm" class="btn-confirm">추가</button>';
-	    html += '      <button id="btn-add-cancel" class="btn-cancel">취소</button>';
-	    html += '    </div>';
-	    html += '  </div>';
-	    html += '</div>';
+    var today = new Date();
+    var year = today.getFullYear();
+    var month = ('0' + (today.getMonth() + 1)).slice(-2);
+    var yearMonth = year + '-' + month;
 
-	    $("body").append(html);
+    var html = '';
+    html += '<div class="modal-overlay">';
+    html += '  <div class="modal-box">';
+    html += '    <div class="modal-header">';
+    html += '      <h3>' + yearMonth + ' 개강 날짜 추가</h3>';
+    html += '    </div>';
 
-	    // 오류 메시지 숨기기 초기화
-	    $(".null-error").hide();
+    html += '    <div class="modal-body">';
+    html += '      <div class="rows-wrap"></div>';
+    html += '      <button type="button" class="btn-add-row">+ 날짜 추가</button>';
+    html += '    </div>';
 
-	    // 취소 버튼
-	    $("#btn-add-cancel").on("click", function() {
-	        $(".modal-overlay").remove();
-	    });
+    html += '    <div class="modal-buttons">';
+    html += '      <button id="btn-add-confirm" class="btn-confirm">추가</button>';
+    html += '      <button id="btn-add-cancel" class="btn-cancel">취소</button>';
+    html += '    </div>';
 
-	    // 추가 버튼
-	    $("#btn-add-confirm").on("click", function() {
-	        var selectedDate = $("#select-openday").val();
-	        var restCount = $(".rest-field").val();
+    html += '  </div>';
+    html += '</div>';
 
-	        if (!restCount || isNaN(restCount) || restCount <= 0) {
-	            $(".null-error").show(); // 경고 표시
-	            $(".rest-field").focus();
-	            return;
-	        }	        
-	        // TODO: 서버 전송
-	        alert("[" + selectedDate + "] 개강일(" + restCount + "명) 추가 완료!");
-	        $(".modal-overlay").remove();
-	    });
+    $("body").append(html);
 
-	    // 입력 시 오류 메시지 자동 숨김
-	    $(".rest-field").on("input", function() {
-	        $(".null-error").hide();
-	    });    
-	    
-	});
+    // 기본 1줄 생성
+    addRow();
+
+    // 취소
+    $("#btn-add-cancel").on("click", function() {
+        $(".modal-overlay").remove();
+    });
+
+    // 행 추가
+    $(document).on("click", ".btn-add-row", function() {
+        addRow();
+    });
+
+    // 행 삭제
+    $(document).on("click", ".btn-remove-row", function() {
+        $(this).closest(".add-row").remove();
+        updateDisabledOptions();
+    });
+
+    // 날짜 변경 시 중복 방지 처리
+    $(document).on("change", ".select-openday", function() {
+        updateDisabledOptions();
+    });
+
+    // 추가 버튼
+     var forRerenderList=null;
+    $("#btn-add-confirm").on("click", function() {
+
+        var resultList = [];
+        var isValid = true;
+
+        $(".add-row").each(function() {
+
+            var selectedDate = $(this).find(".select-openday").val();
+            var restCount = $(this).find(".rest-field").val();
+
+            if (!selectedDate || !restCount || restCount <= 0) {
+                alert("날짜와 인원을 모두 입력하세요.");
+                isValid = false;
+                return false;
+            }
+            
+            resultList.push({
+            	openday: selectedDate,
+            	rest: restCount,
+            	onedayclass_num:onedayclass_num
+            });
+        });
+
+        if (!isValid) return;
+
+        
+        
+        ///open-selectday-onedyaclass
+     $.ajax({
+    url: contextPath + "/api/teacher/open-selectday-onedyaclass",
+    type: "post",
+    contentType: "application/json",   // 이거 추가하는게 좋음
+    data: JSON.stringify(resultList),  // 여기 수정
+    success: function(res) {
+    	 const { findAsyncFlatList } = res;
+    	 
+    	    // 1️⃣ 두 리스트 합치기
+    	    const combined = [...rerenderList, ...findAsyncFlatList];
+
+    	    // 2️⃣ 분할정복 정렬
+    	    rerenderList = mergeSort(combined);    
+    	    
+    	   // console.log(rerenderList);   	    
+    	    
+    	    rerender(rerenderList);
+    	
+    	
+    }
+}); 
+        
+        
+        
+        
+        console.log(resultList); // 서버 전송용
+        alert("여러 개 개강일 추가 완료!");
+        $(".modal-overlay").remove();
+    });
+
+});
 	
+	
+	
+	
+	
+function rerender(list){
+    $("#contentBody").html(createCalendarHTMLTag(list));
+}
+	
+	
+function merge(left, right) {
+    const result = [];
+    let i = 0;
+    let j = 0;
+
+    while (i < left.length && j < right.length) {
+        if (left[i].openday <= right[j].openday) {
+            result.push(left[i++]);
+        } else {
+            result.push(right[j++]);
+        }
+    }
+
+    return result
+        .concat(left.slice(i))
+        .concat(right.slice(j));
+}
+
+	//mergeSort (분할정복 핵심)
+function mergeSort(arr) {
+    if (arr.length <= 1) return arr;
+
+    const mid = Math.floor(arr.length / 2);
+
+    const left = mergeSort(arr.slice(0, mid));
+    const right = mergeSort(arr.slice(mid));
+
+    return merge(left, right);
+}
+	
+	
+	
+	
+	
+	
+// ===== 행 추가 함수 =====
+function addRow() {
+
+    var rowHtml = '';
+    rowHtml += '<div class="add-row">';
+    rowHtml += '  <select class="select-openday">';
+    rowHtml += '      <option value="">날짜 선택</option>';
+
+    for (var i = 0; i < remainingDates.length; i++) {
+        rowHtml += '<option value="' + remainingDates[i] + '">' + remainingDates[i] + '</option>';
+    }
+
+    rowHtml += '  </select>';
+    rowHtml += '  <input type="number" class="rest-field" min="1" placeholder="인원 입력">';
+    rowHtml += '  <button type="button" class="btn-remove-row">✕</button>';
+    rowHtml += '</div>';
+
+    $(".rows-wrap").append(rowHtml);
+    updateDisabledOptions();
+}
+
+
+// ===== 중복 선택 방지 =====
+function updateDisabledOptions() {
+
+    var selectedValues = [];
+
+    $(".select-openday").each(function() {
+        var val = $(this).val();
+        if (val) selectedValues.push(val);
+    });
+
+    $(".select-openday").each(function() {
+
+        var currentVal = $(this).val();
+
+        $(this).find("option").each(function() {
+
+            if ($(this).val() === "") return;
+
+            if (selectedValues.includes($(this).val()) && $(this).val() !== currentVal) {
+                $(this).prop("disabled", true);
+            } else {
+                $(this).prop("disabled", false);
+            }
+
+        });
+    });
+}
 	
 	
 
@@ -830,9 +1169,7 @@ function todayYyyyMmFormatted(){
 				<h1>개설된 월 단위 수업 관리</h1>
 				<p class="header-subtitle">개설된 월단위 수업을 관리 마감 수정합니다.</p>
 			</div>
-			<div id="contentBody">
-			
-			</div>
+			<div id="contentBody"></div>
 		</div>
 	</div>
 

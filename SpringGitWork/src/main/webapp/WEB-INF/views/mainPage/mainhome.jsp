@@ -686,8 +686,8 @@ var key;
 
 		function openCloseAnswer() {
 		    
-		    console.log($(this).next().css('display'))
-		console.log(document.getElementsByClassName("qnaifo"))
+		  //  console.log($(this).next().css('display'))
+		//console.log(document.getElementsByClassName("qnaifo"))
 		    if($(this).next().css('display') === 'none') {
 		        $(this).next().css('display','flex')
 		         $(this).next().css('justify-content','space-evenly');
@@ -715,23 +715,23 @@ var key;
 			let $centermenu = $('.menuewrapper')//그져 객체에 담기
 			let $allwrapper = $('.allwrapper')//그져 객체에 담기
 			let topmenu = $centermenu.offset().top;
-			console.log("센터메뉴의 좌표는->>" + topmenu);
+			//console.log("센터메뉴의 좌표는->>" + topmenu);
 
 			let topmenuheight = $centermenu.outerHeight(true);
 			let allwrapperheight = $allwrapper.outerHeight(true);
-			console.log("센터메뉴의 컨텐츠영역+페딩+보더영역 높이는->>" + topmenuheight);
+			//console.log("센터메뉴의 컨텐츠영역+페딩+보더영역 높이는->>" + topmenuheight);
 			//스크롤 이 계속 바뀜에 따라 속성을 주는 함수를 내부적으로 호출
 			function updatescroll() {
 				let scrollTop = $(window).scrollTop();
-				console.log("scrollTop->>" + scrollTop);
+				//console.log("scrollTop->>" + scrollTop);
 				// console.log(".menuewrapper 빼기 scrollTop ->>"+(scrollTop-topmenu));
 				if ((scrollTop - topmenu) >= 0) {
 					//482.188
-					console.log("scrollTop-topmenu->>" + (scrollTop - topmenu));
-					console.log("센터메뉴의 컨텐츠영역+페딩+보더영역 높이는->>" + topmenuheight);
+					//console.log("scrollTop-topmenu->>" + (scrollTop - topmenu));
+					//console.log("센터메뉴의 컨텐츠영역+페딩+보더영역 높이는->>" + topmenuheight);
 					/* 스크롤 상관없이 올레퍼헤이트의 객체 높이는 변함없음  */
-					console.log("올레퍼의 길이는->>" + allwrapperheight);
-					console.log("올레퍼의 빼기길이->>" + (allwrapperheight - topmenu));
+					//console.log("올레퍼의 길이는->>" + allwrapperheight);
+					//console.log("올레퍼의 빼기길이->>" + (allwrapperheight - topmenu));
 					let minuheight = allwrapperheight - topmenu;
 					$centermenu.css({
 						'background-color' : '#fff',
@@ -762,7 +762,7 @@ var key;
 		
 	$(".managermode").on("click",()=>{		
 		key=localStorage.getItem("key");
-		console.log("로컬스토리지 토큰값"+key)	
+		//console.log("로컬스토리지 토큰값"+key)	
 		$.ajax({				
 			url:"adminmode.do",
 			 beforeSend: function (xhr) {
@@ -771,9 +771,9 @@ var key;
 		            xhr.setRequestHeader("걍아무키","걍아무값");
 		            },
 			success:(data,status,request)=>{
-				console.log(data)
-				console.log(status)
-				console.log(request)
+				//console.log(data)
+				//console.log(status)
+				//console.log(request)
 			//location.replace("/finall/"+data);				
 			}	
 			
@@ -855,7 +855,7 @@ const topTenOnedayclassComponentLoad = () => {
 	  });
 	};
 
-	const introduceOnedayclassComponentLoad = () => {	
+	/* const introduceOnedayclassComponentLoad = () => {	
 		
 		  $.ajax({
 		    url: "${pageContext.request.contextPath}/guest/get-introduce-onedayclass",
@@ -867,10 +867,12 @@ const topTenOnedayclassComponentLoad = () => {
 		      console.error("JSP 조각 불러오기 실패:", err);
 		    }
 		  });
-		};	
+		};	 */
 	
 	topTenOnedayclassComponentLoad();
-	introduceOnedayclassComponentLoad();
+	//디자인이 별로여서 주석처리
+	//introduceOnedayclassComponentLoad();
+	
 	
 	
 

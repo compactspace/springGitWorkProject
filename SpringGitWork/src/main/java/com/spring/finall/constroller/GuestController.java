@@ -57,6 +57,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.finall.WorkImgVO;
 import com.spring.finall.Validator.UploadSecurityManager.UploadSecurityManager;
 import com.spring.finall.apiResponseController.ApiResponse;
@@ -94,6 +96,10 @@ public class GuestController {
 	@Autowired
 	private OneDayClassService oneDayClassService;
 
+	
+	
+	
+	
 	@Autowired
 	private WorkService workService;
 
@@ -392,6 +398,48 @@ public class GuestController {
 		// JSP는 #content2 부분만 포함한 조각 페이지
 		return "compoents/productGroupList";
 	}
+	
+	
+	
+	// 바로위 ajaxProductGroupList 는 현재 디비 컬럼 value = "product_group", 수정중으로 ajaxProductCategoryList로 바꾸는중
+	@RequestMapping(value = "/product-categorylist")
+	public String ajaxProductCategoryList(ProductVO vo,
+			@RequestParam(value = "category_id", required = false, defaultValue = "4") int category_id,
+			@AuthenticationPrincipal UserDetailsVO2 user, Model model) {
+
+		
+
+		vo.setCategory_id(category_id);
+		List<Map<String, Object>> grouplist = protService.productCategoryList(vo);
+		
+		
+		// 안전하게 새 컬럼만 별도 모델로 추가
+		for (Map<String, Object> item : grouplist) {
+			// file_category와 file_name이 존재하고 널이 아닐 때만
+			if (item.containsKey("file_category") && item.get("file_category") != null && item.containsKey("file_name")
+					&& item.get("file_name") != null) {
+
+				// MVC리솔스 처리경로 /images/
+				item.put("imagePath", "/images/" + item.get("file_category") + "/" + item.get("file_name"));
+			}
+		}
+
+		model.addAttribute("productService", grouplist);
+
+		// 로그인 여부
+		Boolean isAuthenticated = user != null;
+		model.addAttribute("isAuthenticated", isAuthenticated);
+
+		// JSP는 #content2 부분만 포함한 조각 페이지
+		return "compoents/products/productPaintList";
+	}
+	
+	
+	
+	
+	
+	
+	
 
 	@RequestMapping(value = "/get-motre-reviews")
 	public String getdynamicworkimg(@RequestParam(defaultValue = "취미만화반") String onedayclass_name,
@@ -404,12 +452,35 @@ public class GuestController {
 		HashMap<String, Object> map = oneDayClassService.getReview2(ovo);
 
 		List<Object> reviewList = (List<Object>) map.get("joinToReview");
-		boolean endPageFlag = (reviewList != null && reviewList.isEmpty());
-		model.addAttribute("endPageFlag", map.get("endPageFlag"));
+		boolean endPageFlag = (reviewList == null || (reviewList != null && reviewList.isEmpty()));
+		model.addAttribute("endPageFlag", endPageFlag);
 		model.addAttribute("joinToReview", map.get("joinToReview"));
 		return "compoents/onedayclassinfopage/reviewFragment";
 	}
 
+	@RequestMapping(value = "/get-reviews-short-form")
+	public String getReviewsShortForm( OneDayClassVO ovo, Model model,
+			HttpServletRequest req) throws JsonProcessingException {
+
+	
+		OneDayClassVO  shortReviewList = oneDayClassService.getReviewsShortForm(ovo);
+		
+		model.addAttribute("shortReviewList", shortReviewList);
+
+		return "compoents/onedayclassinfopage/reviewShortFomFragment";
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@RequestMapping(value = "/get-more-work-comments")
 	@ResponseBody
 	public List<Map<String, Object>> getMoreWorkComments(@RequestParam("work_id") int work_id,

@@ -152,7 +152,35 @@ input[type="number"]:focus {
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
+/* 상품 요약 리터칭 */
+.product-summary {
+  margin-bottom: 15px;
+}
 
+.product-summary label {
+  display: block;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 6px;
+}
+
+#total {
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 15px;
+  color: #212529;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 옵션: 상품 아이콘 추가 가능 */
+#total::before {
+  content: "🛒";
+}
 
 
 /* === 모달 스타일 === */
@@ -512,192 +540,31 @@ $.ajaxSetup({
 		<!-- 결제 정보 -->
 		<div class="info-section payment-info">
 			<h3>결제 정보</h3>
+				<div>
+			<div class="product-summary">
+  <label for="total">상품 요약</label>
+  <div id="total">
+    <!-- JS로 채워지는 상품 요약 텍스트 -->
+  </div>
+</div>
+
+			</div>
+			
+			
 			<div>
 				<label for="amount">총 결제 금액:</label> <input type="number"
 					id="amount" name="amount" readonly />
 			</div>
 			<br />
-			<button id="test">결제 테스트 (localStorage 기반)</button>
+			<button id="test">결제 </button>
 		</div>
-	</div>
-
-	<!-- === 결제 모달 === -->
-<!-- 	<div class="modal-backdrop" id="paymentModal">
-		<div class="modal" id="modalStep1">
-			 <div class="modal-header">카드 선택
-  <span class="modal-close" onclick="closeModal()">×</span>
-</div>
-
-			<div class="modal-body-grid">
-				<div class="col-1">
-					<p style="font-size: 18px; font-weight: bold;">신용카드</p>
-				</div>
-
-				<div class="col-2">
-					약관들
-					<div class="row-box selectbox">
-						<div>전자금융거래 이용약관</div>
-						<div>
-							<input type="checkbox" class="term-check">
-						</div>
-					</div>
-					<div class="row-box selectbox">
-						<div>개인정보 수집 및 이용 동의</div>
-						<div>
-							<input type="checkbox" class="term-check">
-						</div>
-					</div>
-
-					카드 버튼들
-					<div class="card-buttons">
-						<button class="card-button card-hyundai" data-card="현대카드">현대카드</button>
-						<button class="card-button card-shinhan" data-card="신한카드">신한카드</button>
-						<button class="card-button card-kb" data-card="국민카드">국민카드</button>
-						<button class="card-button card-samsung" data-card="삼성카드">삼성카드</button>
-					</div>
-				</div>
-				<div class="col-3" style="text-align: right;">
-					<div class="col-box col-box-col-3">
-						<div class="col-box col-box-summary">
-							<p id="product-summary"
-								style="font-size: 14px; margin-bottom: 12px; font-weight: bold;">
-								상품명 + 외 N건 텍스트가 여기 들어감
-							</p>
-
-							<p style="font-size: 16px;">
-								총 결제 금액: <strong id="modal-total-amount">₩0</strong>
-							</p>
-						</div>
-						<div>
-							<div style="margin-top: 20px;">
-								<button id="step1-next-btn" class="next-btn">다음</button>
-							</div>
-						</div>
-
-					</div>
-				</div>
-
-			</div>
-
-		</div>
-
-		<div class="modal" id="modalStep2" style="display: none;">
-			<div class="modal-body-grid">
-
-				<div class="col-1">
-					<p style="font-size: 18px; font-weight: bold;">카드번호</p>
-				</div>
-
-				<div class="col-2">
-					<div class="modal-header">카드 번호 및 CVV 입력</div>
-
-					<div class="input-group card-number-inputs">
-						<label>카드 번호</label> <input type="text" maxlength="4"
-							class="card-num" /> - <input type="text" maxlength="4"
-							class="card-num" /> - <input type="text" maxlength="4"
-							class="card-num" /> - <input type="text" maxlength="4"
-							class="card-num" />
-					</div>
-
-					<div class="input-group">
-						<label>CVV 번호</label> <input type="text" maxlength="3"
-							class="cvv-input" />
-					</div>
-
-					<div class="modal-footer">
-						<button class="back-btn" id="backToStep1">이전</button>
-						<button class="next-btn" id="toStep3">다음</button>
-					</div>
-				</div>
-
-				✅ 공통 3열
-				<div class="col-3" style="text-align: right;">
-					<div class="col-box col-box-col-3">
-						<div class="col-box col-box-summary">
-							<p class="product-summary"
-								style="font-size: 14px; margin-bottom: 12px; font-weight: bold;"></p>
-							<p style="font-size: 16px;">
-								총 결제 금액: <strong class="modal-total-amount">₩0</strong>
-							</p>
-							<p style="font-size: 14px;" id="selected-card-info"></p>
-						</div>
-					</div>
-				</div>
-
-			</div>
-		</div>
-
-		<div class="modal" id="modalStep3" style="display: none;">
-			<div class="modal-body-grid">
-				<div class="col-1">
-					<p style="font-size: 18px; font-weight: bold;">비밀번호</p>
-				</div>
-
-				<div class="col-2">
-					<div class="modal-header">카드 비밀번호 입력</div>
-					<div class="input-group">
-						<label>카드 비밀번호 앞 2자리</label> <input type="password" maxlength="2"
-							class="pw-input" />
-					</div>
-					<div class="modal-footer">
-						<button class="back-btn" id="backToStep2">이전</button>
-						<button class="next-btn" id="toStep4">다음</button>
-					</div>
-				</div>
-
-
-
-				<div class="col-3" style="text-align: right;">
-					<div class="col-box col-box-col-3">
-						<div class="col-box col-box-summary">
-							<p class="product-summary"
-								style="font-size: 14px; margin-bottom: 12px; font-weight: bold;"></p>
-							<p style="font-size: 16px;">
-								총 결제 금액: <strong class="modal-total-amount">₩0</strong>
-							</p>
-							<p style="font-size: 14px;" id="selected-card-info"></p>
-						</div>
-					</div>
-				</div>
-			</div>
-
-		</div>
-
-		<div class="modal" id="modalStep4" style="display: none;">
-			<div class="modal-header">결제 최종 확인 및 동의</div>
-
-			<div style="padding: 0 20px; max-height: 400px; overflow-y: auto;">
-				<h4>주문 상품</h4>
-				<ul id="final-cart-list"
-					style="margin-bottom: 20px; list-style: none; padding-left: 0;"></ul>
-
-				<h4>주문자 정보</h4>
-				<p id="final-orderer-info" style="margin-bottom: 20px;"></p>
-
-				<h4>결제 정보</h4>
-				<p id="final-payment-info" style="margin-bottom: 20px;"></p>
-
-				<div>
-					<input type="checkbox" id="agreeCheck" /> <label for="agreeCheck">결제에
-						동의합니다.</label>
-				</div>
-			</div>
-
-			<div class="modal-footer">
-				<button class="back-btn" id="backToStep3">이전</button>
-				<button class="next-btn" id="finalizePayment" disabled>결제완료</button>
-			</div>
-		</div>
-
-	</div> -->
-	
-	
+	</div>	
 	
 	
 	<%-- <c:out value="${param.product_name}" escapeXml="false"/> --%>
 	
 	
-<button onclick="openPayment()">결제하기</button>
+<!-- <button onclick="openPayment()">결제하기</button> -->
 <!-- 결제 모달 영역 -->
 <div id="paymentModal2" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
     <div style="position:relative; background:#fff; width:100%; height:100%; border-radius:10px; display:flex; flex-direction:column;">
@@ -755,7 +622,16 @@ $.ajaxSetup({
 	            quantity: item.quantity
 	        }));
 
-	    console.log("productId & quantity only:", productQuantityList);    
+	   
+	    
+	    
+	  let textProductSummaryInfo=cart[0].productName;
+	   if(cart.length>2){
+		   textProductSummaryInfo+=" 외 "+cart.length+"건"
+	   }
+
+	    console.log("textProductSummaryInfo: "+textProductSummaryInfo);
+	    $("#total").text(textProductSummaryInfo);
 	    
 	    
 	    
@@ -799,7 +675,7 @@ $.ajaxSetup({
 
 	            
 	            
-	            console.log('계산된 카트,', cart);   
+	         //   console.log('계산된 카트,', cart);   
 	            
 	            
 	            // 재랜더링 필요 여부 체크
@@ -835,7 +711,7 @@ $.ajaxSetup({
 	    for (var i = 0; i < cart.length; i++) {
 	        var item = selectedCart[i];
 	        
-	        console.log("item,",item);
+	      //  console.log("item,",item);
 	        if (item.status === "UNAVAILABLE" || item.status === "SOLDOUT") {
 	            problemItems.push(item);
 	        }
@@ -901,9 +777,9 @@ $.ajaxSetup({
 	    		url:"${pageContext.request.contextPath}/api/users/update-draft-status-cancle",
 	    		type:"POST",
 	    		success:function(res){    			
-	    			console.log("-----응답결과----")
+	    			/* console.log("-----응답결과----")
 	    			console.log(res)
-	    			console.log("-----응답결과----")
+	    			console.log("-----응답결과----") */
 	    			localStorage.removeItem("cart"); 
 	    			location.replace("${pageContext.request.contextPath}/guest/productlist");	    			
 	    		
@@ -933,6 +809,7 @@ async function updateDraftOrder(cart) {
 
    /*  console.log("finallsum 계산 결과:", finallsum); */
 
+   
     let productIds = [];
     let quantities = [];
     let pricePerUnit = [];
@@ -970,26 +847,19 @@ async function updateDraftOrder(cart) {
 }
 
 
-
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	let x="${pgUrl}";
-
+	 let x="${pgUrl}";
+	 var merchant_uid = '${merchant_uid}';
+	 
+	 
+	 //스섹
 	function openPayment() {
 	    var merchantId = '${merchantId}';
-	    var merchant_uid = "${merchant_uid}";
+	   
 	    var pgUrl = '${pgUrl}';
-	    console.log("pgUrl: " + pgUrl);
-
+	   	// console.log("pgUrl: " + pgUrl);
+	    //console.log("merchant_uid: " + merchant_uid);    
+	    
+	    
 	    // iframe src 설정
 	    var iframe = document.getElementById('pg-iframe');
 	    iframe.src = pgUrl + "?merchantId=" + merchantId;
@@ -999,9 +869,7 @@ async function updateDraftOrder(cart) {
 	    modal.style.display = 'flex';
 
 	    const amountValue = Number($("#amount").val()) || 0;
-	    const formattedAmount = "₩" + amountValue.toLocaleString();
-
-	    
+	    const formattedAmount = "₩" + amountValue.toLocaleString();	    
 	    
 	    
 	    // iframe가 로드되면 아이프레임으로 데이터 전달
@@ -1041,15 +909,10 @@ async function updateDraftOrder(cart) {
 	        };
 	        
 	        iframe.contentWindow.postMessage({ type: "PAYMENT_DATA", ...paymentData }, "*");
-
+ 
 	       
-	        
-	        
-	        
-	        
-	        
 	       
-	        
+	        //흠 설마..이거 자체를 호출 행위로 보는건가
 	   		 onPaymentComplete(function(res) {
 		        console.log("JSP에서 SDK 콜백 호출됨:", res);
 		        
@@ -1167,18 +1030,12 @@ async function updateDraftOrder(cart) {
 	            localStorage.setItem("cart", JSON.stringify(remainingCart));    	
 		        	
 		        	
-		    }); 
-	    
-	    
-		    
-		    
-		    
-	   		 
-	   		 
-		    
-		    
+		    }); 	   
+		   
 	    };	    
 	  
+	    
+	    
 	    
 	    
 	    
@@ -1251,13 +1108,11 @@ function renderOrderItem(){
 		    const img = item.productImg.match(/url\(["']?(.*?)["']?\)/);
 		    const imgSrc = img ? img[1] : item.productImg;
 		    const quantity = item.quantity || 1;
-		   console.log("quantity, ",quantity);
-		   
+		 //  console.log("quantity, ",quantity);
 		    
 		    const price = Number(item.productPrice);
 		    const sum = quantity * price;
-		    console.log("sum: ",sum);
-		    
+		 //   console.log("sum: ",sum);		    
 		    totalAmount += sum;
 
 		    cart_idarray.push(item.cartId);
@@ -1316,12 +1171,19 @@ function validateOrdererInfo() {
 
 
 $("#test").click(() => {
-/*   if (!validateOrdererInfo()) {
+ /*  if (!validateOrdererInfo()) {
     alert("주문자 정보를 다시 확인해주세요.");
     return;
-  }   */
-  openPaymentModal();
+  }     */
+  
+  
+  openPayment();
+  //openPaymentModal();
 });
+
+
+
+
 
 
 function openPaymentModal() {

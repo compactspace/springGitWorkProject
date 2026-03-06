@@ -17,8 +17,7 @@ public class AdminLoginFailureHandler extends SimpleUrlAuthenticationFailureHand
         // 실패 메시지 커스터마이징
         String errorMsg = "로그인 실패: " + exception.getMessage();
         request.getSession().setAttribute("LOGIN_ERROR", errorMsg);
-
-        getRedirectStrategy().sendRedirect(request, response, "/teacher/login-page?error=true");
+        getRedirectStrategy().sendRedirect(request, response, "/admin/login-page?error=true");
 
     }
 }

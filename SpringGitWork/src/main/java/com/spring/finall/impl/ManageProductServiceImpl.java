@@ -2,11 +2,9 @@ package com.spring.finall.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.spring.finall.exception.ManageProductException.ManageProductException;
 import com.spring.finall.exception.common.CommonFileException;
 import com.spring.finall.service.ManageProductService;
+import com.spring.finall.user.CategoryWithProductsVO;
 import com.spring.finall.user.ProductGroupVO;
 import com.spring.finall.user.ProductPriceHistoryVO;
 import com.spring.finall.user.ProductVO;
@@ -43,12 +42,66 @@ public class ManageProductServiceImpl implements ManageProductService {
 
 	@Override
 	public void updateProductStatus(int productId, String status) {
-		// productId와 status를 Map으로 전달
+		
+		
+		
 
 		manageProductServiceDAO.updateProductStatus(productId, status);
 
 	}
 
+	
+	@Override
+	public void insertProductInfomation(ProductVO productVO,MultipartFile img) {
+		String savedFilePath = null;
+		try {
+
+			String alreadyExsistProduct = manageProductServiceDAO.alreadyExsistProduct(productVO.getProduct_name());
+			if (alreadyExsistProduct != null) {
+
+				ManageProductException manageProductException = new ManageProductException(
+						"해당 상품" + productVO.getProduct_name() + "이미 등록된 상품 입니다.", 4001);
+				throw manageProductException;
+			}
+
+			int productCod = manageProductServiceDAO.getproductCod();
+			productVO.setProduct_cod(productCod);
+			// 파일 저장 후 경로 세팅
+			savedFilePath = uploadProductImage(img, productVO);
+			productVO.setProduct_file_path(savedFilePath);
+
+			ProductPriceHistoryVO productPriceHistoryVO = new ProductPriceHistoryVO();
+
+			int newPrice = productVO.getProduct_price();
+			// 첫 삽입은 0 으로한다. 조회 조건이 스냅샷이기 때문에 상품의 등록시 첫 가격은 0 으로
+			productVO.setProduct_price(0);
+			// DB 저장
+			manageProductServiceDAO.insertProductInfomation(productVO);
+			productPriceHistoryVO.setProductId(productVO.getProduct_id());
+			productPriceHistoryVO.setOldPrice(productVO.getProduct_price());
+			productPriceHistoryVO.setNewPrice(newPrice);
+			// 스냅샷으로 저장한다. 조회 조건이니깐
+			manageProductServiceDAO.insertProductPriceHistory(productPriceHistoryVO);
+			
+			
+		} catch (CommonFileException cfe) {
+			ManageProductException manageProductException = new ManageProductException(
+					cfe.getBussinessExceptionMessage(), cfe.getBussinessCode());
+			throw manageProductException;
+
+		}
+
+		catch (Exception e) {
+			deleteProductImage(savedFilePath);
+			ManageProductException manageProductException = new ManageProductException("알수 없는 서버내부 에러 혹은 디비 접근 관련 에러",
+					5001);
+			throw manageProductException;
+		}
+	}	
+	
+	
+	
+	
 	@Override
 	@Transactional
 	public void saveProduct(ProductVO productVO, MultipartFile img, List<Long> warehouseIds,
@@ -233,5 +286,13 @@ public class ManageProductServiceImpl implements ManageProductService {
 		// TODO Auto-generated method stub
 		return manageProductServiceDAO.stockCheck(orderItems);
 	}
+
+	@Override
+	public List<CategoryWithProductsVO> getProductListWithCategory() {
+		// TODO Auto-generated method stub
+		return manageProductServiceDAO.getProductListWithCategory();
+	}
+
+
 
 }

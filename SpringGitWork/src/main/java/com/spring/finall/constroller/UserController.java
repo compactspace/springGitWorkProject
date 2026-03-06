@@ -19,6 +19,7 @@ import javax.validation.Valid;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -41,11 +42,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.spring.finall.RabitEvent.ReserveEvent;
 import com.spring.finall.apiResponseController.ApiResponse;
 import com.spring.finall.businessresult.ArtWorkImagesDeleteResult;
 import com.spring.finall.businessresult.CheckCurrentPwdResult;
 import com.spring.finall.businessresult.SmsSendResult;
 import com.spring.finall.exception.artworkexception.ArtWorkCompleteException;
+import com.spring.finall.exception.common.BusinessException;
 import com.spring.finall.exception.requestRefund.RequestRefundException;
 import com.spring.finall.impl.SmsServiceRedisDao;
 import com.spring.finall.impl.WorkServcieRedisDao;
@@ -60,6 +63,7 @@ import com.spring.finall.security.SecurityUserVO;
 import com.spring.finall.security.SecurityUserVOService;
 import com.spring.finall.security.UserDetailsVO2;
 import com.spring.finall.service.ArtworkService;
+import com.spring.finall.service.DraftReserveinfoService;
 import com.spring.finall.service.ManageProductService;
 import com.spring.finall.service.MemberService;
 import com.spring.finall.service.OneDayClassService;
@@ -160,6 +164,14 @@ public class UserController {
 
 	@Autowired
 	private ProductRefundService productRefundService;
+	
+	@Autowired
+	private DraftReserveinfoService draftReserveinfoService;
+	
+	
+
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
 
 	@RequestMapping(value = "/403", method = { RequestMethod.GET, RequestMethod.POST })
 	public String error403() {
@@ -960,10 +972,28 @@ public class UserController {
 		paramMap.put("payment_method", "Credit Card");
 
 		try {
+
+			// 스프링상의 payment 정보 삽입
+			ReserveEvent reserveEvent = new ReserveEvent();
+			reserveEvent.setUserCode(user_code);
+			reserveEvent.setPaymentMethod("Credit Card");
+			reserveEvent.setMerchantUid(merchant_uid);
+			// orderQueue에 메시지 발행
+			rabbitTemplate.convertAndSend("reserveQueue", reserveEvent);
+
 			reserveService.makeReservation(paramMap);
 
 			return ApiResponse.<Boolean>builder().code(201).success(true).message("결제 성공").data(true).build();
-		} catch (Exception e) {
+		} catch (BusinessException be) {
+			System.err.println("그새 선생님의 마감으로 예약 결제 환불 API호출!!: " + be.getMessage());
+
+			// 자동환불 로직 구현해라 여기서
+
+			return ApiResponse.<Boolean>builder().code(500).success(false).message("그새 선생님의 마감으로 예약 결제 환불 API호출!!: ")
+					.data(false).build();
+		}
+
+		catch (Exception e) {
 			System.err.println("[ERROR] 예약 결제중 예외 발생 환불 API호출!!: " + e.getMessage());
 
 			return ApiResponse.<Boolean>builder().code(500).success(false).message("결제 실패").data(false).build();
@@ -1212,6 +1242,30 @@ public class UserController {
 			return ApiResponse.<Object>builder().code(500).success(false).message("백엔드 코드 에러").data(null).build();
 
 		}
+
+	}
+
+	@PostMapping("/aggre-updated-onedayprice")
+	@ResponseBody
+	public ApiResponse<Object> aggreUpdatedOnedayprice(@AuthenticationPrincipal UserDetailsVO2 userDetails,
+			@RequestParam("merchant_uid") String merchant_uid, @RequestParam("selectedDate") String selectedDate,
+			 @RequestParam(value = "priceUpdated", required = false) Integer priceUpdated,
+			
+			@RequestParam("isAgree") boolean isAgree) {
+		
+		int 	userCod=userDetails.getUser_code();
+		
+		
+		if(isAgree) {
+			draftReserveinfoService.confirmUpdatedOnedayPrice(userCod, selectedDate, merchant_uid, priceUpdated);
+			return ApiResponse.<Object>builder().code(201).success(true).message("가격 인상동의를 하셨습니다.").data(null).build();
+		}
+		else {
+			draftReserveinfoService.rejectUpdatedOnedayPrice(userCod, selectedDate, merchant_uid);
+			return ApiResponse.<Object>builder().code(201).success(true).message("미동의를 하셨습니다. 메인홈으로 되돌아갑니다.").data(null).build();
+		}
+		
+
 
 	}
 

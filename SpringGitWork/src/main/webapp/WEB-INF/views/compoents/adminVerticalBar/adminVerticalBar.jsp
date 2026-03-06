@@ -26,6 +26,21 @@ var titleMenu = [
     { name: "Admin 대시보드", prefix: "main", url: "${pageContext.request.contextPath}/admin/main", children: [] },
     ,
     
+
+    { name: "거래처 관리", prefix: "admin-user", url: "${pageContext.request.contextPath}/admin/user", children: [
+        { name: "신규 거래처 등록", prefix: "new-vendor-insert", url: "${pageContext.request.contextPath}/admin/new-vendor-insert" },
+        { name: "거래처 상품정보 등록", prefix: "new-vendor-insert", url: "${pageContext.request.contextPath}/admin/manage-vendor-list" },
+       // { name: "계약 관리", prefix: "delivery-list", url: "${pageContext.request.contextPath}/admin/delivery-list" }
+       /*  ,{ name: "활동 로그", prefix: "user-log", url: "${pageContext.request.contextPath}/admin/user/user-log" } */
+    ] }
+    ,
+    { name: "상품 입점 관리", prefix: "admin-user", url: "${pageContext.request.contextPath}/admin/user", children: [
+        { name: "상품 입고 등록", prefix: "new-vendor-insert", url: "${pageContext.request.contextPath}/admin/stockin-from-vendor" },
+       // { name: "계약 관리", prefix: "delivery-list", url: "${pageContext.request.contextPath}/admin/delivery-list" }
+       /*  ,{ name: "활동 로그", prefix: "user-log", url: "${pageContext.request.contextPath}/admin/user/user-log" } */
+    ] }
+    ,
+    
     { name: "주문 관리", prefix: "admin-user", url: "${pageContext.request.contextPath}/admin/user", children: [
         { name: "주문 목록", prefix: "order-list", url: "${pageContext.request.contextPath}/admin/order-list" },
         { name: "배송 관리", prefix: "delivery-list", url: "${pageContext.request.contextPath}/admin/delivery-list" }
@@ -61,11 +76,15 @@ var titleMenu = [
         { name: "시스템 통계", prefix: "stats-system", url: "${pageContext.request.contextPath}/admin/stats/stats-system" }
     ] }
     , */
-    { name: "상품관리", prefix: "admin-stats", url: "${pageContext.request.contextPath}/admin/stats", children: [
-    	{ name: "상품 등록", prefix: "add-product", url: "${pageContext.request.contextPath}/admin/add-product" },
+   
+    
+    { name: "쇼핑몰 상품관리", prefix: "admin-stats", url: "${pageContext.request.contextPath}/admin/stats", children: [
+    	{ name: "상품 카테고리 등록", prefix: "add-category", url: "${pageContext.request.contextPath}/admin/add-category" },
+    // 구현기능은 아까우니 써먹을게 있다면 당해 jsp로 가서 써먹을게있는지 보자.	{ name: "상품 등록", prefix: "add-product", url: "${pageContext.request.contextPath}/admin/add-product" },
         { name: "상품 홈페이지 노출 관리", prefix: "active-product-list", url: "${pageContext.request.contextPath}/admin/active-product-list" }
     	//,{ name: "시스템 통계", prefix: "stats-system", url: "${pageContext.request.contextPath}/admin/stats/stats-system" }
     ] }
+    
   
 ];
 

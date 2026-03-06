@@ -39,10 +39,75 @@
 
 
 	<!-- review 테이블과 조인해보자. -->
-	<select id="getReview" parameterType="OneDayClassVO" resultMap="onedayclass">
+	<select id="getReview" parameterType="OneDayClassVO"
+		resultMap="onedayclass">
 		SELECT * FROM onedayclass as o INNER JOIN review AS r ON
-		o.onedayclass_num=r.onedayclass_num  WHERE o.onedayclass_name=#{onedayclass_name} order  BY  review_create_at DESC LIMIT #{nextpage},4;
+		o.onedayclass_num=r.onedayclass_num WHERE
+		o.onedayclass_name=#{onedayclass_name} order BY review_create_at DESC
+		LIMIT #{nextpage},4;
 	</select>
+
+
+<select id="getReviewsShortFormOne"
+        parameterType="OneDayClassVO"
+        resultMap="getReviewsShortFormMap">
+
+    SELECT
+        o.ONEDAYCLASS_NUM,
+        o.ONEDAYCLASS_NAME,
+        o.ONEDAYCLASS_PRICE,
+        o.ONEDAYCLASS_INFO,
+        o.RESERVE_IMG,
+
+        r.REVIEW_NUM,
+        r.REVIEW_IMG,
+        r.REVIEW_COMMENT,
+        r.REVIEW_CREATE_AT,
+        r.REVIEW_NAME
+
+    FROM onedayclass o
+    INNER JOIN review r
+        ON o.onedayclass_num = r.onedayclass_num
+
+    WHERE o.onedayclass_num = #{onedayclass_num}
+
+    ORDER BY r.review_create_at DESC
+    LIMIT 5
+
+</select>
+	
+	<resultMap id="getReviewsShortFormMap"
+           type="com.spring.finall.user.OneDayClassVO">
+
+    <!-- ⭐ 부모 PK 반드시 id로 지정 -->
+    <id column="ONEDAYCLASS_NUM" property="onedayclass_num"/>
+
+    <result column="ONEDAYCLASS_NAME" property="onedayclass_name"/>
+    <result column="ONEDAYCLASS_PRICE" property="onedayclass_price"/>
+    <result column="ONEDAYCLASS_INFO" property="onedayclass_info"/>
+    <result column="RESERVE_IMG" property="reserve_img"/>
+
+    <!-- 리뷰 컬렉션 -->
+    <collection property="reivewvo"
+                resultMap="reviewMap"/>
+
+</resultMap>
+
+<resultMap id="reviewMap"
+           type="com.spring.finall.user.ReviewVO">
+
+    <id column="REVIEW_NUM" property="review_num"/>
+
+    <result column="REVIEW_IMG" property="review_img"/>
+    <result column="REVIEW_COMMENT" property="review_comment"/>
+    <result column="REVIEW_CREATE_AT" property="review_create_at"/>
+    <result column="REVIEW_NAME" property="review_name"/>
+
+</resultMap>
+	
+	
+	
+	
 
 <!-- 후.. jsp돌리고 프론트에서 처리하는게 거의 불가능해서 보조 마지막페이지 연산을 한다. 쿼리문은 같아도 목적이 다르다. -->
 	<select id="isEndpage" parameterType="OneDayClassVO" resultMap="onedayclass">

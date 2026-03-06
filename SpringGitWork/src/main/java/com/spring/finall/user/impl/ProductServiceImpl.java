@@ -58,6 +58,13 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 
+	@Override
+	public List<Map<String, Object>> productCategoryList(ProductVO vo) {
+		// TODO Auto-generated method stub
+		return productdao.productCategoryLlist(vo);
+	}
+
+
 
 
 

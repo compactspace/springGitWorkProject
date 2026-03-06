@@ -2,7 +2,8 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -131,10 +132,6 @@ ul {
 	font-weight: 900;
 }
 
-
-
-
-
 .contentimgtitlewrapper {
 	margin: 10px 0px;
 }
@@ -170,8 +167,6 @@ ul {
 	line-height: 15px;
 	font-weight: 700;
 }
-
-
 
 .reviewsize span {
 	color: #ff5862;
@@ -219,27 +214,22 @@ ul {
 	
 }
 
-.reservebtn-wrapper{
-  padding: 10px 0;
-  margin: 10px 15px 0; /* 좌우 여백 포함 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  background: #FFF0F1; /* 연한 붉은 배경 */
-  border-radius: 5px;
-
-  font-size: 13px;
-  line-height: 15px;
-  font-weight: 700;
-  color: #ff5862; /* 강조색 - 기존 border 색 참고 */
-  
-  cursor: pointer;
-  user-select: none;
-  transition: background 0.2s eas
+.reservebtn-wrapper {
+	padding: 10px 0;
+	margin: 10px 15px 0; /* 좌우 여백 포함 */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #FFF0F1; /* 연한 붉은 배경 */
+	border-radius: 5px;
+	font-size: 13px;
+	line-height: 15px;
+	font-weight: 700;
+	color: #ff5862; /* 강조색 - 기존 border 색 참고 */
+	cursor: pointer;
+	user-select: none;
+	transition: background 0.2s eas
 }
-
-
 
 #iconrow {
 	height: 150px;
@@ -358,9 +348,7 @@ img {
 	background-color: transparent;
 	color: #888 !important;
 }
-
 </style>
-
 
 <script>
 
@@ -382,10 +370,11 @@ $(document).ready(function() {
     var choiceOpenDay = null;
     var reserveRest_id=null
     var onedayclass_num = "${onedayclass.onedayclass_num}";
-    
+    var onedayclass_price = "${onedayclass.onedayclass_price}";
     
     
     /* 하위페이지 전용 변수 시작  */
+    var isEnd=null;
     var todaySoldOut=null;
 	var endPageFlag = null
      /* 하위페이지 전용 변수 종료 */
@@ -436,7 +425,7 @@ $(document).ready(function() {
         // 클래스 이름 변경 시 상세 정보 불러오기
         $("#onedayclass_name").change(function () {
             var selectedName = $(this).val();
-            console.log("선택된 클래스 이름:", selectedName);
+           // console.log("선택된 클래스 이름:", selectedName);
 
             $.ajax({
                 url: "selectOneDayClass.do",
@@ -448,11 +437,11 @@ $(document).ready(function() {
                     console.log("클래스 정보 응답:", val);
 
                     $.each(val, function (index, obj) {
-                        console.log("클래스정보:", obj.onedayclass_info);
+                      /*   console.log("클래스정보:", obj.onedayclass_info);
                         console.log("클래스 이름:", obj.onedayclass_name);
                         console.log("클래스 비용:", obj.onedayclass_price);
                         console.log("클래스 대표이미지:", obj.reserve_img);
-                        console.log("클래스 번호:", obj.onedayclass_num);
+                        console.log("클래스 번호:", obj.onedayclass_num); */
 
                         $(".reserve_img").attr("src", obj.reserve_img);
                         $(".onedayclass_name").text(obj.onedayclass_name);
@@ -489,7 +478,29 @@ $(document).ready(function() {
                     nextpage = Number(nextpage) + 4;
                     $('.update').before(data);                    
                     const endPageEl = $('div[data-endpageflag]');
-                    endPageFlag=endPageEl.data('endpageflag');                   
+                    endPageFlag=endPageEl.data('endpageflag'); 
+                    
+                    
+                    
+                    
+                    const isEndEl= $('#check-end');
+                    
+                   // console.log(isEndEl)
+                    
+                    
+                    isEnd=isEndEl.data('isEnd'); 
+                    //console.log("isEnd: "+isEnd);          
+                    
+                    
+                
+                    
+                    if(isEnd){
+                    	
+                    	$("#getmorebtn").hide();
+                    }
+                    
+                    
+                    
                     if (endPageFlag === true) {
                         $(".nextpagebtn").hide();
                     }        
@@ -508,10 +519,10 @@ $(document).ready(function() {
 
         // 날짜 선택 시 값 저장
         $(document).on("click", ".date-item", function () {        	
-        	console.log('이미 예약한 날짜이니: '+$(this).data("reserved"));
+        //	console.log('이미 예약한 날짜이니: '+$(this).data("reserved"));
         	
         	if ($(this).data("reserved") === true) {
-        	    console.log("예약된 항목이므로 클릭 처리 안 함.");
+        	   // console.log("예약된 항목이므로 클릭 처리 안 함.");
         	    return;
         	}
         	
@@ -524,15 +535,48 @@ $(document).ready(function() {
             choiceOpenDay = 한글용데이트;
             reserveRest_id = selectedId;
             
-            console.log("선택한 백엔드파라미터용 개강 날짜:", selectedDate);
+           /*  console.log("선택한 백엔드파라미터용 개강 날짜:", selectedDate);
             console.log("선택한 프론트 유아이용  개강 날짜:", choiceOpenDay);
-            console.log("선택한 날짜 ID:", reserveRest_id);
+            console.log("선택한 날짜 ID:", reserveRest_id); */
         });
 
     });     
   
-    
     const loadPaymentPage = () => {
+        const form = $('<form>', {
+            method: 'POST',
+            action: contextPath + '/users/onedayclass-payment'
+        });
+
+        const params = {
+            onedayclass_num: onedayclass_num,
+            choiceOpenDay: choiceOpenDay,
+            onedayclass_name: onedayclass_name,
+            reserveRest_id: reserveRest_id,
+            onedayclass_price: onedayclass_price,
+            selectedDate: selectedDate
+        };
+
+        // hidden input으로 폼에 추가
+        $.each(params, (key, value) => {
+            form.append($('<input>', { type: 'hidden', name: key, value: value }));
+        });
+
+        
+        // ✅ CSRF 토큰 hidden input으로 추가 (form submit용)
+        const token = $("meta[name='_csrf']").attr("content");
+        form.append($('<input>', { type: 'hidden', name: '_csrf', value: token }));
+        // 폼을 body에 추가 후 submit
+        $('body').append(form);
+        form.submit();
+    };
+    
+    
+    
+    
+    
+    
+   /*  const loadPaymentPage = () => {
         $.ajax({
             url: contextPath + "/users/onedayclass-payment",
             type: "POST",
@@ -550,7 +594,7 @@ $(document).ready(function() {
             	console.log(err);
             }
         });
-    }
+    } */
     
     
     
@@ -574,6 +618,22 @@ $(document).ready(function() {
                 alert('날짜를 선택해주세요.');
                 return;
             }
+            
+     
+            //스섹
+           let reserveCart = [
+        	   {
+        		    productName: onedayclass_name,
+        		    productPrice: onedayclass_price,
+        		    quantity: 1,
+        		    selected: true
+        		}
+           ];
+            
+            
+            
+            
+            localStorage.setItem("reserveCart", JSON.stringify(reserveCart));
 
             // pcbox 숨기고 결제창 보이기
             $(".pcboxwrapper").hide();
@@ -601,12 +661,7 @@ $(document).ready(function() {
                 $(".payment-wrapper").hide();
             }
         };
-    });
- 
- 
- 
- 
- 
+    }); 
 </script>
 
 </head>
@@ -616,37 +671,36 @@ $(document).ready(function() {
 	<div class="allwrapper">
 		<!-- pc 디자인 시작 -->
 
-<div class="payment-wrapper" style='display: none'></div>
+		<div class="payment-wrapper" style='display: none'></div>
 
 
 		<div class="pcboxwrapper">
 
 			<div class="back">
 
-				<a href="${pageContext.request.contextPath}/"><div class="backarea"></div></a>
-				
+				<a href="${pageContext.request.contextPath}/"><div
+						class="backarea"></div></a>
+
 			</div>
 
-			<div class="pcwrapper">				
+			<div class="pcwrapper">
 				<div class="newpageinsert">
 					<div class="contentimgwrapper">
-					
+
 						<ul>
 							<li class="contentimgtitlewrapper">
 								<div class="contentimgtitlearea"
-								style="background-image:
-		url('${pageContext.request.contextPath}/resources/${onedayclass.reserve_img}');"
-								></div>
+									style="background-image:
+		url('${pageContext.request.contextPath}/resources/${onedayclass.reserve_img}');"></div>
 							</li>
-							<li class="candidateimgwrapper">					
-							<c:forEach
+							<li class="candidateimgwrapper"><c:forEach
 									items="${candiImageList}" var="candidateimg" begin="0" end="2">
 									<div class="candidateimgarea"
 										style="background-image: url('${pageContext.request.contextPath}/resources/${candidateimg}')">
 									</div>
-								</c:forEach></li>								
+								</c:forEach></li>
 						</ul>
-					</div>			
+					</div>
 
 					<!-- Section2_3 시작 -->
 					<div id="calendarwrapper">
@@ -668,7 +722,7 @@ $(document).ready(function() {
 										src='${pageContext.request.contextPath}/resources/img_infoicon/warnning.png'>
 									<span>주차 ${onedayclass.park}</span>
 								</div>
-								
+
 								<div class="detail">
 									<img class="infoicon"
 										src='${pageContext.request.contextPath}/resources/img_infoicon/headcount.png'>
@@ -678,53 +732,45 @@ $(document).ready(function() {
 								<input type="hidden" id="check" name="check">
 								<!-- user_code 로 다 작동하면 userId는 지워라. -->
 								<input type="hidden" id="id" name="id" value="${userId}">
-								<input type="hidden" id="user_code"  name="user_code" value="${user_code}">
+								<input type="hidden" id="user_code" name="user_code"
+									value="${user_code}">
 
 
-							</div>			
-							
-				
-							
-							
-							<!-- 예약날짜  -->
-							<div id="possibleDate">
-							
 							</div>
-							
+
+
+
+
+							<!-- 예약날짜  -->
+							<div id="possibleDate"></div>
+
 						</div>
 					</div>
 					<!-- Section2_3 종료 -->
 
- <!-- 인증 여부를 JS로 안전하게 넘기기 -->
-    <script>
+					<!-- 인증 여부를 JS로 안전하게 넘기기 -->
+					<script>
       var isAuthenticated = false;
     </script>
 
-    <sec:authorize access="isAuthenticated()">
-      <script>
+					<sec:authorize access="isAuthenticated()">
+						<script>
         isAuthenticated = true;
       </script>
-    </sec:authorize>
-			<div class="reservebtn-wrapper" style='display: none;'>
-				예약하기
-			</div>
+					</sec:authorize>
+					<div class="reservebtn-wrapper" style='display: none;'>예약하기</div>
 					<div class="linecut1">
 
 						참여자들이<span style="color: #ff5862;">직접 체험하고</span>작성하는 후기입니다.
 					</div>
-			<div class="first-story-wraaper" style="display: none;
-    text-align: center;
-    padding: 30px 20px;
-    color: #555;
-    font-size: 1rem;
-   margin-top: 20px;
-    ">    
-    
-    <strong style="display: block; font-size: 1.1rem; color: #333; margin-bottom: 8px;">
-        아직 등록된 후기가 없어요.
-    </strong>
-    가장 먼저 소중한 후기를 남겨주세요 ✨
-</div>
+					<div class="first-story-wraaper"
+						style="display: none; text-align: center; padding: 30px 20px; color: #555; font-size: 1rem; margin-top: 20px;">
+
+						<strong
+							style="display: block; font-size: 1.1rem; color: #333; margin-bottom: 8px;">
+							아직 등록된 후기가 없어요. </strong> 가장 먼저 소중한 후기를 남겨주세요 ✨
+					</div>
+
 
 
 
@@ -762,7 +808,7 @@ $(document).ready(function() {
 						<div class="update"></div>
 
 
-						<div class="nextpage">
+						<div class="nextpage" id="getmorebtn">
 							<button class="nextpagebtn">더보기</button>
 						</div>
 

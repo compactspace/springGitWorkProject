@@ -15,7 +15,7 @@ public class AdminAuthenticationEntryPoint implements AuthenticationEntryPoint {
 	                     AuthenticationException authException) throws IOException {
 	    // 권한 없는 요청에 대해 404 Not Found 응답 -> 그러나 친절히 알릴필요 없스니 가시적으로 없는페이지 입니다 처리
 		
-		response.sendRedirect(request.getContextPath() + "/err/notfound");
+		response.sendRedirect(request.getContextPath() + "/err/retryLogin");
 	}
 
 }

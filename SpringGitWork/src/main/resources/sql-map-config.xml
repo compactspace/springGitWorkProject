@@ -25,13 +25,18 @@
 		<typeAlias type="com.spring.finall.user.ProductVO"
 			alias="productVO" />
 
-<typeAlias type="com.spring.finall.user.ProductPriceHistoryVO"
+		<typeAlias
+			type="com.spring.finall.user.ProductPriceHistoryVO"
 			alias="ProductPriceHistoryVO" />
 
-<typeAlias type="com.spring.finall.user.InventoryVO" alias="InventoryVO" />
-<typeAlias type="com.spring.finall.user.InventoryLogVO" alias="InventoryLogVO" />
-<typeAlias type="com.spring.finall.user.ShipmentItemVO" alias="ShipmentItemVO" />
-<typeAlias type="com.spring.finall.user.WarehouseVO" alias="WarehouseVO" />
+		<typeAlias type="com.spring.finall.user.InventoryVO"
+			alias="InventoryVO" />
+		<typeAlias type="com.spring.finall.user.InventoryLogVO"
+			alias="InventoryLogVO" />
+		<typeAlias type="com.spring.finall.user.ShipmentItemVO"
+			alias="ShipmentItemVO" />
+		<typeAlias type="com.spring.finall.user.WarehouseVO"
+			alias="WarehouseVO" />
 
 
 
@@ -67,11 +72,11 @@
 		<typeAlias
 			type="com.spring.finall.reqDto.orderRequest.OrderPersonDTO"
 			alias="OrderPersonDTO" />
-	<typeAlias
+		<typeAlias
 			type="com.spring.finall.reqDto.refundRequest.ProductRefundDTO"
 			alias="ProductRefundDTO" />
 
-	<typeAlias
+		<typeAlias
 			type="com.spring.finall.reqDto.deliverRequest.RequestDeliverDTO"
 			alias="RequestDeliverDTO" />
 
@@ -87,32 +92,95 @@
 			alias="ArtworkVO" />
 		<typeAlias type="com.spring.finall.user.ArtworkImageVO"
 			alias="ArtworkImageVO" />
-			<typeAlias type="com.spring.finall.user.ArtWorkCommentVO"
+		<typeAlias type="com.spring.finall.user.ArtWorkCommentVO"
 			alias="ArtWorkCommentVO" />
 
-<typeAlias type="com.spring.finall.user.ProductGroupVO"
+		<typeAlias type="com.spring.finall.user.ProductGroupVO"
 			alias="ProductGroupVO" />
 
 
 
 
-<typeAlias type="com.spring.FormSecurity.teacher.UserTeacherDetail"
+		<typeAlias
+			type="com.spring.FormSecurity.teacher.UserTeacherDetail"
 			alias="UserTeacherDetail" />
 
-<typeAlias type="com.spring.FormSecurity.admin.UserAdminDetail"
+		<typeAlias
+			type="com.spring.FormSecurity.admin.UserAdminDetail"
 			alias="UserAdminDetail" />
-			
-			<typeAlias type="com.spring.finall.user.TeacherDocumentVO"
+
+		<typeAlias type="com.spring.finall.user.TeacherDocumentVO"
 			alias="TeacherDocumentVO" />
-			
-				<typeAlias type="com.spring.finall.user.OrderStatusVO"
+
+		<typeAlias type="com.spring.finall.user.OrderStatusVO"
 			alias="OrderStatusVO" />
-			
-				<typeAlias type="com.spring.finall.resDto.mannageUserListResPonse.ManageUserListResponseDTO"
+
+		<typeAlias
+			type="com.spring.finall.resDto.mannageUserListResPonse.ManageUserListResponseDTO"
 			alias="ManageUserListResponseDTO" />
+
+
+
+		<!--CategoryRequest 관련 서비스 시작 -->
+
+		<typeAlias
+			type="com.spring.finall.reqDto.getCateGoryListDTO.GetCateGoryListDTO"
+			alias="GetCateGoryListDTO" />
+		<!--CategoryRequest 관련 서비스 종료 -->
+		<!-- vendorReuqest 관련 서비스 시작 -->
+		<typeAlias
+			type="com.spring.finall.reqDto.newInsertVendorRequest.newInsertVendorRequest"
+			alias="newInsertVendorRequestDTO" />
+
+		<typeAlias
+			type="com.spring.finall.reqDto.InsertCategoryRequestDTO"
+			alias="InsertCategoryRequestDTO" />
+
+		<typeAlias
+			type="com.spring.finall.reqDto.getVendorListDTO.GetVendorListDTO"
+			alias="GetVendorListDTO" />
+
+
+		<!-- vendorReuqest 관련 서비스 종료 -->
+
+
+		<!-- ManageOnedyclass 관련 서비스 시작 -->
+
+		<typeAlias
+			type="com.spring.finall.reqDto.manageonedayclass.AsyncCurrentMonthOpenningOnedyaClassBySelectOpenDTO"
+			alias="AsyncCurrentMonthOpenningOnedyaClassBySelectOpenDTO" />
+		<!-- ManageOnedyclass 관련 서비스 종료 -->
+
+
+		<!-- Search관련 서비스 시작 -->
+
+
+
+		<typeAlias
+			type="com.spring.finall.resDto.SearchProductResDTO.SearchProductResDTO"
+			alias="SearchProductResDTO" />
+
+		<!--Search관련 서비스 종료 -->
+
+
+		<!-- 사전(가)예약정보 관련 서비스 
+		시작 -->
+		<typeAlias
+			type="com.spring.finall.reqDto.InsertDraftReserveinfoRequestDTO.InsertDraftReserveinfoDTO"
+			alias="InsertDraftReserveinfoDTO" />
 			
-			
-			
+			<typeAlias
+			type="com.spring.finall.user.DraftReserveinfoVO"
+			alias="DraftReserveinfoVO" />
+		
+		
+			<typeAlias
+			type="com.spring.finall.resDto.HasRecentUpdateOnedayClassInfoResDTO.HasRecentUpdateOnedayClassInfoResDTO"
+			alias="HasRecentUpdateOnedayClassInfoResDTO" />
+		
+		<!-- 사전(가)예약정보 관련 서비스 종료 -->
+		
+		
 	</typeAliases>
 
 	<!-- SQL이 작성되는 mapper 파일 위치 등록! MyBatis에서 SQL 매퍼 파일을 등록하는 태그. mapper 태그를 
@@ -135,22 +203,27 @@
 		<mapper resource="mappings/ReserveInfoVO-mapping.xml" />
 		<mapper resource="mappings/ReserveMapper.xml" />
 		<mapper resource="mappings/SecurityUserVO-mapping.xml" />
-<mapper resource="mappings/ArtworkMapper.xml" />
+		<mapper resource="mappings/ArtworkMapper.xml" />
 
 
 		<mapper resource="mappings/OrderMapper.xml" />
 		<mapper resource="mappings/PaymentMapper.xml" />
-<mapper resource="mappings/UserTeacherDetailMapper.xml" />
-<mapper resource="mappings/UserAdminDetailMapper.xml" />
-<mapper resource="mappings/ManageOneDayClassMapper.xml" />
-<mapper resource="mappings/productRefundMapper.xml" />
-<mapper resource="mappings/ApplicantDocuments.xml" />
-<mapper resource="mappings/ManageProductMapper.xml" />
-<mapper resource="mappings/ManageOrderMapper.xml" />
-<mapper resource="mappings/ManageinventoryMapper.xml" />
-<mapper resource="mappings/ManageUserMapper.xml" />
-<mapper resource="mappings/FakeArtworkMapper.xml" />
-
+		<mapper resource="mappings/UserTeacherDetailMapper.xml" />
+		<mapper resource="mappings/UserAdminDetailMapper.xml" />
+		<mapper resource="mappings/ManageOneDayClassMapper.xml" />
+		<mapper resource="mappings/productRefundMapper.xml" />
+		<mapper resource="mappings/ApplicantDocuments.xml" />
+		<mapper resource="mappings/ManageProductMapper.xml" />
+		<mapper resource="mappings/ManageOrderMapper.xml" />
+		<mapper resource="mappings/ManageinventoryMapper.xml" />
+		<mapper resource="mappings/ManageUserMapper.xml" />
+		<mapper resource="mappings/FakeArtworkMapper.xml" />
+		<mapper resource="mappings/VendorMapper.xml" />
+		<mapper resource="mappings/CategoryMapper.xml" />
+		<mapper resource="mappings/SearchMapper.xml" />
+				<mapper resource="mappings/DraftReserveMapper.xml" />
+				<mapper resource="mappings/ReservePaymentMapper.xml" />
+						
 
 	</mappers>
 

@@ -52,6 +52,49 @@ ORDER BY
 </select>
 
 
+<select id="productCategoryLlist" resultType="map">
+SELECT
+	p.product_img,
+	p.product_Registration_status,
+	p.product_info,
+	p.product_status,
+	p.product_id,
+	p.product_cod,
+	p.product_name,
+	p.product_group,
+	p.product_file_path,
+	p.file_category,
+	p.file_name,
+	h.old_price,
+	h.new_price,
+	h.changed_at
+FROM
+	product p
+INNER JOIN product_price_history h ON
+	p.product_id = h.product_id
+INNER JOIN (
+	SELECT
+		product_id,
+		MAX(changed_at) AS max_changed_at
+	FROM
+		product_price_history
+	GROUP BY
+		product_id
+) latest ON
+	h.product_id = latest.product_id
+	AND h.changed_at = latest.max_changed_at
+WHERE
+	p. product_Registration_status = 1
+	AND
+	p.category_id = #{category_id}
+	AND h.old_price != h.new_price
+ORDER BY
+	p.product_id;
+
+
+</select>
+
+
 
 
 <select id="getProductGroupList" resultType="ProductGroupVO">

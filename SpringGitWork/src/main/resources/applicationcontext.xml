@@ -21,6 +21,7 @@
 
 
 
+
 <!--task:annotation-driven 와  helloBatch 둘이 쌍으로 배치 스케쥴러 같은건데 지금 주석처리함 -->
 <!--    <task:annotation-driven/>
  <bean id="helloBatch" class="com.spring.finall.apiResponseController.HelloBatch"/> -->

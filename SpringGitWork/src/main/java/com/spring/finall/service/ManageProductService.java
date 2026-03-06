@@ -5,10 +5,17 @@ import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.spring.finall.user.CategoryWithProductsVO;
 import com.spring.finall.user.ProductGroupVO;
 import com.spring.finall.user.ProductVO;
 
 public interface ManageProductService {
+	
+	
+	
+	List<CategoryWithProductsVO> getProductListWithCategory();
+	
+	
 	
 	List<Map<String,Object>> getProductCode();
 	
@@ -23,6 +30,9 @@ public interface ManageProductService {
     
     void  saveProduct(ProductVO productVO, MultipartFile img,	List<Long> warehouseIds,Map<String, Integer> quantityMap);
 	
+    void insertProductInfomation(ProductVO productVO,MultipartFile img);
+    
+    
     void addProductGroup(ProductGroupVO productGroupVO);
     
     List<Map<String, Object>> stockCheck(List<Map<String, Object>> orderItems);

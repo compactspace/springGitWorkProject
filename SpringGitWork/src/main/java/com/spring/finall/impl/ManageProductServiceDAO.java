@@ -1,19 +1,20 @@
 package com.spring.finall.impl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.spring.finall.user.CategoryWithProductsVO;
 import com.spring.finall.user.ProductGroupVO;
 import com.spring.finall.user.ProductPriceHistoryVO;
 import com.spring.finall.user.ProductVO;
+import com.spring.finall.user.getProductWithCategoryFlatListVO;
 
 @Repository
 public class ManageProductServiceDAO {
@@ -37,8 +38,20 @@ public class ManageProductServiceDAO {
 
 	public void updateProductStatus(int productId, String status) {
 		// productId와 status를 Map으로 전달
-		Map<String, Object> param = Map.of("productId", productId, "status", status);
-		mybaits.update("ManageProductMapper.updateProductStatus", param);
+		// productId와 status를 Map으로 전달
+				String product_status=null;
+				
+				Map<String,Object> paramsMap= new HashMap();
+				
+				paramsMap.put("productId", productId);
+				paramsMap.put("product_Registration_status", status);
+				paramsMap.put("product_status", product_status);
+				if(status.equals("1")) {
+					product_status="판매";
+				}else {
+					product_status="판매 중단";
+				}
+		mybaits.update("ManageProductMapper.updateProductStatus", paramsMap);
 	}
 
 	public void saveProduct(ProductVO productVO) {
@@ -46,6 +59,15 @@ public class ManageProductServiceDAO {
 		int affectedRow = mybaits.insert("ManageProductMapper.saveProduct", productVO);
 
 	}
+	
+	
+	public void insertProductInfomation(ProductVO productVO) {
+
+		int affectedRow = mybaits.insert("ManageProductMapper.insertProductInfomation", productVO);
+
+	}
+	
+	
 
 	public void insertProductPriceHistory(ProductPriceHistoryVO productPriceHistoryVO) {
 
@@ -139,5 +161,109 @@ public class ManageProductServiceDAO {
 
 		return result;
 	}
+	
+	
+	
+	
+	
+	public List<CategoryWithProductsVO> getProductListWithCategory() {
+	    List<getProductWithCategoryFlatListVO> flatList
+	         = mybaits.selectList("ManageProductMapper.getProductWithCategoryFlatList");
+
+	    return toCategoryTreeWithProducts(flatList);
+	}
+
+	
+	  /**
+     * Flat List → 계층 트리 + 정렬
+     */
+	public static List<CategoryWithProductsVO> toCategoryTreeWithProducts(
+	        List<getProductWithCategoryFlatListVO> flatList) {
+
+	    // --- 1. 카테고리 VO 생성(Map) ---
+	    Map<Integer, CategoryWithProductsVO> categoryMap = new HashMap<>();
+	    for (getProductWithCategoryFlatListVO vo : flatList) {
+	        int catId = vo.getCategory_id();
+
+	        // 카테고리 VO 최초 생성
+	        categoryMap.putIfAbsent(catId, new CategoryWithProductsVO());
+
+	        CategoryWithProductsVO cat = categoryMap.get(catId);
+	        cat.setParent_id(vo.getCategory_parent_id());
+	        cat.setCategory_id(vo.getCategory_id());
+	        cat.setCategory_name(vo.getCategory_name());
+	        cat.setCategory_sort_order(vo.getCategory_sort_order());
+	    }
+
+	    // --- 2. 트리 구조 연결 ---
+	    List<CategoryWithProductsVO> roots = new ArrayList<>();
+	    for (CategoryWithProductsVO cat : categoryMap.values()) {
+	        // flat list에서 parentId 찾기
+	        Integer parentId = flatList.stream()
+	                .filter(vo -> vo.getCategory_id() == cat.getCategory_id())
+	                .findFirst()
+	                .map(getProductWithCategoryFlatListVO::getCategory_parent_id)
+	                .orElse(null);
+
+	        if (parentId == null || !categoryMap.containsKey(parentId)) {
+	            roots.add(cat);  // 최상위
+	        } else {
+	            categoryMap.get(parentId).getChildren().add(cat);
+	        }
+	    }
+
+	    // --- 3. products 채우기 ---
+	    for (getProductWithCategoryFlatListVO vo : flatList) {
+	        int catId = vo.getCategory_id();
+	        int parentId=vo.getCategory_parent_id() ==null? 0:vo.getCategory_parent_id() ;
+	        
+	        
+	        
+	        
+	        
+	        ProductVO product = new ProductVO();
+	      
+	        product.setProduct_id(vo.getProduct_id());
+	        product.setProduct_name(vo.getProduct_name());
+	        product.setProduct_price(vo.getProduct_price());
+	        product.setProduct_img(vo.getProduct_img());
+	        product.setProduct_info(vo.getProduct_info());
+	        product.setProduct_Registration_status(vo.getProduct_Registration_status());
+	        
+	        // if parent_id=null?
+	        if(parentId==0) {
+	        	  product.setParent_id(parentId);	
+	        }else {
+	        	 product.setParent_id(parentId);
+	        }
+	        
+	        // if not null parent_id => category_id
+	        
+	        // 필요한 다른 상품 필드도 추가 가능!
+
+	        categoryMap.get(catId).getProducts().add(product);
+	    }
+
+	    // --- 4. 정렬 ---
+	    sortCategoryRecursive(roots);
+
+	    return roots;
+	}
+
+
+    /**
+     * children 리스트를 category_sort_order 기준으로 재귀 정렬
+     */
+	private static void sortCategoryRecursive(List<CategoryWithProductsVO> list) {
+	    list.sort(Comparator.comparing(c ->
+	        c.getCategory_sort_order() != null ? c.getCategory_sort_order() : 0));
+
+	    for (CategoryWithProductsVO cat : list) {
+	        if (!cat.getChildren().isEmpty()) {
+	            sortCategoryRecursive(cat.getChildren());
+	        }
+	    }
+	}
+
 
 }

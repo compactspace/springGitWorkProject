@@ -233,14 +233,11 @@ const artWorkID="${artWorkDetail.artwork_id}"
     	console.log("click")
     	x();
     })
-    
-
  
  function getMoreArtworkComment(){
 	  $.ajax({
-      	url:"${pageContext.request.contextPath}/guest/artwork-comment",
-      	type:"POST",
-      	data:{test:"x"},
+      	url:"${pageContext.request.contextPath}/guest/artwork-comment?work_id="+artWorkID,
+      	type:"GET",
       	 success: function(responseHtml) {
       	        // 받아온 HTML을 .comment-fragment 내부에 삽입
       			$('.comment-fragment').append(responseHtml);

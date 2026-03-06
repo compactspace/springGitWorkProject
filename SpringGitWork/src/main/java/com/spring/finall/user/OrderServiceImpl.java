@@ -41,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
 		List<Map<String, Object>> list = orderServiceDAO.selectOneDraftOrder(user_id);
 		Map<String, Object> myDraftOrderInfo = null;
 		boolean 장바구니가변했니 = false;
-		
+
 		if (list != null && !list.isEmpty()) {
 			myDraftOrderInfo = list.get(0);
 			장바구니가변했니 = findUpdateDraftValues(params, myDraftOrderInfo);
@@ -51,11 +51,10 @@ public class OrderServiceImpl implements OrderService {
 			myDraftOrderInfo = list.get(0);
 			List<Long> orderItemIdList = new ArrayList<Long>();
 
-			
-			int 디비에서결제대기중인오더항목갯수=list.size();
-			if(orderRequestDTO.getItems().size()<list.size()) {
-				디비에서결제대기중인오더항목갯수=orderRequestDTO.getItems().size();
-				
+			int 디비에서결제대기중인오더항목갯수 = list.size();
+			if (orderRequestDTO.getItems().size() < list.size()) {
+				디비에서결제대기중인오더항목갯수 = orderRequestDTO.getItems().size();
+
 			}
 			for (int k = 0; k < 디비에서결제대기중인오더항목갯수; k++) {
 				Long order_item_id = (Long) list.get(k).get("order_item_id");
@@ -72,7 +71,6 @@ public class OrderServiceImpl implements OrderService {
 			params.put("order_info_id", order_info_id);
 
 			// 여기서부턴 좀 위험하니 생각하자.
-			
 
 			orderServiceDAO.updateDraftOrderItem(params);
 			// 여기서 항목도 찾아서 업데이트해주는 DAO메서드 추가하자.
@@ -149,6 +147,9 @@ public class OrderServiceImpl implements OrderService {
 			if (personInserted <= 0) {
 				throw new OrderException("주문자 정보 삽입 실패");
 			}
+
+			orderServiceDAO.updateOrderInfoStatusByAfterSuccesspaymentComplement(orderInfoId);
+
 			int totalAmount = 0;
 
 			List<OrderItemDTO> orderList = orderRequestDTO.getItems();
@@ -163,6 +164,7 @@ public class OrderServiceImpl implements OrderService {
 
 			paymentDTO.setPaymentNumber(merchantUid);
 			orderServiceDAO.updateStockByOrderItemsQuantity(orderList);
+
 			int paymentInserted = paymentServiceDAO.insertPayment(paymentDTO);
 			if (paymentInserted <= 0) {
 				throw new OrderException("결제정보 삽입 실패");
@@ -297,26 +299,50 @@ public class OrderServiceImpl implements OrderService {
 			List<OrderItemDTO> orderList) {
 
 		try {
-			
 
 			String currentOrderStatus = orderServiceDAO.getCurrentOrderStatusByOrderInfoId(orderInfoId);
 			if (currentOrderStatus.equals("SHIPPING")) {
 				List<Map<String, Object>> ivList = orderServiceDAO.getInventoryListFindByOrderInfoId(orderInfoId);
-				
-				
+
 				orderServiceDAO.updateInventoryPlusQuantiryByInventoryId(ivList);
-				
+
 				orderServiceDAO.recodeInventoryLogByRefund(ivList);
-				
-				orderServiceDAO.updateShipmentByRefund(ivList);	
-				
-				
+
+				orderServiceDAO.updateShipmentByRefund(ivList);
+
 			}
 			orderServiceDAO.approveForReqeustClientPayCancel(orderInfoId);
 			paymentServiceDAO.updateProductRefund(orderInfoId, paymentId);
 			orderServiceDAO.updateStockByOrderItemsQuantityCausePayCancel(orderList);
-			
-			
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public boolean updateOrderInfoStatusByAdmminCancellPayment(String impUid, String merchantUid, String orderInfoId, String paymentId,
+			List<OrderItemDTO> orderList) {
+
+		try {
+
+			String currentOrderStatus = orderServiceDAO.getCurrentOrderStatusByOrderInfoId(orderInfoId);
+			if (currentOrderStatus.equals("SHIPPING")) {
+				List<Map<String, Object>> ivList = orderServiceDAO.getInventoryListFindByOrderInfoId(orderInfoId);
+
+				orderServiceDAO.updateInventoryPlusQuantiryByInventoryId(ivList);
+
+				orderServiceDAO.recodeInventoryLogByRefund(ivList);
+
+				orderServiceDAO.updateShipmentByRefund(ivList);
+
+			}
+			orderServiceDAO.orderInfoStatusByAdmminCancellPayment(orderInfoId);
+			paymentServiceDAO.updateProductRefund(orderInfoId, paymentId);
+			orderServiceDAO.updateStockByOrderItemsQuantityCausePayCancel(orderList);
 
 		} catch (Exception e) {
 			e.printStackTrace();

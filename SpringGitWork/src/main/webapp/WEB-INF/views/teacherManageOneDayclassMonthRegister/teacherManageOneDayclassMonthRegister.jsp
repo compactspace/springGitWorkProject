@@ -376,22 +376,41 @@ $(document).ready(function() {
 
     // 각 월 카드 클릭 시
     $(".monthCard.possibleOpen").on("click", function() {
-        const yyyyMM = $(this).data("alreadyopen"); // "2025-12"
-        const [yearStr, monthStr] = yyyyMM.split("-");
-        const year = parseInt(yearStr);
-        const month = parseInt(monthStr) - 1;
+    	 const yyyyMM = $(this).data("alreadyopen"); // "2026-02"
+    	    const [yearStr, monthStr] = yyyyMM.split("-");
+    	    const year = parseInt(yearStr);
+    	    const month = parseInt(monthStr) - 1;
 
-        // 월별 날짜 배열 캐싱
-        if(!monthDates[yyyyMM]) {
-            const lastDay = new Date(year, month + 1, 0).getDate();
-            let arr = [];
-            for(let d=1; d<=lastDay; d++){
-                const dayStr = d < 10 ? "0"+d : ""+d;
-                arr.push(yearStr + "-" + monthStr + "-" + dayStr);
-            }
-            monthDates[yyyyMM] = arr;
+    	    const now = new Date();
+    	    const nowYear = now.getFullYear();
+    	    const nowMonth = now.getMonth();
+    	    const nowDate = now.getDate();
+    	    const nowHour = now.getHours(); // 0~23
+
+    	    if (!monthDates[yyyyMM]) {
+    	        const lastDay = new Date(year, month + 1, 0).getDate();
+    	        let arr = [];
+
+    	        let startDay = 1;
+
+    	        // 🔥 현재 월 처리
+    	        if (year === nowYear && month === nowMonth) {
+    	            startDay = nowDate;
+
+    	            // 🔥 오후 3시 초과면 오늘도 제외 → 내일부터
+    	            if (nowHour > 15) {
+    	                startDay = nowDate + 1;
+    	            }
+    	        }
+
+    	        for (let d = startDay; d <= lastDay; d++) {
+    	            const dayStr = d < 10 ? "0" + d : "" + d;
+    	            arr.push(yearStr + "-" + monthStr + "-" + dayStr);
+    	        }
+
+    	        monthDates[yyyyMM] = arr;
         }
-
+    	    
         // 모달 제목 업데이트
         $("#modalTitle").text(parseInt(monthStr) + "월 수업 추가");
 

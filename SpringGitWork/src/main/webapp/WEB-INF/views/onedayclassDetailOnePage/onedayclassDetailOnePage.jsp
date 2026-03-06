@@ -104,7 +104,103 @@
 }
 
 
-  
+/*짧은 리뷰 섹셕 시작  */
+/* 후기 헤더 */
+#reviews-section .reviews-header h3 {
+    font-weight: 700;
+}
+
+#reviews-section .reviews-header p {
+    font-weight: 400;
+}
+
+/* shortReviewFragment 내부 카드와 자연스럽게 연결 */
+#shortReviewFragment {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+/*짧은 리뷰 섹셕 종료  */
+
+
+/* 짧은 리뷰 카드  시작*/
+#shortReviewFragment {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.short-recentreviewwrapper {
+    flex: 1 1 calc(33.33% - 16px);
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease;
+}
+.short-recentreviewwrapper:hover {
+    transform: translateY(-3px);
+}
+
+.short-recentreview {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.short-reviewimg {
+    width: 100%;
+    height: 160px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 6px;
+}
+
+.short-reviewcreate {
+    font-size: 0.9rem;
+    color: #333;
+}
+.short-commentcontent {
+    display: block;
+    margin-bottom: 4px;
+}
+.short-createcontent {
+    font-size: 0.8rem;
+    color: #ff5862;
+}
+
+/* 반응형 */
+@media screen and (max-width: 1024px) {
+    .short-recentreviewwrapper {
+        flex: 1 1 calc(50% - 16px);
+    }
+}
+@media screen and (max-width: 760px) {
+    html, body {
+        font-size: 15px;
+    }
+    #allwrapper {
+        padding: 10px;
+    }
+    .header-wrapper h2 {
+        font-size: 1.5rem;
+    }
+    .header-wrapper .subtitle {
+        font-size: 0.95rem;
+    }
+    .select-label {
+        display: block;
+        margin-bottom: 6px;
+    }
+    #classSelect {
+        width: 100%;
+        padding: 10px;
+    }
+    .short-recentreviewwrapper {
+        flex: 1 1 100%;
+    }
+}
+  /* 짧은 리뷰 카드  종료*/
   
 </style>
 <script>
@@ -193,6 +289,10 @@ const classExtraInfoMap = {
 
         eventInit(); // 함수 호출 방식 수정
         findReviewGroupOnedayClass(select.value); // 현재 선택된 값 전달
+        getReviewsShortFragment(select.value);
+        
+        
+        
     };
     
     const findReviewGroupOnedayClass = (selectedValue) => {
@@ -223,11 +323,49 @@ const classExtraInfoMap = {
             }
         });
     };
+    
+    
+    
+    
+    
+    function getReviewsShortFragment(selectedValue){
+    	
+    	
+    	
+    	
+    	  if (selectedValue === undefined) {
+              selectedValue = 1;
+          } 
+    	  
+    	  
+    	  
+    	   $.ajax({
+               url: "${pageContext.request.contextPath}/api/guest/get-reviews-short-form?onedayclass_num=" + selectedValue,
+               method: "GET",
+               success: (res) => {
+                   $("#shortReviewFragment").html(res);
+                   
+                   
+                 //  const extra = classExtraInfoMap[selectedValue];
+                   
+               
+                   
+               },
+               error: (err) => {
+                   console.error("JSP 조각 불러오기 실패:", err);
+               }
+           });
+    }
+    
+    
+    
 
     const eventInit = () => {
         $("#classSelect").on("change", function () {
             const selectedValue = $(this).val();
-       /*      console.log("선택된값: "+selectedValue) */
+            getReviewsShortFragment(selectedValue);
+       /*      console.log("선택된값: "+selectedValue) */  
+       
             findReviewGroupOnedayClass(selectedValue);
        
        
@@ -257,6 +395,19 @@ const classExtraInfoMap = {
     </div>
 
     <div id="onedayclassDetailOneFragment"></div>
+    <!-- 후기 영역 추가 -->
+<div id="reviews-section" style="margin-top:40px;">
+    <div class="reviews-header" style="text-align:center; margin-bottom:20px;">
+        <h3 style="font-size:1.6rem; color:#2a9df4; margin-bottom:6px;">이용자들의 생생한 후기</h3>
+        <p style="font-size:1rem; color:#555;">학생들이 직접 작성한 작품 후기와 경험을 확인해보세요.</p>
+    </div>
+    
+
+    <!-- 기존 shortReviewFragment가 들어가는 곳 -->
+    <div id="shortReviewFragment"></div>
+</div>
   </div>
+  
+  
 </body>
 </html>

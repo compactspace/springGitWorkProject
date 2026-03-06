@@ -529,8 +529,14 @@ $(function() {
 	                // 현재 상태에서 허용되는 다음 상태 ID 목록 가져오기
 var possibleStatusIds = statusTransitions[orderStatusId] || [];
 
+	               // console.log("possibleStatusIds: "+possibleStatusIds);	                
+	                
+	                
+	                
 // orderStatusList에서 실제 상태 객체로 필터링
 var possibleStatusAction = orderStatusList.filter(s => possibleStatusIds.includes(s.statusId));
+console.log("possibleStatusAction: "+possibleStatusAction);
+
 
 					
 					var currentStatusObj = orderStatusList.find(s => s.statusId === orderStatusId);
@@ -694,13 +700,14 @@ html += '<div class="status-header">현재 주문상태: <span class="status-lab
 html += '<div class="status-change">';
 
 //가능한 상태 목록 (현재 상태 제외)
-
+//섹스
 if(currentStatusName!='주문취소'&&currentStatusName!='환불완료'){	
 html += '<div class="status-label">상태 변경:</div>';
 html += '<div class="status-options">';
 possibleStatusAction.forEach(function(status) {
+	console.log(status);
 	html += '<button class="status-btn" ' +
-    'data-status-id="' + orderStatusId + '" ' +
+    'data-status-id="' + status.statusId + '" ' +
     'data-merchant-uid="' + paymentInfo.payment_number + '" ' +
     'data-imp-uid="' + paymentInfo.imp_uid + '" ' +
     'data-order_info_id="' + orderInfoId + '" ' +
@@ -892,8 +899,8 @@ html += '</div>'; // modal-status-row 끝
      // snake → camel
        const converted = keysToCamel(selectedOrderItemList);
 	   console.log("업보 청산 변환 결과:", converted);        
-        
-      if(statusId===7){
+       console.log(statusId);        
+      if(statusId===8){
         	 $.ajax({
                  url: contextPath + '/api/admin/delegate-to-pg-refund',
                  type: 'POST',
@@ -924,7 +931,47 @@ html += '</div>'; // modal-status-row 끝
                      console.log("errorThrown:", errorThrown);
                  }
              });
-        }     
+        }      
+      
+      
+      //
+      
+      if(statusId===6){
+     	 $.ajax({
+              url: contextPath + '/api/admin/payment-Cancelle-by-admmin',
+              type: 'POST',
+              data: {
+             	 impUid: impUid, // 전역 또는 적절한 변수로 전달
+             	 merchantUid: merchantUid,
+             	 amount:amount,
+             	 orderInfoId:orderInfoId,
+             	 paymentId:paymentId
+             	 
+              },
+              
+              
+
+              
+              success: function(response) {
+         const    	 promiseAfterSuccesPgRefund=afterSuccesPgRefund(impUid,merchantUid,amount,amount,orderInfoId,paymentId,converted);
+         promiseAfterSuccesPgRefund.then(() => {
+         	  doNextStepSearchTriger(statusId);
+         	}).catch(err => {
+         	  console.error("환불 후 처리 실패:", err);
+         	});
+             	 
+              },
+              error: function(jqXHR, textStatus, errorThrown) {
+                  console.log("jqXHR:", jqXHR);
+                  console.log("textStatus:", textStatus);
+                  console.log("errorThrown:", errorThrown);
+              }
+          });
+     }  
+   
+      
+      
+      
     });	
 	
 	

@@ -143,7 +143,9 @@ li {
 
 
 
-						<c:if test="${empty orderWrapper.refund}">
+
+						<c:if test="${empty orderWrapper.refund and orderWrapper.order_status_id ne 6}">
+
 							<c:if test="${orderWrapper.pay.refundable}">
 								<span class='refund-btn' data-paymentid="${orderWrapper.pay.paymentId}"
       data-amount="${orderWrapper.pay.amount}"
@@ -152,6 +154,13 @@ li {
 							<c:if test="${not orderWrapper.pay.refundable}">
 								<span class='refundunable'>교환/환불 불가</span>
 							</c:if>
+						</c:if>
+						
+						
+						<c:if test="${orderWrapper.order_status_id eq 6}">							
+							
+								<span class='refundunable'>재고부족 으로 인한 자동 환불처리가 되었습니다.</span>
+						
 						</c:if>
 
 					</div>

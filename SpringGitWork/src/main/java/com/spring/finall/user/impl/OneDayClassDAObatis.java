@@ -150,5 +150,19 @@ public class OneDayClassDAObatis {
 
 	    return map;
 	}
+	
+	
+	
+	public OneDayClassVO getReviewsShortForm(OneDayClassVO ovo) {
+		
+		
+		OneDayClassVO result =
+			    mybatis.selectOne("OneDayClassVO.getReviewsShortFormOne", ovo);
+
+			
+
+		return  result;
+	}
+	
 
 }

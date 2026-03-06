@@ -6,48 +6,31 @@ import java.util.List;
 import java.util.Map;
 
 public class OneDayClassVO {
-	
-	
-	 int UPDATECOLUMNMAXCNT=10;
-	 
-	
+
+	int UPDATECOLUMNMAXCNT = 10;
 
 	private String onedayclass_name;
 	private int onedayclass_price;
 	private String onedayclass_info;
 	private String reserve_img;
 	private Integer onedayclass_num;
-	
+
 	private Long teacher_id;
-	
-	
-	
-	
-	//각종 간단 정보
+
+	// 각종 간단 정보
 	private String address;
 	private String park;
 	private String playtime;
 	private String maximum_guests;
-	
-	
-	
-	
-	
-	
-	//편의상 뷰 프로젝트의 폴더경로의 사진저장소
-		//편의상 반정규화로 간다.
-		private String imagelocallpath1;
-		private String imagelocallpath2;
-		private String imagelocallpath3;
-		private String imagelocallpath4;
-		private String imagelocallpath5;
-		
-	
-	
-	
-	
-	
-	
+
+	// 편의상 뷰 프로젝트의 폴더경로의 사진저장소
+	// 편의상 반정규화로 간다.
+	private String imagelocallpath1;
+	private String imagelocallpath2;
+	private String imagelocallpath3;
+	private String imagelocallpath4;
+	private String imagelocallpath5;
+
 	public String getAddress() {
 		return address;
 	}
@@ -80,11 +63,6 @@ public class OneDayClassVO {
 		this.maximum_guests = maximum_guests;
 	}
 
-	
-	
-	
-	
-	
 	public String getImagelocallpath1() {
 		return imagelocallpath1;
 	}
@@ -125,20 +103,15 @@ public class OneDayClassVO {
 		this.imagelocallpath5 = imagelocallpath5;
 	}
 
-	//그냥 리미트절을 위한 단순 필드이다. 컬럼 아님!
+	// 그냥 리미트절을 위한 단순 필드이다. 컬럼 아님!
 	private Integer nextpage;
-	
-	//오류예방 마지막  리미트절을 위한 단순 필드이다. 컬럼 아님!
+
+	// 오류예방 마지막 리미트절을 위한 단순 필드이다. 컬럼 아님!
 	private Integer preventNextPage;
-	
-	
-	//그냥 마지막 페이지인지 확인하는 단순 필드이다 컬럼 아님!.
+
+	// 그냥 마지막 페이지인지 확인하는 단순 필드이다 컬럼 아님!.
 	private boolean endPageFlag;
-	
-	
-	
-	
-	
+
 	public Integer getPreventNextPage() {
 		return preventNextPage;
 	}
@@ -155,13 +128,9 @@ public class OneDayClassVO {
 		this.endPageFlag = endPageFlag;
 	}
 
-	//조인용 ReivewVO 클래스이다.
+	// 조인용 ReivewVO 클래스이다.
 	private List<ReviewVO> reivewvo;
-	
-	
-	
-	
-	
+
 	public Long getTeacher_id() {
 		return teacher_id;
 	}
@@ -178,25 +147,14 @@ public class OneDayClassVO {
 		this.nextpage = nextpage;
 	}
 
+	public List<Object> toList(OneDayClassVO ovo, int size) {
 
-
-
-	public List<Object> toList(OneDayClassVO ovo,int size) {
-		
 		List<Object> list = new ArrayList();
-		for(int k=0; k<size; k++ ) {
+		for (int k = 0; k < size; k++) {
 			list.add(ovo.getReivewvo().get(k));
 		}
 		return list;
 	}
-
-	
-	
-	
-	
-
-
-
 
 	public Integer getOnedayclass_num() {
 		return onedayclass_num;
@@ -245,11 +203,9 @@ public class OneDayClassVO {
 	public void setOnedayclass_info(String onedayclass_info) {
 		this.onedayclass_info = onedayclass_info;
 	}
-	
-	
-	
-	public List<String> getCandiImageList(){		
-		List<String> candiImageList= new ArrayList<String>();
+
+	public List<String> getCandiImageList() {
+		List<String> candiImageList = new ArrayList<String>();
 		candiImageList.add(this.getImagelocallpath1());
 		candiImageList.add(this.getImagelocallpath2());
 		candiImageList.add(this.getImagelocallpath3());
@@ -257,56 +213,37 @@ public class OneDayClassVO {
 		candiImageList.add(this.getImagelocallpath5());
 		return candiImageList;
 	}
-	
-	
-	
-	
+
 	public Map<String, Object> toFieldMap() {
-	    Map<String, Object> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<>();
 
-	    // VO 내 필드들 중 imagelocallpath1~5 제외
-	    map.put("onedayclass_name", getOnedayclass_name());
-	    map.put("onedayclass_price", getOnedayclass_price());
-	    map.put("onedayclass_info", getOnedayclass_info());
-	    map.put("reserve_img", getReserve_img());
-	    map.put("onedayclass_num", getOnedayclass_num());
-	    map.put("teacher_id", getTeacher_id());
+		// VO 내 필드들 중 imagelocallpath1~5 제외
+		map.put("onedayclass_name", getOnedayclass_name());
+		map.put("onedayclass_price", getOnedayclass_price());
+		map.put("onedayclass_info", getOnedayclass_info());
+		map.put("reserve_img", getReserve_img());
+		map.put("onedayclass_num", getOnedayclass_num());
+		map.put("teacher_id", getTeacher_id());
 
-	    map.put("address", getAddress());
-	    map.put("park", getPark());
-	    map.put("playtime", getPlaytime());
-	    map.put("maximum_guests", getMaximum_guests());
+		map.put("address", getAddress());
+		map.put("park", getPark());
+		map.put("playtime", getPlaytime());
+		map.put("maximum_guests", getMaximum_guests());
 
-	    return map;
+		return map;
 	}
-	
-	
-	
-	
-	
-	
+
 	@Override
 	public String toString() {
-	    return "OneDayClassVO {" +
-	            "onedayclass_name='" + onedayclass_name + '\'' +
-	            ", onedayclass_price=" + onedayclass_price +
-	            ", onedayclass_info='" + onedayclass_info + '\'' +
-	            ", reserve_img='" + reserve_img + '\'' +
-	            ", onedayclass_num=" + onedayclass_num +
-	            ", imagelocallpath1='" + imagelocallpath1 + '\'' +
-	            ", imagelocallpath2='" + imagelocallpath2 + '\'' +
-	            ", imagelocallpath3='" + imagelocallpath3 + '\'' +
-	            ", imagelocallpath4='" + imagelocallpath4 + '\'' +
-	            ", imagelocallpath5='" + imagelocallpath5 + '\'' +
-	            ", address='" + address + '\'' +
-	            ", park='" + park + '\'' +
-	            ", playtime='" + playtime + '\'' +
-	            ", maximum_guests='" + maximum_guests + '\'' +
-	            ", nextpage=" + nextpage +
-	            ", preventNextPage=" + preventNextPage +
-	            ", endPageFlag=" + endPageFlag +
-	            ", reivewvo=" + (reivewvo != null ? reivewvo.toString() : "null") +
-	            '}';
+		return "OneDayClassVO {" + "onedayclass_name='" + onedayclass_name + '\'' + ", onedayclass_price="
+				+ onedayclass_price + ", onedayclass_info='" + onedayclass_info + '\'' + ", reserve_img='" + reserve_img
+				+ '\'' + ", onedayclass_num=" + onedayclass_num + ", imagelocallpath1='" + imagelocallpath1 + '\''
+				+ ", imagelocallpath2='" + imagelocallpath2 + '\'' + ", imagelocallpath3='" + imagelocallpath3 + '\''
+				+ ", imagelocallpath4='" + imagelocallpath4 + '\'' + ", imagelocallpath5='" + imagelocallpath5 + '\''
+				+ ", address='" + address + '\'' + ", park='" + park + '\'' + ", playtime='" + playtime + '\''
+				+ ", maximum_guests='" + maximum_guests + '\'' + ", nextpage=" + nextpage + ", preventNextPage="
+				+ preventNextPage + ", endPageFlag=" + endPageFlag + ", reivewvo="
+				+ (reivewvo != null ? reivewvo.toString() : "null") + '}';
 	}
 
 }

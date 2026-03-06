@@ -1,8 +1,7 @@
 package com.spring.finall.view.controller;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -13,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,12 +27,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.finall.WorkImgVO;
-import com.spring.finall.Validator.UploadValidator.UploadValidator;
+import com.spring.finall.RabitEvent.ReserveEvent;
 import com.spring.finall.impl.ArtworkServiceDAO;
 import com.spring.finall.impl.WorkServcieRedisDao;
+import com.spring.finall.resDto.SearchProductResDTO.SearchProductResDTO;
 import com.spring.finall.security.UserDetailsVO2;
 import com.spring.finall.service.ArtworkService;
 import com.spring.finall.service.OneDayClassService;
+import com.spring.finall.service.SearchService;
 import com.spring.finall.service.WorkService;
 import com.spring.finall.user.ArtworkVO;
 import com.spring.finall.user.OneDayClassVO;
@@ -60,46 +63,30 @@ public class GuestViewController {
 	@Autowired
 	private ArtworkService artWorkService;
 	
+	
+	@Autowired
+	private SearchService searchService;
+	
 	@Autowired
 	private WorkServcieRedisDao workServiceRedisDao;
 	
 	@Autowired
 	private ArtworkServiceDAO artworkServiceDAO;
-	
+	@Autowired
+    private RabbitTemplate rabbitTemplate;
 	@Autowired
 	private RedisTemplate<String, String> redisTemplate;
 
 	  @GetMapping("/")
 	    public String showMainHome() {
-	        System.out.println(">>> GuestViewController: showMainHome 진입됨");
+		  //스프링상의 payment 정보 삽입
+          ReserveEvent reserveEvent = new ReserveEvent();
+          reserveEvent.setUserCode(0);
+          reserveEvent.setPaymentMethod("Credit Card");
+          reserveEvent.setMerchantUid(null);
+          rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
 
-	        try {
-	            // PowerShell 명령어: cscli decision list
-	            String command = "powershell.exe -Command \"cscli decision list\"";
-
-	            ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", command);
-	            pb.redirectErrorStream(true);
-	            Process process = pb.start();
-
-	            // 결과 읽기
-	            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-	            StringBuilder output = new StringBuilder();
-	            String line;
-	            while ((line = reader.readLine()) != null) {
-	                output.append(line).append(System.lineSeparator());
-	            }
-
-	            int exitCode = process.waitFor();
-	            System.out.println(">>> PowerShell exit code: " + exitCode);
-
-	            // 결과 출력
-	            String result = output.toString();
-	            System.out.println(">>> cscli 출력 결과:\n" + result);
-
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
-
+	        rabbitTemplate.convertAndSend("reserveQueue", reserveEvent);
 	        return "mainPage/mainhome";
 	    }
 
@@ -213,6 +200,7 @@ public class GuestViewController {
 	@RequestMapping(value = "/productlist")
 	public String showProductGroupLlistPage(ProductVO vo,
 			@RequestParam(value = "product_group", required = false, defaultValue = "pencile") String product_group,
+			@AuthenticationPrincipal UserDetailsVO2 user,
 			Model model) {
 
 		if ("groupdetermined".equals(product_group)) {
@@ -226,7 +214,9 @@ public class GuestViewController {
 		model.addAttribute("productService", grouplist);
 		List<ProductGroupVO> groupInfolist =protService.getProductGroupList();
 		model.addAttribute("groupInfolist", groupInfolist);
-
+		// 로그인 여부
+				Boolean isAuthenticated = user != null;
+				model.addAttribute("isAuthenticated", isAuthenticated);
 		return "productPage/generalproductlist";
 	}
 
@@ -286,10 +276,17 @@ public class GuestViewController {
 			userId = userDetails.getUser_code();
 		}
 
-		List<Map<String, Object>> getAvailableDaysInMonth = reserveRestServie.restOneDayClass(onedayClassNum,
-				searchMonth, userId);
+		List<Map<String, Object>> getAvailableDaysInMonth = reserveRestServie.restOneDayClass(
+		        onedayClassNum, searchMonth, userId);
 
-		// model에 그대로 넘김 (JSON으로 안바꿈)
+		// openday 기준 오름차순 정렬
+		getAvailableDaysInMonth.sort((map1, map2) -> {
+		    Timestamp t1 = (Timestamp) map1.get("openday");
+		    Timestamp t2 = (Timestamp) map2.get("openday");
+		    return t1.compareTo(t2); // compareTo: 오름차순
+		});
+
+		// model에 그대로 넘김 (JSON으로 변환 안 함)
 		model.addAttribute("filteredList", getAvailableDaysInMonth);
 
 		return "compoents/onedayclassinfopage/possibleDateFragment";
@@ -398,10 +395,10 @@ public class GuestViewController {
 	
 	
 	
-
+	//여기
 	@RequestMapping(value = "/artwork-comment")
-	public String test(Model model) throws Exception {
-	    List<Map<String, Object>> list = artworkServiceDAO.getMoreWorkComments(1, 10, 0);
+	public String test(Model model,@RequestParam(name = "work_id", required = true) int work_id) throws Exception {
+	    List<Map<String, Object>> list = artworkServiceDAO.getMoreWorkComments(work_id, 10, 0);
 
 	    ObjectMapper mapper = new ObjectMapper();
 	    String jsonList = mapper.writeValueAsString(list);
@@ -412,44 +409,52 @@ public class GuestViewController {
 	}
 	
 	@RequestMapping(value = "/search")
-	public String showSearchResultPage(Model model, @RequestParam(defaultValue = "community") String keywordType,
-			@RequestParam("query") String query, @RequestParam(defaultValue = "1") int page,
-			@RequestParam(defaultValue = "10") int limit,
-			@CookieValue(value = "cachyTotalCnt", defaultValue = "0") String cachyTotalCnt // 쿠키값 읽기
+	public String showSearchResultPage(
+			@AuthenticationPrincipal UserDetailsVO2 user,
+	        Model model,
+	        @RequestParam(defaultValue = "community") String search_type,
+	        @RequestParam("query") String query,
+	        @RequestParam(defaultValue = "1") int page,
+	        @RequestParam(defaultValue = "10") int limit,
+	        @CookieValue(value = "cachyTotalCnt", defaultValue = "0") String cachyTotalCnt
 	) throws Exception {
-		System.out.println("쿠키 cachyTotalCnt 값: " + cachyTotalCnt);
+	    System.out.println("쿠키 cachyTotalCnt 값: " + cachyTotalCnt);
 
-		if (keywordType.equals("community")) {
+	    model.addAttribute("searchType", search_type);
+	    model.addAttribute("query", query);
 
-			ArtworkVO artWorkVO = new ArtworkVO();
-			int offSet = (page - 1) * limit;
+	    if (search_type.equals("community")) {
+	        ArtworkVO artWorkVO = new ArtworkVO();
+	        int offSet = (page - 1) * limit;
+	        artWorkVO.setContent(query);
+	        artWorkVO.setLimit(limit);
+	        artWorkVO.setOffSet(offSet);
 
-			artWorkVO.setContent(query);
-			artWorkVO.setLimit(limit);
-			artWorkVO.setOffSet(offSet);
+	        int TotalCnt = Integer.parseInt(cachyTotalCnt);
+	        if (TotalCnt <= 0) {
+	            int totalCnt = artWorkService.searchyCntAll(artWorkVO);
+	            model.addAttribute("totalCnt", totalCnt);
+	        } else {
+	            model.addAttribute("totalCnt", TotalCnt);
+	        }
 
-			int TotalCnt = Integer.parseInt(cachyTotalCnt);
+	        Map<String, Object> searchData = artWorkService.searchyArtWork(artWorkVO);
+	        model.addAttribute("searchyList", searchData.get("searchyList")); // List<Map<String,Object>>
+	    }
 
-			if (TotalCnt <= 0) {
-				int totalCnt = artWorkService.searchyCntAll(artWorkVO);
-				model.addAttribute("totalCnt", totalCnt);
-			} else {
+	    if (search_type.equals("product")) {
+	        List<SearchProductResDTO> productList = searchService.SearchFindProductList(query);
+	        model.addAttribute("productList", productList);
 
-				model.addAttribute("totalCnt", TotalCnt);
-			}
+	        // 상품도 totalCnt 필요하면:
+	        model.addAttribute("totalCnt", productList.size());
+	    }
+	    
+	 // 로그인 여부
+	 		Boolean isAuthenticated = user != null;
+	 		model.addAttribute("isAuthenticated", isAuthenticated);
 
-			Map<String, Object> searchData = artWorkService.searchyArtWork(artWorkVO);
-			model.addAttribute("searchyList", searchData.get("searchyList")); // List<Map<String,Object>>
-			model.addAttribute("query", query); // Boolean
-		}
-		if(keywordType.equals("product")) {
-			
-			
-		}
-		
-		
-
-		return "searchResultPage/searchResultPage";
+	    return "searchResultPage/searchResultPage";
 	}
 	
 }

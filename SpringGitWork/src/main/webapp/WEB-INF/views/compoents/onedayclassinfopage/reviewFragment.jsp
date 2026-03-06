@@ -3,14 +3,19 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 
-<div class="endPageFlag" data-endPageFlag=${endPageFlag} ></div>
+<div class="endPageFlag" data-endPageFlag="${endPageFlag}" ></div>
 
 <c:choose>
-	<c:when test="${joinToReview eq nul}">
-		<h1 data-endPageFlag=${endPageFlag} >${endPageFlag} 아직 등록후기가 없습니다. 첫 후기의 주인이 되어주세요</h1>
+	<c:when test="${joinToReview eq null}">
+		<div id="check-end" data-is-end="${endPageFlag}">		
+		</div>		
 	</c:when>
+	
+	
 
 	<c:otherwise>
+	
+	
 		<c:forEach items="${joinToReview}" var="review">
 			<div class="recentreviewwrapper" 
 				style="

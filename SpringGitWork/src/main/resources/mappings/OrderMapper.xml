@@ -221,6 +221,14 @@ SELECT * From order_info  WHERE merchant_uid=#{merchantUid}
     VALUES (#{orderInfoId}, #{name}, #{email}, #{phone}, #{zipcode}, #{address}, #{address_detail})
 </insert>
 
+<!--4. 주문 상태 업데이트  -->
+<update id="updateOrderInfoStatusByAfterSuccesspaymentComplement" parameterType="java.util.Map">
+  UPDATE order_info
+    SET order_status_id = 2
+    WHERE order_info_id = #{orderInfoId}
+</update>
+
+
 
 
 
@@ -287,6 +295,7 @@ SELECT * From order_info  WHERE merchant_uid=#{merchantUid}
 SELECT
   oi.order_info_id,
   oi.user_id,
+  oi.order_status_id,
   op.name AS person_name,
   op.email AS person_email,
   op.phone AS person_phone,
@@ -355,7 +364,7 @@ LIMIT #{limit} OFFSET #{offset}
 <resultMap id="orderResultMap" type="OrderRequestDTO">
   <id property="orderInfoId" column="order_info_id"/>
   <result property="userId" column="user_id"/>
-  
+  <result property="orderStatusId" column="order_status_id"/>
   <association property="person" javaType="OrderPersonDTO">
     <result property="name" column="person_name"/>
     <result property="email" column="person_email"/>
@@ -390,6 +399,18 @@ WHERE order_info_id=#{orderInfoId}
 
 </update>
 
+
+
+<update id="orderInfoStatusByAdmminCancellPayment" parameterType="String">
+	UPDATE
+	order_info
+set
+	status = 'CancelledPaymentOrderByAdmin',
+	order_status_id = 6,
+	order_status_comment = '재고부족으로 인한 결제 주문건 취소'
+WHERE order_info_id=#{orderInfoId}
+
+</update>
 
 <update id="updateStatusToShippingByShipping" parameterType="Long">
 	UPDATE

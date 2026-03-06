@@ -33,6 +33,10 @@ public interface OrderService {
 
 	boolean updateOrderStatusToSuccess(String merchantUid);
 
+	
+	boolean updateOrderInfoStatusByAdmminCancellPayment(String impUid,    		String merchantUid,String orderInfoId ,String paymentId, List<OrderItemDTO> orderList);
+	
+	
 	/**
 	 * 주문 목록을 페이징 조회 (6개월 이내)
 	 * 
