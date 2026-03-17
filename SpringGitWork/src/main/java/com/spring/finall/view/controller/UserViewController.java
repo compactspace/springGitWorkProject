@@ -508,7 +508,7 @@ public class UserViewController {
 		}
 		model.addAttribute("merchant_uid", merchant_uid);
 		model.addAttribute("merchantId", merchantId);
-		model.addAttribute("pgUrl", "http://localhost:7010/fake-pg/index.html");
+		model.addAttribute("pgUrl", "http://222.121.127.89:7010/fake-pg/index.html");
 		return "onedayclassPaymentPage/onedayclassPaymentPage";
 	}
 

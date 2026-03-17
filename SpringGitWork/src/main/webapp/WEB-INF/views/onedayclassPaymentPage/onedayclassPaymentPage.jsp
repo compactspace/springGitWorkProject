@@ -10,7 +10,7 @@
 <html>
 <head>
 <sec:csrfMetaTags />
-<script type="module" src="http://localhost:7010/fake-pg/script2.js"></script>
+<script type="module" src="http://222.121.127.89:7010/fake-pg/script2.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 <style>
 .container {
@@ -25,7 +25,6 @@
 .title {
 	color: #2c3e50;
 }
-
 .info-text {
 	font-size: 16px;
 	color: #555;
