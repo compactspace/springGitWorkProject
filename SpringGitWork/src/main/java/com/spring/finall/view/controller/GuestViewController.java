@@ -80,13 +80,13 @@ public class GuestViewController {
 	  @GetMapping("/")
 	    public String showMainHome() {
 		  //스프링상의 payment 정보 삽입
-          ReserveEvent reserveEvent = new ReserveEvent();
-          reserveEvent.setUserCode(0);
-          reserveEvent.setPaymentMethod("Credit Card");
-          reserveEvent.setMerchantUid(null);
-          rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
-
-	        rabbitTemplate.convertAndSend("reserveQueue", reserveEvent);
+//          ReserveEvent reserveEvent = new ReserveEvent();
+//          reserveEvent.setUserCode(0);
+//          reserveEvent.setPaymentMethod("Credit Card");
+//          reserveEvent.setMerchantUid(null);
+//          rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
+//
+//	        rabbitTemplate.convertAndSend("reserveQueue", reserveEvent);
 	        return "mainPage/mainhome";
 	    }
 

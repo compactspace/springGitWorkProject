@@ -55,22 +55,29 @@ public class AdminConfig implements WebMvcConfigurer {
     // aws 로 연결 할거면 jdbc:mysql://13.209.16.121:3306/octfair2?allowMultiQueries=true
     // 아이디는 root 비번은 hwangkh704!
 
-    // local로 연결할거면 jdbc:mariadb://localhost:3306/finall
-    // 아이디는 root 비번은 1111
+   
 
     @Bean
     public BasicDataSource dataSource() {
         BasicDataSource datasource = new BasicDataSource();
         datasource.setDriverClassName("org.mariadb.jdbc.Driver");
+        // 홈서버 키면 
+//        datasource.setUrl("jdbc:mariadb://localhost:4400/finall"); 
+//        datasource.setUsername("root");
+//        datasource.setPassword("5susdbwj!");
+        // 홈서버가 꺼져있으면 우선 로컬로 datasource.setUrl("jdbc:mariadb://localhost:3306/finall");        
+//        datasource.setUsername("root");
+//        datasource.setPassword("1111");
+        
         datasource.setUrl("jdbc:mariadb://localhost:3306/finall");
         datasource.setUsername("root");
         datasource.setPassword("1111");
 
         // ★ 핵심 설정
-        datasource.setInitialSize(1);   // 최초 생성 커넥션 수
-        datasource.setMaxTotal(1);      // 최대 커넥션 수 (가장 중요)
-        datasource.setMaxIdle(1);       // 유휴 커넥션 최대
-        datasource.setMinIdle(1);       // 유휴 커넥션 최소
+        datasource.setInitialSize(5);   // 최초 생성 커넥션 수
+        datasource.setMaxTotal(20);     // 최대 커넥션 수 (핵심)
+        datasource.setMaxIdle(10);      // 유휴 커넥션 최대
+        datasource.setMinIdle(5);       // 유휴 커넥션 최소
 
         return datasource;
     }
