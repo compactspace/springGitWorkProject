@@ -33,7 +33,7 @@
 
 
 	<select id="currentDraftInfoEqulLastedSnapshot"
-		parameterType="Long" resultType="HasRecentUpdateOnedayClassInfoResDTO">
+		parameterType="Map" resultType="HasRecentUpdateOnedayClassInfoResDTO">
 	SELECT
 		h.history_id as history_id,
 		h.onedayclass_num as onedayclassNum,
@@ -53,7 +53,7 @@
 		FROM onedayclass_history
 		WHERE onedayclass_num = h.onedayclass_num
 		)
-		AND h.onedayclass_num = #{onedayclassNum} and dr.status='READY'
+		AND h.onedayclass_num = #{onedayclassNum} and dr.status='READY' AND dr.user_code =#{userCode}
 
 	</select>
 

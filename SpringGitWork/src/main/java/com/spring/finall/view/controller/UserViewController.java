@@ -478,7 +478,7 @@ public class UserViewController {
 		if (draftReserveinfoVO != null) {
 			Long onedayclassNum = Long.valueOf(onedayclass_num); // int -> Long 객체로 변환
 			Map<String,Object> resultMap = draftReserveinfoService.currentDraftInfoEqulLastedSnapshot(onedayclassNum,
-					draftReserveinfoVO);
+					draftReserveinfoVO,userCode);
 			merchant_uid = draftReserveinfoVO.getMerchantUid();
 
 			boolean isEqual=(boolean) resultMap.get("isEqual");

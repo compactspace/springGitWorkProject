@@ -39,10 +39,13 @@ public class DraftReserveinfoServiceDAO {
 		return generatedPk;
 	}
 
-	public HasRecentUpdateOnedayClassInfoResDTO currentDraftInfoEqulLastedSnapshot(Long onedayclassNum) {
-
+	public HasRecentUpdateOnedayClassInfoResDTO currentDraftInfoEqulLastedSnapshot(Long onedayclassNum,int userCode) {
+		Map<String, Object> paramMap = new HashMap();
+		paramMap.put("onedayclassNum", onedayclassNum);
+		paramMap.put("userCode", userCode);
+		
 		HasRecentUpdateOnedayClassInfoResDTO recentUpdateOnedayClassInfoResDTO = mybatis
-				.selectOne("DraftReserveMapper.currentDraftInfoEqulLastedSnapshot", onedayclassNum);
+				.selectOne("DraftReserveMapper.currentDraftInfoEqulLastedSnapshot", paramMap);
 
 		return recentUpdateOnedayClassInfoResDTO;
 	}

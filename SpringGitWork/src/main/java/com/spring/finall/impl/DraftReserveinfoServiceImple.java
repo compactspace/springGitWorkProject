@@ -33,10 +33,10 @@ public class DraftReserveinfoServiceImple implements DraftReserveinfoService {
 		return generatedPk;
 	}
 
-	public Map<String,Object> currentDraftInfoEqulLastedSnapshot(Long OnedayClassNum, DraftReserveinfoVO draftReserveinfoVO) {
+	public Map<String,Object> currentDraftInfoEqulLastedSnapshot(Long OnedayClassNum, DraftReserveinfoVO draftReserveinfoVO,int userCode) {
 
 		HasRecentUpdateOnedayClassInfoResDTO recentUpdateOnedayClassInfoResDTO = draftReserveinfoServiceDAO
-				.currentDraftInfoEqulLastedSnapshot(OnedayClassNum);
+				.currentDraftInfoEqulLastedSnapshot(OnedayClassNum,userCode);
 
 		Integer draftPrice = draftReserveinfoVO.getOnedayclassPrice();
 

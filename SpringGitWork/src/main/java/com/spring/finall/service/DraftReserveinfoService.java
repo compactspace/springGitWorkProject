@@ -14,12 +14,10 @@ public interface DraftReserveinfoService {
 
 	Long insertDraftReserveInfo(InsertDraftReserveinfoDTO insertDraftReserveInfoDTO);
 
-	Map<String,Object> currentDraftInfoEqulLastedSnapshot(Long OnedayClassNum, DraftReserveinfoVO draftReserveinfoVO);
+	Map<String, Object> currentDraftInfoEqulLastedSnapshot(Long OnedayClassNum, DraftReserveinfoVO draftReserveinfoVO,int userCode);
 
-int	confirmUpdatedOnedayPrice(int 	userCod,String selectedDate,String merchant_uid,Integer priceUpdated);
-	
-int	rejectUpdatedOnedayPrice(int 	userCod,String selectedDate,String merchant_uid);
-	
-	
+	int confirmUpdatedOnedayPrice(int userCod, String selectedDate, String merchant_uid, Integer priceUpdated);
+
+	int rejectUpdatedOnedayPrice(int userCod, String selectedDate, String merchant_uid);
 
 }
