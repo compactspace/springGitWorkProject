@@ -328,7 +328,7 @@ JOIN order_person op ON oi.order_info_id = op.order_info_id
 JOIN payment p ON oi.order_info_id = p.order_info_id
 LEFT JOIN product_refund pr ON p.payment_id = pr.payment_id
 WHERE
-  oi.order_date BETWEEN #{startDate} AND #{endDate}
+  oi.order_date BETWEEN #{startDate} AND #{endDate} AND oi.user_id=#{user_id}
 ORDER BY
 oi.order_info_id DESC,
   p.created_at DESC

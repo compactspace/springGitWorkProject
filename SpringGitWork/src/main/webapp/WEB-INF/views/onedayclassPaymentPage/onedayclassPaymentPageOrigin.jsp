@@ -94,58 +94,6 @@
 	color: #d32f2f; /* 붉은 계열 */
 	font-weight: bold;
 }
-
-/* ========== 예약자 폼 디자인 개선 ========== */
-.booker-section input[type="text"] {
-	width: 100%;
-	padding: 10px 12px;
-	margin-bottom: 5px;
-	border: 1px solid #ccc;
-	border-radius: 6px;
-	font-size: 14px;
-	box-sizing: border-box;
-	transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.booker-section input[type="text"]:focus {
-	border-color: #2980b9;
-	outline: none;
-	box-shadow: 0 0 5px rgba(41, 128, 185, 0.3);
-}
-
-.booker-section label {
-	display: block;
-	margin-bottom: 4px;
-	font-weight: bold;
-	color: #2c3e50;
-}
-
-.booker-section .error-msg {
-	font-size: 12px;
-	color: #f44336;
-	margin-bottom: 10px;
-	display: block;
-}
-
-.booker-section button#openfake {
-	padding: 12px 20px;
-	background-color: #2980b9;
-	color: #fff;
-	border: none;
-	border-radius: 6px;
-	font-size: 16px;
-	cursor: pointer;
-	transition: background-color 0.3s;
-	margin-top: 10px;
-}
-
-.booker-section button#openfake:hover {
-	background-color: #1f618d;
-}
-
-.booker-section .form-group {
-	margin-bottom: 15px;
-}
 </style>
 
 <script>
@@ -162,6 +110,7 @@ $.ajaxSetup({
 
 
 </script>
+
 
 <script>
 const currentReserveCart = JSON.parse(localStorage.getItem("reserveCart") || "[]");
@@ -180,6 +129,7 @@ $(document).ready(function() {
 		openUpdatedPriceModal();
 	}	
 	
+	
 	if(!wrongEntrance()){
 		// alert("날짜를 다시 선택해주세요")
 		// 여기서 윈도우 조작
@@ -189,16 +139,14 @@ $(document).ready(function() {
 	//	alert("날짜를 다시 선택해주세요")
 	};
 	
-	 selectedCart = currentReserveCart.filter(item => !!item && item.selected === true && item.quantity>0);
 	
-	// 모달 닫기 버튼 클릭 시 모달 숨기기
-	 document.getElementById('closeModal').addEventListener('click', function() {
-	     const modal = document.getElementById('paymentModal2');
-	     modal.style.display = 'none';
-	 });
+	
+	//console.log(currentReserveCart);
+	 selectedCart = currentReserveCart.filter(item => !!item && item.selected === true && item.quantity>0);
 	
 	
 });
+
 
 /* 
 잘못된 진입. 즉 다이렉트로 url요청으로 온경우나/ 사용자가 로컬스토리지를 페이지 진입후 삭제한경우
@@ -209,6 +157,7 @@ function wrongEntrance() {
 	const pgUrl = '${pgUrl}';
 	const selectedDate = "${selectedDate}";
 
+	// 모든 값이 null, undefined, 빈 문자열이 아닐 때만 true
 	if (
 		merchantId != null && merchantId.trim() !== "" &&
 		merchant_uid != null && merchant_uid.trim() !== "" &&
@@ -220,6 +169,8 @@ function wrongEntrance() {
 
 	return false;
 }
+
+
 
 function openUpdatedPriceModal() {
     const modal = document.getElementById("agreementUpdatedPayAlertModal");
@@ -237,11 +188,21 @@ function confirmUpdatedPrice(isConfirmed) {
     if (isConfirmed) {
         console.log("변동된 가격으로 진행");
         comfirmUpdatedPriceRquest();
+ 
+        
     } else {
         console.log("진행 취소");
         rejactUpdatedPriceRquest();
+      
+        // 👉 취소 처리 로직
+        
+        
     }
 }
+
+
+
+
 
 function comfirmUpdatedPriceRquest() {
     const confirmData = {
@@ -254,10 +215,10 @@ function comfirmUpdatedPriceRquest() {
     $.ajax({
         url: "${pageContext.request.contextPath}/api/users/aggre-updated-onedayprice",
         type: "POST",
-        data: confirmData,
+        data: confirmData, // JSON.stringify 대신 그냥 객체 전달
         success: function(res) {
             if (res.success) {
-                alert(res.message);
+                alert(res.message); // 가격 동의 완료 메시지
                 reserveCartUpdateByConfirmUpdatedPrice();
             } else {
                 alert("실패: " + res.message);
@@ -270,21 +231,25 @@ function comfirmUpdatedPriceRquest() {
     });
 }
 
+
 function rejactUpdatedPriceRquest() {
     const rejectData = {
         merchant_uid: merchant_uid,
         priceUpdated: priceUpdated,
         selectedDate: selectedDate,
-        isAgree: false
+        isAgree: false  // 동의하지 않음
     };
 
+    
+    
     $.ajax({
         url: "${pageContext.request.contextPath}/api/users/aggre-updated-onedayprice",
         type: "POST",
-        data: rejectData,
+        data: rejectData,  // 객체 그대로 전달
         success: function(res) {
+        //	console.log(res);        	
             if (res.success) {
-                alert(res.message);
+                alert(res.message); // 서버에서 오는 메시지
                 removeReserveCartByRejectUpdatedPrice();
             } else {
                 alert("실패: " + res.message);
@@ -298,24 +263,36 @@ function rejactUpdatedPriceRquest() {
 }
 
 function reserveCartUpdateByConfirmUpdatedPrice() {
+    // 1. localStorage에서 현재 장바구니 가져오기
     let currentCart = JSON.parse(localStorage.getItem("reserveCart") || "[]");
+
+    // 2. 첫 번째 아이템 가격 업데이트
     if(currentCart.length > 0 && typeof priceUpdated !== 'undefined') {
         currentCart[0].productPrice = priceUpdated;
     }
+
+    // 3. localStorage에 다시 저장
     localStorage.setItem("reserveCart", JSON.stringify(currentCart));
-    const productPriceDiv = document.querySelector('.info-row .right');
+
+    // 4. 화면 가격 업데이트
+    const productPriceDiv = document.querySelector('.info-row .right'); // 상품 가격
     if (productPriceDiv && typeof priceUpdated !== 'undefined') {
         productPriceDiv.textContent = priceUpdated + "원";
     }
-    const paymentPriceDiv = document.getElementById('onedayclass-price');
+
+    const paymentPriceDiv = document.getElementById('onedayclass-price'); // 결제금액
     if (paymentPriceDiv && typeof priceUpdated !== 'undefined') {
         paymentPriceDiv.textContent = priceUpdated + "원";
         paymentPriceDiv.setAttribute('data-onedayclass-price', priceUpdated);
     }
 }
 
+
 function removeReserveCartByRejectUpdatedPrice() {
+    // 로컬 스토리지에서 'reserveCart' 제거
     localStorage.removeItem("reserveCart");
+
+    // 페이지를 루트('/')로 이동
     const rootPage="${pageContext.request.contextPath}/guest/"
     location.replace(rootPage);
 }
@@ -333,23 +310,19 @@ function removeReserveCartByRejectUpdatedPrice() {
 			<div class="header-date">선택한 일정: ${choiceOpendayInfo}</div>
 		</div>
 
-	<div class="container">
-    <div class="info-row">
-        <div class="left">${onedayClassInfo.onedayclass_name}</div>
-        <div class="right">${onedayClassInfo.onedayclass_price}원</div>
-    </div>
+		<div class="info-row">
+			<div class="left">${onedayClassInfo.onedayclass_name}</div>
+			<div class="right">${onedayClassInfo.onedayclass_price}원</div>
+		</div>
 
-    <hr class="divider" />
+		<hr class="divider" />
 
-    <div class="info-row">
-        <div class="left">결제금액</div>
-        <div class="right payment-price" id="onedayclass-price"
-             data-onedayclass-price="${onedayClassInfo.onedayclass_price}">
-             ${onedayClassInfo.onedayclass_price}원
-        </div>
-    </div>
-</div>
-
+		<div class="info-row">
+			<div class="left">결제금액</div>
+			<div class="right payment-price" id="onedayclass-price"
+				data-onedayclass-price="${onedayClassInfo.onedayclass_price}">${onedayClassInfo.onedayclass_price}
+				원</div>
+		</div>
 
 		<div class="container">
 			<ul class="info-list">
@@ -361,31 +334,33 @@ function removeReserveCartByRejectUpdatedPrice() {
 		</div>
 	</div>
 
+
+	<!-- 예약자 섹션 시작 -->
 	<div class="booker-section container">
 		<h2 class="title">예약자 정보</h2>
 
-		<div class="form-group">
-			<label for="orderer_name">주문자 이름:</label>
-			<input type="text" id="orderer_name" name="orderer_name" />
-			<span class="error-msg" id="error_orderer_name"></span>
+		<div>
+			<label for="orderer_name">주문자 이름:</label> <input type="text"
+				id="orderer_name" name="orderer_name" /> <span class="error-msg"
+				id="error_orderer_name" style="color: red;"></span>
+		</div>
+		<div>
+			<label for="orderer_email">이메일:</label> <input type="text"
+				id="orderer_email" name="orderer_email" /> <span class="error-msg"
+				id="error_orderer_email" style="color: red;"></span>
+		</div>
+		<div>
+			<label for="orderer_phone">연락처:</label> <input type="text"
+				id="orderer_phone" name="orderer_phone"
+				placeholder="숫자만 입력 (예: 01012345678)" /> <span class="error-msg"
+				id="error_orderer_phone" style="color: red;"></span>
 		</div>
 
-		<div class="form-group">
-			<label for="orderer_email">이메일:</label>
-			<input type="text" id="orderer_email" name="orderer_email" />
-			<span class="error-msg" id="error_orderer_email"></span>
-		</div>
+		<!-- 필요하면 더 추가 -->
+		<button id="openfake">결제 테스트 (localStorage 기반)</button>
 
-		<div class="form-group">
-			<label for="orderer_phone">연락처:</label>
-			<input type="text" id="orderer_phone" name="orderer_phone"
-				placeholder="숫자만 입력 (예: 01012345678)" />
-			<span class="error-msg" id="error_orderer_phone"></span>
-		</div>
 
-		<button id="openfake">모의 결제 하기</button>
 	</div>
-	
 
 	<div id="paymentModal2"
 		style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">

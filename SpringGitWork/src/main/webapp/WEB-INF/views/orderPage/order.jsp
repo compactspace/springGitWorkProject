@@ -470,7 +470,7 @@ button.back-btn {
 
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script  src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
-<script type="module" src="http://localhost:7010/fake-pg/script2.js"></script>
+<script type="module" src="https://fakepg.r-e.kr:7010/fake-pg/script2.js"></script>
 
 
 <script>
@@ -606,7 +606,11 @@ $.ajaxSetup({
 	
 	window.onload=function(){		
 		step1StockCheck();
-		
+		// 모달 닫기 버튼 클릭 시 모달 숨기기
+		document.getElementById('closeModal').addEventListener('click', function() {
+		    const modal = document.getElementById('paymentModal2');
+		    modal.style.display = 'none';
+		});	
 		
 	}
 	

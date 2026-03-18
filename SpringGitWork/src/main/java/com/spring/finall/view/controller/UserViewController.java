@@ -171,7 +171,7 @@ public class UserViewController {
 		String merchantId = "M003"; // 테스트용, 발급받은 가맹점 ID
 		model.addAttribute("merchant_uid", merchant_uid);
 		model.addAttribute("merchantId", merchantId);
-		model.addAttribute("pgUrl", "http://localhost:7010/fake-pg/index.html");
+		model.addAttribute("pgUrl", "https://fakepg.r-e.kr:7010/fake-pg/index.html");
 
 		return "orderPage/order";
 	}

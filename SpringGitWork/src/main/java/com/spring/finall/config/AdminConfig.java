@@ -62,16 +62,16 @@ public class AdminConfig implements WebMvcConfigurer {
         BasicDataSource datasource = new BasicDataSource();
         datasource.setDriverClassName("org.mariadb.jdbc.Driver");
         // 홈서버 키면 
-//        datasource.setUrl("jdbc:mariadb://localhost:4400/finall"); 
-//        datasource.setUsername("root");
-//        datasource.setPassword("5susdbwj!");
+        datasource.setUrl("jdbc:mariadb://localhost:4400/finall"); 
+        datasource.setUsername("root");
+        datasource.setPassword("5susdbwj!");
         // 홈서버가 꺼져있으면 우선 로컬로 datasource.setUrl("jdbc:mariadb://localhost:3306/finall");        
 //        datasource.setUsername("root");
 //        datasource.setPassword("1111");
         
-        datasource.setUrl("jdbc:mariadb://localhost:3306/finall");
-        datasource.setUsername("root");
-        datasource.setPassword("1111");
+//        datasource.setUrl("jdbc:mariadb://localhost:3306/finall");
+//        datasource.setUsername("root");
+//        datasource.setPassword("1111");
 
         // ★ 핵심 설정
         datasource.setInitialSize(5);   // 최초 생성 커넥션 수
