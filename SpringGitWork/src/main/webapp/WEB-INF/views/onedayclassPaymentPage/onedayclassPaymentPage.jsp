@@ -5,12 +5,12 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="sec"
 	uri="http://www.springframework.org/security/tags"%>
-
 <!DOCTYPE html>
 <html>
 <head>
+
 <sec:csrfMetaTags />
-<script type="module" src="http://222.121.127.89:7010/fake-pg/script2.js"></script>
+<script type="module" src="https://fakepg.r-e.kr:7010/fake-pg/script2.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 <style>
 .container {
